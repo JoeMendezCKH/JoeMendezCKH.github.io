@@ -1,96 +1,246 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-  
-  <title>redis学习笔记(一) | 今天你摸鱼&lt;。)#)))≦了嘛</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
   <meta name="description" content="1. NoSQL 概念1. NoSQL 数据模型简介 聚合模型  KV键值对  Bson: JSON串的数据表达  列族:  图形  聚合模型      2. NoSQL数据库四大分类 KV键值对: redis, memcache, tair, BerkeleyDB 文档型数据库(Bson格式):CouchDB, MongoDB: 基于分布式文件存储的数据库, 介于关系型数据库和非关系数据库之间">
 <meta property="og:type" content="article">
 <meta property="og:title" content="redis学习笔记(一)">
-<meta property="og:url" content="http://yoursite.com/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/index.html">
+<meta property="og:url" content="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/index.html">
 <meta property="og:site_name" content="今天你摸鱼&lt;。)#)))≦了嘛">
 <meta property="og:description" content="1. NoSQL 概念1. NoSQL 数据模型简介 聚合模型  KV键值对  Bson: JSON串的数据表达  列族:  图形  聚合模型      2. NoSQL数据库四大分类 KV键值对: redis, memcache, tair, BerkeleyDB 文档型数据库(Bson格式):CouchDB, MongoDB: 基于分布式文件存储的数据库, 介于关系型数据库和非关系数据库之间">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/cap.jpg">
-<meta property="og:image" content="http://yoursite.com/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/rob&aof.png">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/cap.jpg">
+<meta property="og:image" content="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/rob&aof.png">
 <meta property="article:published_time" content="2020-03-20T03:36:01.000Z">
 <meta property="article:modified_time" content="2020-03-20T03:37:40.514Z">
 <meta property="article:author" content="Joe Mendez">
 <meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/cap.jpg">
-  
-    <link rel="alternate" href="/atom.xml" title="今天你摸鱼&lt;。)#)))≦了嘛" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+<meta name="twitter:image" content="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/img/cap.jpg">
 
-<meta name="generator" content="Hexo 4.2.0"></head>
+<link rel="canonical" href="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">今天你摸鱼&lt;。)#)))≦了嘛</a>
-      </h1>
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redis学习笔记(一) | 今天你摸鱼<。)#)))≦了嘛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">今天你摸鱼<。)#)))≦了嘛</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">用学习驱动自己的生活.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-redis学习笔记-一" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" class="article-date">
-  <time datetime="2020-03-20T03:36:01.000Z" itemprop="datePublished">2020-03-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 class="article-title" itemprop="name">
-      redis学习笔记(一)
-    </h1>
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">
 
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="my personal blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="今天你摸鱼<。)#)))≦了嘛">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redis学习笔记(一)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-20 11:36:01 / 修改时间：11:37:40" itemprop="dateCreated datePublished" datetime="2020-03-20T11:36:01+08:00">2020-03-20</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
       </header>
+
     
-    <div class="article-entry" itemprop="articleBody">
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
         <h2 id="1-NoSQL-概念"><a href="#1-NoSQL-概念" class="headerlink" title="1. NoSQL 概念"></a>1. NoSQL 概念</h2><h3 id="1-NoSQL-数据模型简介"><a href="#1-NoSQL-数据模型简介" class="headerlink" title="1. NoSQL 数据模型简介"></a>1. NoSQL 数据模型简介</h3><ul>
 <li><p>聚合模型</p>
@@ -436,111 +586,224 @@
 </li>
 </ul>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" data-id="ck7zmv7vk0000r8uf03554jnr" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a></li></ul>
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/20/testCode/" rel="next" title="testCode">
+      testCode <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <a href="/">
+    <img class="site-author-image" itemprop="image"
+      src="/images/header.jpg"
+      alt="Joe Mendez" />
+  </a>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-NoSQL-概念"><span class="nav-number">1.</span> <span class="nav-text">1. NoSQL 概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-NoSQL-数据模型简介"><span class="nav-number">1.1.</span> <span class="nav-text">1. NoSQL 数据模型简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NoSQL数据库四大分类"><span class="nav-number">1.2.</span> <span class="nav-text">2. NoSQL数据库四大分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-分布式数据库中的CAP原理"><span class="nav-number">1.3.</span> <span class="nav-text">3. 分布式数据库中的CAP原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-分布式-集群简介"><span class="nav-number">1.4.</span> <span class="nav-text">4. 分布式+集群简介</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Redis-介绍"><span class="nav-number">2.</span> <span class="nav-text">2. Redis 介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Redis的5大数据类型"><span class="nav-number">2.1.</span> <span class="nav-text">1. Redis的5大数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常用命令"><span class="nav-number">2.1.1.</span> <span class="nav-text">常用命令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-解析配置文件-redis-conf"><span class="nav-number">2.2.</span> <span class="nav-text">2. 解析配置文件 redis.conf</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Redis-持久化"><span class="nav-number">3.</span> <span class="nav-text">3. Redis 持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-RDB-redis-database"><span class="nav-number">3.1.</span> <span class="nav-text">1. RDB(redis database)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-AOF-append-only-file"><span class="nav-number">3.2.</span> <span class="nav-text">2. AOF(append only file)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-小总结"><span class="nav-number">3.3.</span> <span class="nav-text">3. 小总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Redis-事务"><span class="nav-number">4.</span> <span class="nav-text">4. Redis 事务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插曲-Redis-发布和订阅"><span class="nav-number">4.1.</span> <span class="nav-text">插曲: Redis 发布和订阅</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Redis的复制-master-slave"><span class="nav-number">5.</span> <span class="nav-text">5. Redis的复制(master&#x2F;slave)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-概念"><span class="nav-number">5.1.</span> <span class="nav-text">1. 概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-怎么用"><span class="nav-number">5.2.</span> <span class="nav-text">2. 怎么用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-复制原理"><span class="nav-number">5.3.</span> <span class="nav-text">3.  复制原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-哨兵模式-sentinel"><span class="nav-number">5.4.</span> <span class="nav-text">4. 哨兵模式(sentinel)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Joe Mendez"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">Joe Mendez</p>
+  <div class="site-description" itemprop="description">my personal blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JoeMendezCKH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JoeMendezCKH" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:joemendez@163.com" title="E-Mail → mailto:joemendez@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe Mendez</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">12k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
     </footer>
   </div>
-  
-    
-  
-</article>
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
 
   
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a></li></ul>
-    </div>
-  </div>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
 
 
   
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">笔记</a>
-    </div>
-  </div>
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li></ul>
-    </div>
-  </div>
+
 
 
   
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">redis学习笔记(一)</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2020 Joe Mendez<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-
-  
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-
-  
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-  </div>
 </body>
 </html>
