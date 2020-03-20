@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>testCode</title>
-    <url>/2020/03/20/testCode/</url>
-    <content><![CDATA[<h2 id="test"><a href="#test" class="headerlink" title="test"></a>test</h2><p>asdf</p>
-<h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3><p>asdf</p>
-<h3 id="23"><a href="#23" class="headerlink" title="23"></a>23</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.out.println(<span class="string">"hello"</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="asdf"><a href="#asdf" class="headerlink" title="asdf"></a>asdf</h3><p>asdfasdf</p>
-]]></content>
-  </entry>
-  <entry>
     <title>redis学习笔记(一)</title>
-    <url>/2020/03/20/redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/</url>
+    <url>/posts/ccb0c92d.html</url>
     <content><![CDATA[<h2 id="1-NoSQL-概念"><a href="#1-NoSQL-概念" class="headerlink" title="1. NoSQL 概念"></a>1. NoSQL 概念</h2><h3 id="1-NoSQL-数据模型简介"><a href="#1-NoSQL-数据模型简介" class="headerlink" title="1. NoSQL 数据模型简介"></a>1. NoSQL 数据模型简介</h3><ul>
 <li><p>聚合模型</p>
 <ol>
@@ -36,6 +26,8 @@
 <li>列族: HBase, Cassandra, 分布式文件系统</li>
 <li>图形: 放的是图谱, Neo4J, InfoGrid</li>
 </ol>
+<a id="more"></a>
+
 <h3 id="3-分布式数据库中的CAP原理"><a href="#3-分布式数据库中的CAP原理" class="headerlink" title="3. 分布式数据库中的CAP原理"></a>3. 分布式数据库中的CAP原理</h3><ul>
 <li><p>传统的关系型数据库是 ACID  </p>
 <ul>
@@ -356,6 +348,63 @@
 </ul>
 </li>
 </ul>
+]]></content>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>jdk8中HashMap更新映射项的方法(merge)笔记</title>
+    <url>/posts/85124b9.html</url>
+    <content><![CDATA[<ul>
+<li><p>在jdk1.8中, HashMap中更新了几个关于更新映射项的方法, 个人觉得很好用,于是写个笔记小记一下.</p>
+<ul>
+<li><code>public V getOrDefault(Object key, V defaultValue)</code></li>
+<li><code>public V putIfAbsent(K key, V value)</code>  </li>
+<li><code>public V merge(K key, V value, BiFunction&lt;? super V,? super V,? extends V&gt; remappingFunction)</code></li>
+</ul>
+</li>
+<li><p>处理映射项的一个难点是更新映射项, 也就是我们常说的键值对中的值. 正常情况下, 可以通过<code>get(key)</code>方法获得值, 然后对其进行更新, 然后再放回更新的值. 但是要考虑到键第一次出现的时候. 比如, 再统计某个单词在文件中出现的频度.  </p>
+</li>
+<li><p>在看到一个单词(word)时, 将对应的计数器加1, 如下所示</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; counts = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">String word = <span class="string">"word"</span>;</span><br><span class="line">counts.put(word, counts.get(word)+<span class="number">1</span>); <span class="comment">// NullPointerException, 第一次获取"1"时get返回null</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在jdk8之前我们解决这个问题, 应该就会在put前进行检测, 虽然不难, 但是当jdk8后可以更加便捷的方法.  </p>
+<ul>
+<li><p>第一种方法就是利用<code>getOrDefault</code>方法:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">counts.put(word, counts.getOrDefault(word, <span class="number">0</span>) + <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>api中的描述是:<blockquote>
+<p>Returns the value to which the specified key is mapped, or if this map contains no mapping for the key.</p>
+</blockquote>
+</li>
+<li>直接看源码:</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">getOrDefault</span><span class="params">(Object key, V defaultValue)</span> </span>&#123;</span><br><span class="line">    V v;</span><br><span class="line">    <span class="keyword">return</span> (((v = get(key)) != <span class="keyword">null</span>) || containsKey(key)) ? v : defaultValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>发现这个默认方法其实就是把我们之前做的事简单封装了一下, 简单明了</p>
+</li>
+<li><p>第二种方法是先调用putIfAbsent方法, 只有当键存在时才放入一个值, 这跟我们之前的做法是一样的,只不过更加便捷.  </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">counts.putIfAbsent(word,<span class="number">0</span>); <span class="comment">// 直接看源代码, 清楚明白</span></span><br><span class="line">counts.put(word, counts.get(word)+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">putIfAbsent</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    V v = get(key);</span><br><span class="line">    <span class="keyword">if</span> (v == <span class="keyword">null</span>) &#123;</span><br><span class="line">        v = put(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>看到源码, 我不知道怎么形容了, 就是2个字, 清晰</li>
+<li>第三种方法就是使用merge方法, 这也是最方便的方法, 强烈建议:</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">counts.merge(word, <span class="number">1</span>, Integer::sum);  </span><br><span class="line"></span><br><span class="line"><span class="comment">// 用方法引用传入sum方法, 当word第一次出现时, word的值被赋值为1,  </span></span><br><span class="line"><span class="comment">// 不是第一次出现时, 会将其值加1.</span></span><br><span class="line"><span class="comment">// 这是一个函数式接口, 用来写怎样处理默认值value和get方法得到的oldValue之间的关系</span></span><br><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">merge</span><span class="params">(K key, V value,  BiFunction&lt;? <span class="keyword">super</span> V, ? <span class="keyword">super</span> V, ? extends V&gt; remappingFunction)</span>   </span>&#123;</span><br><span class="line">    <span class="comment">// 确保remappingFunction 不是一个 null 值,  </span></span><br><span class="line">    <span class="comment">// 如果是null会直接抛异常, 不是null就返回对象本身.</span></span><br><span class="line">    Objects.requireNonNull(remappingFunction);  </span><br><span class="line">    Objects.requireNonNull(value);  </span><br><span class="line">    <span class="comment">// 获取当前key中的值, 如果是第一次出现的键, 会得到一个null</span></span><br><span class="line">    V oldValue = get(key);  </span><br><span class="line">    V newValue = (oldValue == <span class="keyword">null</span>) ? value :</span><br><span class="line">                remappingFunction.apply(oldValue, value);</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    当oldVlue为null时, 也就是说该键key第一次出现, 返回默认值value,</span></span><br><span class="line"><span class="comment">    不是第一次出现的时候, 交给函数式接口来处理, 在调用的时候可以用lambda表达式或方法引用来写</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">if</span>(newValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">        remove(key); <span class="comment">// 如果经过以上处理, 得到的newValue还是null的话, 删去该key, 否则就正常的添加该键值对,  </span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        put(key, newValue);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 方法最终返回我们想要的值</span></span><br><span class="line">    <span class="keyword">return</span> newValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>都在注释里写清楚了.</li>
+<li>综上, 以后再更新映射项就考虑merge吧!</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>参考文献</strong>:<br>Java核心技术 卷1 原书第10版 , 第9章</p>
+</blockquote>
 ]]></content>
       <tags>
         <tag>笔记</tag>
