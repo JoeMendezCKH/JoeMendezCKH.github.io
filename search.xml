@@ -1,6 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>并发编程实践笔记2-对象的共享</title>
+    <url>/posts/48123146.html</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>并发编程实践笔记(1)--线程安全</title>
+    <url>/posts/41c3286f.html</url>
+    <content><![CDATA[<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><h3 id="1-并发的风险"><a href="#1-并发的风险" class="headerlink" title="1. 并发的风险"></a>1. 并发的风险</h3><ul>
+<li><p>安全性问题</p>
+<ul>
+<li><p>在没有充足同步的情况下, 多个线程的操作执行顺序是不可预测的, 有可能产生奇怪的结果, 比如:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UnsafeSequence</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value++; <span class="comment">// 竟态条件(Race Condition)</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ++ 操作不是原子性操作, 在单线程时没有问题, 但是多线程时,就可能引发线程安全问题</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    i++ 不是原子操作, 是3个原子操作组合</span></span><br><span class="line"><span class="comment">        1.读取主存中的count值, 赋值给一个局部成员变量tmp</span></span><br><span class="line"><span class="comment">        2.tmp+1</span></span><br><span class="line"><span class="comment">        3.将tmp赋值给count</span></span><br><span class="line"><span class="comment">    可能会出现线程1运行到第2步的时候, tmp值为1；这时CPU调度切换到线程2执行完毕, count值为1；切换到线程1, 继续执行第3步, count被赋值为1</span></span><br><span class="line"><span class="comment">    结果就是两个线程执行完毕, count的值只加了1, 而且两个线程获取到同样的值</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Sequence</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value++;  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为<code>i++</code>不是原子操作, 所以会引发多线程安全问题, 可以通过加<code>synchronized</code>关键字保证同步, 这样可以保证线程安全, 但是效率会变的很慢</p>
+</li>
+<li><p>安全性的含义是”保证永远不会发生糟糕的事”.</p>
+</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li><p>活跃性问题</p>
+<ul>
+<li>当某个操作无法继续执行下去时, 就会发生活跃性问题. 在串行程序中活跃性问题的形式之一就是无线循环, 而在多线程中, 则是死锁, 饥饿, 活锁等.</li>
+<li>活跃性意味着某件事最终会发生</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-线程安全性"><a href="#2-线程安全性" class="headerlink" title="2. 线程安全性"></a>2. 线程安全性</h3><ul>
+<li><p>当多个线程访问某个状态变量并且其中有一个线程执行写入操作时, 必须采用同步机制来协同这些线程对变量的访问.</p>
+</li>
+<li><p>完全由线程安全类构成的程序并不一定就是线程安全的, 而在线程安全类中也可以包含非线程安全的类, 只有当类中仅包含自己的状态时, 线程安全类才是有意义的</p>
+</li>
+<li><p>当多个线程访问某个类时, 这个类始终都能表现出正确的行为, 那么就称这个类是线程安全的.(无状态(不包含任何域, 也不包含任何对其他类中域的引用)对象一定是线程安全的)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StatelessFactorizer</span> <span class="keyword">implements</span> <span class="title">Servlet</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse resp)</span></span>&#123;</span><br><span class="line">        BigInteger i = extractFromRequest(req);</span><br><span class="line">        BigIntergerp[] factors = factor[i];</span><br><span class="line">        encodeIntoResponse(resp, factors);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="非原子性问题解决-CAS"><a href="#非原子性问题解决-CAS" class="headerlink" title="非原子性问题解决(CAS)"></a>非原子性问题解决(CAS)</h4><ul>
+<li>在 Java 并发领域, 我们解决并发安全问题最粗暴的方式就是使用 synchronized 关键字了, 但它是一种独占形式的锁, 属于悲观锁机制, 性能会大打折扣。volatile 貌似也是一个不错的选择, 但 volatile 只能保持变量的可见性, 并不保证变量的原子性操作。</li>
+<li>CAS 全称是 <code>compare and swap</code>, 即比较并交换, 它是一种原子操作, 同时 CAS 是一种乐观机制。<code>java.util.concurrent</code> 包很多功能都是建立在 CAS 之上, 如 <code>ReenterLock</code> 内部的 AQS, 各种原子类, 其底层都用 CAS来实现原子操作</li>
+</ul>
+<h5 id="原子性问题分析"><a href="#原子性问题分析" class="headerlink" title="原子性问题分析"></a>原子性问题分析</h5><ul>
+<li><p>查看 i++ 的机制</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AddTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  通过<code>javap -c AddTest</code>反编译查看add方法的字节码</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span>;</span><br><span class="line">    Code:</span><br><span class="line">    <span class="number">0</span>: aload_0</span><br><span class="line">    <span class="number">1</span>: dup</span><br><span class="line">    2: getfield      #2          // Field i:I</span><br><span class="line">    <span class="number">5</span>: iconst_1</span><br><span class="line">    <span class="number">6</span>: iadd</span><br><span class="line">    7: putfield      #2          // Field i:I</span><br><span class="line">    <span class="number">10</span>: <span class="keyword">return</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>i++</code>被拆分成了几个指令：<ol>
+<li>执行<code>getfield</code>拿到原始<code>i</code>；</li>
+<li>执行<code>iadd</code>进行加 1 操作；</li>
+<li>执行<code>putfield</code>写把累加后的值写回<code>i</code>。</li>
+</ol>
+</li>
+<li>当线程 1 执行到加 1 步骤时, 由于还没有执行赋值改变变量的值, 这时候并不会刷新主内存区中的变量, 如果此时线程 2 正好要拷贝该变量的值到自己私有缓存中, 问题就出现了, 当线程 2 拷贝完以后, 线程1正好执行赋值运算, 立马更新主内存区的值, 那么此时线程 2 的副本就是旧的了, 出现了脏读.</li>
+</ul>
+</li>
+<li><p>如何解决呢?</p>
+<ul>
+<li><p>在add方法上加上 <code>synchronized</code> 关键字</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AddTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">volatile</span> <span class="keyword">int</span> i;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解决了并发安全问题, 但是性能也大打折扣</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="CAS-底层原理"><a href="#CAS-底层原理" class="headerlink" title="CAS 底层原理"></a>CAS 底层原理</h5><p>CAS 的思想很简单：三个参数, 一个当前内存值 V、旧的预期值 A、即将更新的值 B, 当且仅当预期值 A 和内存值 V 相同时, 将内存值修改为 B 并返回 true, 否则什么都不做, 并返回 false。</p>
+<ul>
+<li><p>查看 <code>AtomicInteger</code> 静态代码块片段：</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicInteger</span> <span class="keyword">extends</span> <span class="title">Number</span> <span class="keyword">implements</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">6214790243416807050L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// setup to use Unsafe.compareAndSwapInt for updates</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Unsafe unsafe = Unsafe.getUnsafe();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> valueOffset;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        valueOffset = unsafe.objectFieldOffset</span><br><span class="line">            (AtomicInteger.class.getDeclaredField("value"));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> Error(ex); &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line">    <span class="comment">// 省略部分代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  这里用到了 <code>sun.misc.Unsafe</code> 类, 它可以提供硬件级别的原子操作, 它可以获取某个属性在内存中的位置, 也可以修改对象的字段值, 只不过该类对一般开发而言, 很少会用到, 其底层是用 <code>C/C++</code> 实现的, 所以它的方式都是被 <code>native</code> 关键字修饰过的<br>  可以看得出 <code>AtomicInteger</code> 类存储的值是在 <code>value</code> 字段中, 并且获取了 <code>Unsafe</code> 实例, 在静态代码块中, 还获取了 <code>value</code> 字段在内存中的偏移量 <code>valueOffset</code></p>
+<ul>
+<li><p>接下来的例子使用CAS技术保证了并发安全</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AddIntTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> AtomicInteger i;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        i.getAndIncrement();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// getAndIncrement();</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndIncrement</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> unsafe.getAndAddInt(<span class="keyword">this</span>, valueOffset, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// getAndAddInt()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndAddInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> var5;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        var5 = <span class="keyword">this</span>.getIntVolatile(var1, var2); <span class="comment">// native方法</span></span><br><span class="line">    &#125; <span class="keyword">while</span>(!<span class="keyword">this</span>.compareAndSwapInt(var1, var2, var5, var5 + var4));<span class="comment">// native 方法, 自旋</span></span><br><span class="line">    <span class="keyword">return</span> var5;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>var5 通过 <code>this.getIntVolatile(var1, var2)</code>方法获取, 是个 native 方法, 其目的是获取 var1 在 var2 偏移量的值, 其中 var1 就是 <code>AtomicInteger</code>, var2 是 valueOffset 值</p>
+</li>
+<li><p>那么 CAS 核心重点来了，<code>compareAndSwapInt</code> 就是实现 CAS 的核心方法，其原理是如果 var1 中的 value 值和 var5 相等，就证明没有其他线程改变过这个变量，那么就把 value 值更新为 <code>var5 + var4</code>，其中 var4 是更新的增量值；反之如果没有更新，那么 CAS 就一直采用自旋的方式继续进行操作（其实就是个 while 循环），这一步也是一个原子操作</p>
+</li>
+<li><p>举例分析:</p>
+<ol>
+<li>设定 <code>AtomicInteger</code> 的 value 原始值为 A，从 Java 内存模型得知，线程 1 和线程 2 各自持有一份 value 的副本，值都是 A。</li>
+<li>线程 1 通过<code>getIntVolatile(var1, var2)</code>拿到 value 值 A，这时线程 1 被挂起</li>
+<li>线程 2 也通过<code>getIntVolatile(var1, var2)</code>方法获取到 value 值 A，并执行<code>compareAndSwapInt</code>方法比较内存值也为 A，成功修改内存值为 B</li>
+<li>这时线程 1 恢复执行<code>compareAndSwapInt</code>方法比较，发现自己手里的值 A 和内存的值 B 不一致，说明该值已经被其它线程提前修改过了</li>
+<li>线程 1 重新执行<code>getIntVolatile(var1, var2)</code>再次获取 value 值，因为变量 value 被 volatile 修饰，所以其它线程对它的修改，线程 A 总是能够看到，线程A继续执行<code>compareAndSwapInt</code>进行比较替换，直到成功</li>
+</ol>
+</li>
+<li><p>查看 <code>hospot</code> 的源码<code>hotspot\src\share\vm\prims\unsafe.cpp</code>, 发现具体实现为:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))</span><br><span class="line">UnsafeWrapper(<span class="string">"Unsafe_CompareAndSwapInt"</span>);</span><br><span class="line">oop p = JNIHandles::resolve(obj);</span><br><span class="line"> <span class="comment">// 根据偏移量，计算 value 的地址。这里的 offset 就是 AtomaicInteger 中的 valueOffset</span></span><br><span class="line">jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);</span><br><span class="line"><span class="comment">// 调用 Atomic 中的函数 cmpxchg，该函数声明于 Atomic.hpp 中</span></span><br><span class="line"><span class="keyword">return</span> (jint)(Atomic::cmpxchg(x, addr, e)) == e;</span><br><span class="line">UNSAFE_END</span><br><span class="line"></span><br><span class="line"><span class="comment">// atomic.cpp</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="title">Atomic::cmpxchg</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> exchange_value,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">volatile</span> <span class="keyword">unsigned</span> <span class="keyword">int</span>* dest, <span class="keyword">unsigned</span> <span class="keyword">int</span> compare_value)</span> </span>&#123;</span><br><span class="line">assert(<span class="keyword">sizeof</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span>) == <span class="keyword">sizeof</span>(jint), <span class="string">"more work to do"</span>);</span><br><span class="line"><span class="keyword">return</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span>)Atomic::cmpxchg((jint)exchange_value, (<span class="keyword">volatile</span> jint*)dest,</span><br><span class="line">                                   (jint)compare_value);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>…没看懂<ol>
+<li>先想办法拿到变量value在内存中的地址。</li>
+<li>通过<code>Atomic::cmpxchg</code>实现比较替换，其中参数x是即将更新的值，参数e是原内存的值</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="CAS的问题"><a href="#CAS的问题" class="headerlink" title="CAS的问题"></a>CAS的问题</h5><ol>
+<li><p>ABA问题</p>
+<ul>
+<li>有2个线程同时对同一个值(初始值为A)进行CAS操作，还有一个线程想要更新该值为A, 这3个线程如下:<ul>
+<li>线程1，期望值为A，欲更新的值为B</li>
+<li>线程2，期望值为A，欲更新的值为B</li>
+<li>线程3，期望值为B，欲更新的值为A</li>
+</ul>
+</li>
+<li><strong>线程1</strong>抢先获得CPU时间片，而<strong>线程2</strong>因为其他原因阻塞了，<strong>线程1</strong>取值与期望的A值比较，发现相等然后将值更新为B, 然后<strong>线程3</strong>抢到了CPU时间片, <strong>线程3</strong>取值与期望的值B比较，发现相等则将值更新为A，此时<strong>线程2</strong>从阻塞中恢复，并且获得了CPU时间片，这时候<strong>线程2</strong>取值与期望的值A比较，发现相等则将值更新为B，虽然<strong>线程2</strong>也完成了操作，但是<strong>线程2</strong>并不知道值已经经过了<code>A-&gt;B-&gt;A</code>的变化过程<blockquote>
+<p>ABA问题带来的危害：<br>小明在提款机，提取了50元，因为提款机问题，有两个线程，同时把余额从100变为50<br>线程1（提款机）：获取当前值100，期望更新为50，<br>线程2（提款机）：获取当前值100，期望更新为50，<br>线程1成功执行，线程2某种原因block了，这时，某人给小明汇款50<br>线程3（默认）：获取当前值50，期望更新为100，<br>这时候线程3成功执行，余额变为100，<br>线程2从Block中恢复，获取到的也是100，compare之后，继续更新余额为50！！！<br>此时可以看到，实际余额应该为100（100-50+50），但是实际上变为了50（100-50+50-50）这就是ABA问题带来的成功提交。</p>
+</blockquote>
+</li>
+<li>通常，我们的乐观锁实现中都会带一个 <code>version</code> 字段来记录更改的版本, 每次变量更新的时候, 版本号+1, 避免并发操作带来的问题。在 Java 中，<code>AtomicStampedReference</code> 实现了这个处理方式。</li>
+</ul>
+</li>
+<li><p>循环时间长开销大</p>
+<ul>
+<li><p>如果CAS操作失败，就需要循环进行CAS操作(循环同时将期望值更新为最新的)，如果长时间都不成功的话，那么会造成CPU极大的开销</p>
+<blockquote>
+<p>这种循环也称为自旋</p>
+</blockquote>
+</li>
+<li><p>解决方法： 限制自旋次数，防止进入死循环</p>
+</li>
+</ul>
+</li>
+<li><p>只能保证一个共享变量的原子操作</p>
+<ul>
+<li><code>CAS</code>的原子操作只能针对一个共享变量</li>
+<li>解决方法： 如果需要对多个共享变量进行操作，可以使用加锁方式(悲观锁)保证原子性，或者可以把多个共享变量合并成一个共享变量进行CAS操作</li>
+</ul>
+</li>
+</ol>
+<h5 id="CAS的应用"><a href="#CAS的应用" class="headerlink" title="CAS的应用"></a>CAS的应用</h5><p>CAS操作并不会锁住共享变量，也就是一种<strong>非阻塞</strong>的同步机制，CAS就是乐观锁的实现</p>
+<ol>
+<li><p>乐观锁  </p>
+<p> 乐观锁总是假设最好的情况，每次去操作数据都认为不会被别的线程修改数据，<strong>所以在每次操作数据的时候都不会给数据加锁</strong>，即在线程对数据进行操作的时候，<strong>别的线程不会阻塞</strong>仍然可以对数据进行操作，只有在需要更新数据的时候才会去判断数据是否被别的线程修改过，如果数据被修改过则会拒绝操作并且返回错误信息给用户。</p>
+</li>
+<li><p>悲观锁  </p>
+<p>  悲观锁总是假设最坏的情况，每次去操作数据时候都认为会被的线程修改数据，<strong>所以在每次操作数据的时候都会给数据加锁</strong>，让别的线程无法操作这个数据，<strong>别的线程会一直阻塞</strong>直到获取到这个数据的锁。这样的话就会影响效率，比如当有个线程发生一个很耗时的操作的时候，别的线程只是想获取这个数据的值而已都要等待很久  </p>
+</li>
+</ol>
+<p>Java利用CAS的乐观锁、原子性的特性高效解决了多线程的安全性问题，例如JDK1.8中的集合类<code>ConcurrentHashMap</code>、关键字<code>volatile</code>、<code>ReentrantLock</code>等</p>
+<blockquote>
+<p>参考文章:<br><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a><br><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a></p>
+</blockquote>
+<h4 id="竟态条件"><a href="#竟态条件" class="headerlink" title="竟态条件"></a>竟态条件</h4><ul>
+<li><p>由于不恰当的执行时序而出现不正确的结果就是竟态条件(Race Condition). 最常见的竟态条件类型就是”先检查后执行(check-then-Act)”操作, 即通过一个可能失效的观测结果来决定下一步的动作</p>
+<blockquote>
+<p>数据竞争(data race): 如果在访问共享的非final类型的域时没有采用同步来进行协同, 那么就会出现数据竞争.</p>
+<p>当一个线程写入一个变量, 而另一个线程接下来读取这个变量, 或者获取一个之前由另一个线程写入的变量时, 并且在这两个线程之间没有使用同步, 那么就可能出现数据竞争.</p>
+<p>如果存在数据竞争, 那么这段代码没有确定的语义, 并非所有的竟态条件都是数据竞争, 同样并非所有的数据竞争都是竟态条件, 但二者都可能使并发程序失败</p>
+</blockquote>
+<ul>
+<li>竟态条件并不总会产生错误, 还需要某种不恰当的执行时序</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li><p>惰性初始化中的竟态条件(lazy initialization)</p>
+<ul>
+<li><p>目的是延迟对象的初始化, 直到程序真正使用它, 同时确保他只初始化一次(单例)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@NotThreadSafe</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UnsafeLazyInitialization</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Resource resource;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Resource <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (resource == <span class="keyword">null</span>)</span><br><span class="line">            resource = <span class="keyword">new</span> Resource(); <span class="comment">// unsafe publication</span></span><br><span class="line">        <span class="keyword">return</span> resource;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Resource</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>复合操作</p>
+<ul>
+<li><p>复合操作: 先检查后执行, “读取-修改-写入”等操作的全部执行过程看作复合操作, 为了保证线程安全, 操作必须原子地执行.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@ThreadSafe</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountingFactorizer</span> <span class="keyword">extends</span> <span class="title">GenericServlet</span> <span class="keyword">implements</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 原子类变量, 利用CAS原理实现</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AtomicLong count = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> count.get(); &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse resp)</span> </span>&#123;</span><br><span class="line">        BigInteger i = extractFromRequest(req);</span><br><span class="line">        BigInteger[] factors = factor(i);</span><br><span class="line">        <span class="comment">// 原子操作</span></span><br><span class="line">        count.incrementAndGet();</span><br><span class="line">        encodeIntoResponse(resp, factors);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">encodeIntoResponse</span><span class="params">(ServletResponse res, BigInteger[] factors)</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function">BigInteger <span class="title">extractFromRequest</span><span class="params">(ServletRequest req)</span> </span>&#123;<span class="keyword">return</span> <span class="keyword">null</span>; &#125;</span><br><span class="line">    BigInteger[] factor(BigInteger i) &#123; <span class="keyword">return</span> <span class="keyword">null</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><ul>
+<li><p>尽管在程序中所有的变量都是原子操作, 但还是可能出现竟态条件, 可能产生错误的结果. 当不变性条件中涉及多个变量时, 各个变量之间并不是彼此独立的, 而是某个变量的值会对其他变量的值产生约束, 因此, 当需要更新某个变量时, 需要在同一个原子操作中对其他变量同时进行更新, 这就需要加锁来实现</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@NotThreadSafe</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UnsafeCachingFactorizer</span> <span class="keyword">extends</span> <span class="title">GenericServlet</span> <span class="keyword">implements</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AtomicReference&lt;BigInteger&gt; lastNumber</span><br><span class="line">            = <span class="keyword">new</span> AtomicReference&lt;BigInteger&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AtomicReference&lt;BigInteger[]&gt; lastFactors</span><br><span class="line">            = <span class="keyword">new</span> AtomicReference&lt;BigInteger[]&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse resp)</span> </span>&#123;</span><br><span class="line">        BigInteger i = extractFromRequest(req);</span><br><span class="line">        <span class="keyword">if</span> (i.equals(lastNumber.get())) <span class="comment">// 竟态条件</span></span><br><span class="line">            encodeIntoResponse(resp, lastFactors.get());</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            BigInteger[] factors = factor(i);</span><br><span class="line">            lastNumber.set(i);<span class="comment">//竟态条件, 每个set是安全的, 但是合起来就不一定了, 可能只更新了一个值然后被中断</span></span><br><span class="line">            lastFactors.set(factors);</span><br><span class="line">            encodeIntoResponse(resp, factors);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ol>
+<li><p><strong>内置锁</strong><br> Java中提供了一种内置的锁机制来支持原子性:  </p>
+<ul>
+<li><strong>同步代码块(Synchronized Block)</strong><br>同步代码块包括2部分, 一个作为锁的对象引用, 一个作为由这个锁保护的代码块.<br>同步代码块的锁就是方法调用所在的对象, 静态的<code>synchronized</code>方法以Class对象作为锁 <code>synchronized(lock) { // 由锁保护的共享状态 }</code><br>每个Java对象都可以用做一个实现同步的锁, 这些锁被称为<strong>内置锁(Intrinsic Lock)</strong>或<strong>监视器锁(Monitor Lock)</strong>, 线程在进入同步代码块之前会自动获得锁, 并且在退出同步代码块后自动释放锁, 无论是正常退出还是抛出异常.<br>Java的内置锁相当于一种互斥体, 即最多只有一个线程持有这种锁</li>
+</ul>
+</li>
+<li><p><strong>重入</strong><br> 当某个线程请求一个由其他线程持有的锁时, 发出的线程就会阻塞. 然而由于<strong>内置锁是可重入的</strong>(某个线程试图获取一个已经由他自己持有的锁, 那么这个请求会成功).  </p>
+</li>
+</ol>
+<p>重入意味着获取锁的操作的粒度是”线程”,不是”调用”.</p>
+<pre><code><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.ou.println(<span class="string">"doSomething..."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">LoggingWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(toString() + <span class="string">": calling doSomething"</span>);</span><br><span class="line">            <span class="keyword">super</span>.doSomething();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+- 子类重写了父类的`synchronized`方法, 然后调用父类的方法, 如果没有可重入的锁, 那么这段代码将会产生死锁, 由于`Widget`和`LoggingWidget`中的`doSomething`方法都是`synchronized`方法, 因此每个`doSomething`方法执行前都会获取`Widget`上的锁, 如果内置锁是不可重入的, 那么调用`super.doSomething`时将无法获得`Widget`上的锁, 因为这个锁已经被持有.</code></pre>]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>并发</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MySQL学习笔记</title>
     <url>/posts/f12cbde5.html</url>
     <content><![CDATA[<h2 id="1-数据库基本知识"><a href="#1-数据库基本知识" class="headerlink" title="1.数据库基本知识"></a>1.数据库基本知识</h2><h3 id="1-数据库相关概念"><a href="#1-数据库相关概念" class="headerlink" title="1.数据库相关概念"></a>1.数据库相关概念</h3><ol>
