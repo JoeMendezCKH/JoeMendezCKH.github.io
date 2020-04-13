@@ -1,9 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>并发编程实践笔记2-对象的共享</title>
+    <title>并发编程实践笔记(2)-对象的共享</title>
     <url>/posts/48123146.html</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<h2 id="2-对象的共享"><a href="#2-对象的共享" class="headerlink" title="2. 对象的共享"></a>2. 对象的共享</h2><p>我们知道同步代码块和同步方法可以保证原子性,但是还有重要的另一方面:<strong>内存可见性(Memory Visibility)</strong>, 确保当一个线程修改了对象状态后, 其他线程可以看到发生的状态变化,(即可以防止脏读)</p>
+<h3 id="1-可见性"><a href="#1-可见性" class="headerlink" title="1. 可见性"></a>1. 可见性</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoVisibility</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> ready;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> number;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span> (!ready) &#123;</span><br><span class="line">                Thread.yield();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(number);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> ReaderThread().start();</span><br><span class="line">        number = <span class="number">42</span>;</span><br><span class="line">        ready = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述程序中, 可能会持续循环下去, 因为可能看不到ready的值. 还有可能输出0, 即读线程看到了ready的值, 但是却没有看到之后写入number的值, 即”重排序(Reordering)”,如果有重排序情况, 那么就无法确定程序按照指定的顺序执行.</p>
+<a id="more"></a>
+
+<h4 id="出现的问题"><a href="#出现的问题" class="headerlink" title="出现的问题"></a>出现的问题</h4><ol>
+<li><strong>失效数据</strong><ul>
+<li>类似脏读, 读取到已经失效的值, 即别的线程已经更新了该值,却还是读取到之前的值</li>
+</ul>
+</li>
+<li><strong>非原子的64位操作</strong><ul>
+<li>当线程在没有同步的情况下, 可能会读取到失效值, 但是这个值至少是之前某个线程设置的值, 而不是一个随机值.这种安全性称为最低安全性(<code>out-of-thin-airsafety</code>)</li>
+<li>最低安全行适用于绝大多数变量, 但是存在例外: 非volatile的64位数值变量(double,long). JVM允许将64位的读/写操作分解为2个32位的操作, 如果对改变量的读写分别在不同的线程种, 可能会读取到某个值的高32位和另一个值的低32位, 这就导致严重的错误</li>
+<li>因此在多线程中使用共享且可变的long/double类型的变量是不安全的, 要用volatile声明或锁保护.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>加锁的意义:<ol>
+<li>保证原子性</li>
+<li>保证内存可见性</li>
+</ol>
+</li>
+</ul>
+<h3 id="2-发布与逸出"><a href="#2-发布与逸出" class="headerlink" title="2. 发布与逸出"></a>2. 发布与逸出</h3><ul>
+<li><p>发布(Publish): 使对象能够在当前作用域之外的代码中使用.<br>也就是在其他域中持有了对象的引用, 例如, 将对象的引用保存到公有的静态变量中, 以便任何类和线程都可以看到该对象</p>
+</li>
+<li><p>逸出(Escape): 不该被发布的对象被发布时, 就称作逸出</p>
+<ul>
+<li>当某个对象逸出后, 必须假设有某个类或线程可能会无用该对象, 这正是使用封装的最主要原因: 封装使得对程序的正确性进行分析变的可能, 并使得无意中破坏设计约束条件变得更难</li>
+</ul>
+</li>
+<li><p>当发布一个对象时, 在该对象的非私有域中引用的所有对象同样会被发布. 一般来说, 如果一个已经发布的对象能够通过非私有的变量引用和方法调用到达其他的对象, 那么这些对象也都会被发布  </p>
+<ul>
+<li><p>假定有一个类C, 对C来说, “外部(Alien)方法”是指并不完全由C来规定的方法, 包括其它类中定义的方法以及C中可以被改写的方法(即不是私有方法(private)也不是终结方法(final)), 当把一个对象传递给某个外部方法时, 就相当于发布了这个对象</p>
+<blockquote>
+<p>也就是说, Javabean的属性都属于发布, 但是这是我们需要发布的, 而如果是不应该被发布的对象却被发布了, 就是逸出</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1. 将对象的引用保存到公有的静态变量中</span></span><br><span class="line"><span class="comment">// knownSecrets 被发布, 间接的发布了Secret对象</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Set&lt;Secret&gt; knownSecrets;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span></span>&#123;</span><br><span class="line">    knownSecrets = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 从非私有方法中返回一个引用, 同样会发布返回的对象</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnsafeStates</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String[] states = <span class="keyword">new</span> String[] &#123;</span><br><span class="line">        <span class="string">"AK"</span>,<span class="string">"AL"</span>...</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">public</span> String[] getStates()&#123;</span><br><span class="line">        <span class="keyword">return</span> states;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 发布一个内部的类实例</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThisEscape</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 公有的构造器, 在对象没有构造成功时, 就发布了this 对象的引用</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThisEscape</span><span class="params">(EventSource source)</span> </span>&#123;</span><br><span class="line">        source.registerListener(<span class="keyword">new</span> EventListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(Event e)</span> </span>&#123;</span><br><span class="line">                doSomething(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">//  上面的相当于: source.registerListener(this::doSomething);</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(Event e)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">EventSource</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">registerListener</span><span class="params">(EventListener e)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">EventListener</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(Event e)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">Event</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>安全的对象构造过程</p>
+<ul>
+<li><p>不要再构造过程中使this引用逸出  </p>
+<ul>
+<li>在构造过程中使this逸出的常见错误:  <ul>
+<li>在构造函数中启动一个线程</li>
+<li>在构造函数中调用一个可改写的外部方法</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>想要避免不正确的构造过程, 可以使用私有的构造函数和公有的工厂方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SafeListener</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> EventListener listener;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SafeListener</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"私有构造方法....."</span>);</span><br><span class="line">        listener = <span class="keyword">this</span>::doSomething;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 工厂方法,</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SafeListener <span class="title">newInstance</span><span class="params">(EventSource source)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"工厂方法"</span>);</span><br><span class="line">        SafeListener safe = <span class="keyword">new</span> SafeListener();</span><br><span class="line">        source.registerListener(safe.listener);</span><br><span class="line">        <span class="keyword">return</span> safe;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(Event e)</span> </span>&#123; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">EventSource</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">registerListener</span><span class="params">(EventListener e)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">EventListener</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(Event e)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">Event</span> </span>&#123; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-线程封闭"><a href="#3-线程封闭" class="headerlink" title="3. 线程封闭"></a>3. 线程封闭</h3><p>仅在单线程内访问数据, 就不需要使用同步, 这种技术称为线程封闭(Thread Confinement), 是实现线程安全性的最简单方式之一.  </p>
+<p>常见应用有: JDBC的connection对象.将每个Connection对象封闭在一个线程中.</p>
+<ol>
+<li><p>Ad-hoc: 维护线程封闭性的职责完全地由程序实现承担. 这种方式很脆弱,建议使用更强的栈封闭或ThreadLocal</p>
+</li>
+<li><p>栈封闭: 线程封闭的一种特例, 只能通过局部变量才能访问对象.<strong>局部变量的固有属性就是封闭在执行线程中</strong></p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">loadTheArk</span><span class="params">(Collection&lt;Animal&gt; candidates)</span> </span>&#123;</span><br><span class="line">    SortedSet&lt;Animal&gt; animals;</span><br><span class="line">    <span class="keyword">int</span> numPairs = <span class="number">0</span>;</span><br><span class="line">    Animal candidate = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// animals confined to method, don't let them escape!</span></span><br><span class="line">    animals = <span class="keyword">new</span> TreeSet&lt;&gt;(<span class="keyword">new</span> SpeciesGenderComparator());</span><br><span class="line">    animals.addAll(candidates);</span><br><span class="line">    <span class="keyword">for</span> (Animal a : animals) &#123;</span><br><span class="line">        <span class="keyword">if</span> (candidate == <span class="keyword">null</span> || !candidate.isPotentialMate(a)) &#123;</span><br><span class="line">            candidate = a;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ark.load(<span class="keyword">new</span> AnimalPair(candidate, a));</span><br><span class="line">            ++numPairs;</span><br><span class="line">            candidate = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> numPairs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ThreadLocal</p>
+</li>
+</ol>
+<ul>
+<li><p><a href="http://www.jasongj.com/java/threadlocal/" target="_blank" rel="noopener">ThreadLocal理解</a> 原理涉及到 <code>countDownLatch</code>  和 <code>concurrentMap</code>方面的知识, 后面再看, 先简单理解用法</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectionDispenser</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> String DB_URL = <span class="string">"jdbc:mysql://localhost:3306/mydatabase"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;Connection&gt; connectionHolder</span><br><span class="line">            = ThreadLocal.withInitial(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> DriverManager.getConnection(DB_URL);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Unable to acquire Connection, e"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> connectionHolder.get();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="4-不变性"><a href="#4-不变性" class="headerlink" title="4. 不变性"></a>4. 不变性</h3><p>如果某个对象在被创建后其状态就不能被修改, 那么这个对象就称为不可变对象, 线程安全性是不可变对象的固有属性之一, 不变性是由构造函数创建的, 只要他们的状态不改变, 那么这些不变性条件就能得以维持</p>
+<ul>
+<li><p>不可变性不等于将对象中的所有域都声明为final类型, 即使对象中所有的域都是final类型的, 这个对象也仍然是可变的, 因为在final类型的域中可以保存对可变对象的引用</p>
+</li>
+<li><p>不可变对象的定义</p>
+<ul>
+<li>对象创建后其状态就不能修改</li>
+<li>对象的所有域都是final类型</li>
+<li>对象是正确创建的(在对象的创建期间, this引用没有逸出)</li>
+</ul>
+</li>
+<li><p>不可变对象内部仍可以使用可变对象来管理他们的状态, 如下所示</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 在可变对象基础上构建的不可变类</span></span><br><span class="line"><span class="meta">@Immutable</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreeStooges</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Set&lt;String&gt; stooges = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThreeStooges</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        stooges.add(<span class="string">"Moe"</span>);</span><br><span class="line">        stooges.add(<span class="string">"Larry"</span>);</span><br><span class="line">        stooges.add(<span class="string">"Curly"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isStooge</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> stooges.contains(name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>尽管Set对象是可变的, 但是在Set对象构造完成后无法对其进行修改, <code>stooges</code>是一个<code>final</code>类型的引用变量, 因此所有的对象状态都通过一个<code>final</code>域来访问, 且构造函数保证了防止其他代码的访问</p>
+</li>
+</ul>
+<h4 id="Final域"><a href="#Final域" class="headerlink" title="Final域"></a>Final域</h4><p><code>final</code>类型的域是不可修改的, 但如果<code>final</code>域所引用的对象是可变的, 那么被引用的对象是可以被修改的. 在Java内存模型中, <code>final</code>域有特殊的语义, <strong>final域确保初始化过程的安全性, 从而可以不受限制地访问不可变对象, 并在共享这些对象时无需同步</strong></p>
+<h4 id="使用volatile类型发布不可变对象"><a href="#使用volatile类型发布不可变对象" class="headerlink" title="使用volatile类型发布不可变对象"></a>使用volatile类型发布不可变对象</h4><ul>
+<li><p>对于访问和更新多个相关变量时出现竞争条件问题, 可以通过将这些变量全部保存在一个不可变对象中来消除, 如果是一个可变的对象, 那么就需要使用锁来确保原子性. 如果是一个不可变对象, 那么当线程获得了该对象的引用后, 就不必担心另一个线程会修改对象的状态. 如果要更新这些变量, 呢么可以创建一个新的容器对象, 但其他使用原有对象的线程仍然会看到对象处于一致的状态.</p>
+<ul>
+<li><p>当一个线程将volatile类型的cache设置为引用一个新的<code>OneValueCache</code>时, 其他线程会立即看到新缓存的数据</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用指向不可变容器对象的volatile类型引用以缓存最新的结果</span></span><br><span class="line"><span class="meta">@ThreadSafe</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VolatileCachedFactorizer</span> <span class="keyword">extends</span> <span class="title">GenericServlet</span> <span class="keyword">implements</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> OneValueCache cache = <span class="keyword">new</span> OneValueCache(<span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse resp)</span> </span>&#123;</span><br><span class="line">        BigInteger i = extractFromRequest(req);</span><br><span class="line">        BigInteger[] factors = cache.getFactors(i);</span><br><span class="line">        <span class="keyword">if</span> (factors == <span class="keyword">null</span>) &#123;</span><br><span class="line">            factors = factor(i);</span><br><span class="line">            cache = <span class="keyword">new</span> OneValueCache(i, factors);</span><br><span class="line">        &#125;</span><br><span class="line">        encodeIntoResponse(resp, factors);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Immutable</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OneValueCache</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BigInteger lastNumber;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BigInteger[] lastFactors;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OneValueCache</span><span class="params">(BigInteger i,</span></span></span><br><span class="line"><span class="function"><span class="params">                        BigInteger[] factors)</span> </span>&#123;</span><br><span class="line">        lastNumber = i;</span><br><span class="line">        lastFactors = Arrays.copyOf(factors, factors.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> BigInteger[] getFactors(BigInteger i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (lastNumber == <span class="keyword">null</span> || !lastNumber.equals(i))</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> Arrays.copyOf(lastFactors, lastFactors.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>与<code>cache</code>相关的操作不会相互干扰, 因为<code>OneValueCache</code>是不可变的, 并且在每条相应的代码路径中只会访问它一次, 通过使用包含多个状态变量的容器对象来维持不变性,并使用<code>volatile</code>类型的引用确保可见性, 使得<code>VolatileCachedFactorizer</code>在没有显示的使用锁的情况下仍是线程安全的</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-安全发布"><a href="#5-安全发布" class="headerlink" title="5. 安全发布"></a>5. 安全发布</h3><ul>
+<li><p>由于存在可见性问题, 其他线程看到的Holder对象将处于不一致的状态, 即便在该对象的构造函数中正确的构建了不变性条件, 这种不正确的发布将导致其他线程看到尚未创建完成的对象</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 不安全的发布</span></span><br><span class="line"><span class="keyword">public</span> Holder holder;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span></span>&#123;</span><br><span class="line">    holder = <span class="keyword">new</span> Holder(<span class="number">42</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ol>
+<li><p>不正确的发布: 正确的对象被破坏</p>
+<ul>
+<li><p>不能指望一个<strong>尚未被完全创建</strong>的对象拥有完整性.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Holder</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> n;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Holder</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.n = n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">assertSanity</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n!=n)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"This statement is false!"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>除了发布对象的线程外, 其他线程可以看到的Holder是一个失效值, 因此将看到一个空引用或之前的旧值</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>要安全的发布一个对象, 对象的引用以及对象的状态必须同时对其他线程可见, 一个正确构造的对象可以通过以下方式来安全地发布;</p>
+<ul>
+<li>在静态初始化函数中初始化一个对象引用</li>
+<li>将对象的引用保存到<code>volatile</code>类型的域或<code>AtomicReferance</code>对象中</li>
+<li>将对象的引用保存到某个正确构造对象的final类型域中</li>
+<li>将对象的引用保存到一个由锁保护的域中</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>通常, 要发布一个静态构造的对象, 最简单和最安全的方式是使用静态的初始化器, 因为静态初始化器由JVM在类的初始化阶段执行</p>
+</li>
+<li><p>对象的发布需求取决于它的可变性:</p>
+<ul>
+<li>不可变对象可以通过任意机制发布</li>
+<li>事实不可变对象必须通过安全方式来发布</li>
+<li>可变对象必须通过安全方式来发布, 并且必须是线程安全的或者由某个锁保护起来</li>
+</ul>
+</li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在并发程序中使用和共享对象时, 可以使用一些使用的策略, 包括:</p>
+<ul>
+<li><strong>线程封闭</strong>: 线程封闭的对象只能由一个线程拥有, 对象被封闭在该线程中, 并且只能由这个线程修改</li>
+<li><strong>只读共享</strong>: 在没有额外同步的情况下, 共享的只读对象可以由多个线程并发访问,但是任何线程都不能修改它. 共享的只读对象包括不可变对象和事实不可变对象</li>
+<li><strong>线程安全共享</strong>: 线程安全的对象在其内部实现同步, 因此多个线程可以通过公有接口进行访问, 而不用进一步的同步</li>
+<li><strong>保护对象</strong>: 被保护的对象只能通过持有特定的锁来访问, 保护对象包括封装再其他线程安全对象中的对象, 以及已发布的并由某个特定所保护的对象</li>
+</ul>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>并发</tag>
+      </tags>
   </entry>
   <entry>
     <title>并发编程实践笔记(1)--线程安全</title>
@@ -154,7 +312,9 @@
 </ol>
 <p>Java利用CAS的乐观锁、原子性的特性高效解决了多线程的安全性问题，例如JDK1.8中的集合类<code>ConcurrentHashMap</code>、关键字<code>volatile</code>、<code>ReentrantLock</code>等</p>
 <blockquote>
-<p>参考文章:<br><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a><br><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a></p>
+<p>参考文章:  </p>
+<p><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a>  </p>
+<p><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a></p>
 </blockquote>
 <h4 id="竟态条件"><a href="#竟态条件" class="headerlink" title="竟态条件"></a>竟态条件</h4><ul>
 <li><p>由于不恰当的执行时序而出现不正确的结果就是竟态条件(Race Condition). 最常见的竟态条件类型就是”先检查后执行(check-then-Act)”操作, 即通过一个可能失效的观测结果来决定下一步的动作</p>
@@ -196,18 +356,27 @@
 <li><strong>同步代码块(Synchronized Block)</strong><br>同步代码块包括2部分, 一个作为锁的对象引用, 一个作为由这个锁保护的代码块.<br>同步代码块的锁就是方法调用所在的对象, 静态的<code>synchronized</code>方法以Class对象作为锁 <code>synchronized(lock) { // 由锁保护的共享状态 }</code><br>每个Java对象都可以用做一个实现同步的锁, 这些锁被称为<strong>内置锁(Intrinsic Lock)</strong>或<strong>监视器锁(Monitor Lock)</strong>, 线程在进入同步代码块之前会自动获得锁, 并且在退出同步代码块后自动释放锁, 无论是正常退出还是抛出异常.<br>Java的内置锁相当于一种互斥体, 即最多只有一个线程持有这种锁</li>
 </ul>
 </li>
-<li><p><strong>重入</strong><br> 当某个线程请求一个由其他线程持有的锁时, 发出的线程就会阻塞. 然而由于<strong>内置锁是可重入的</strong>(某个线程试图获取一个已经由他自己持有的锁, 那么这个请求会成功).  </p>
+<li><p><strong>重入</strong><br> 当某个线程请求一个由其他线程持有的锁时, 发出的线程就会阻塞. 然而由于<strong>内置锁是可重入的</strong>(某个线程试图获取一个已经由他自己持有的锁, 那么这个请求会成功).<br> 重入意味着获取锁的操作的粒度是”线程”,不是”调用”.</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.ou.println(<span class="string">"doSomething..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoggingWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(toString() + <span class="string">": calling doSomething"</span>);</span><br><span class="line">        <span class="keyword">super</span>.doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>子类重写了父类的<code>synchronized</code>方法, 然后调用父类的方法, 如果没有可重入的锁, 那么这段代码将会产生死锁, 由于<code>Widget</code>和<code>LoggingWidget</code>中的<code>doSomething</code>方法都是<code>synchronized</code>方法, 因此每个<code>doSomething</code>方法执行前都会获取<code>Widget</code>上的锁, 如果内置锁是不可重入的, 那么调用<code>super.doSomething</code>时将无法获得<code>Widget</code>上的锁, 因为这个锁已经被持有.</li>
+</ul>
 </li>
 </ol>
-<p>重入意味着获取锁的操作的粒度是”线程”,不是”调用”.</p>
-<pre><code><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.ou.println(<span class="string">"doSomething..."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">LoggingWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(toString() + <span class="string">": calling doSomething"</span>);</span><br><span class="line">            <span class="keyword">super</span>.doSomething();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-- 子类重写了父类的`synchronized`方法, 然后调用父类的方法, 如果没有可重入的锁, 那么这段代码将会产生死锁, 由于`Widget`和`LoggingWidget`中的`doSomething`方法都是`synchronized`方法, 因此每个`doSomething`方法执行前都会获取`Widget`上的锁, 如果内置锁是不可重入的, 那么调用`super.doSomething`时将无法获得`Widget`上的锁, 因为这个锁已经被持有.</code></pre>]]></content>
+<hr>
+<p>参考资料:  </p>
+<blockquote>
+<p><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a>  </p>
+<p><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a>  </p>
+<p>Java Concurrency in Practice(Java并发编程实践) [作者: Brian Goetz]</p>
+</blockquote>
+]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>
       <tags>
-        <tag>Java</tag>
+        <tag>java</tag>
         <tag>并发</tag>
       </tags>
   </entry>

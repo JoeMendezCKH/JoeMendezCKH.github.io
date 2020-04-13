@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 4.2.0">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon16x16.png">
   <meta http-equiv="Cache-Control" content="no-transform">
   <meta http-equiv="Cache-Control" content="no-siteapp">
 
@@ -16,7 +16,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="线程安全1. 并发的风险 安全性问题  在没有充足同步的情况下, 多个线程的操作执行顺序是不可预测的, 有可能产生奇怪的结果, 比如: 123456789101112131415161718192021public class UnsafeSequence&amp;#123;    private int value;    public int getValue()&amp;#123;        retur">
@@ -27,9 +27,9 @@
 <meta property="og:description" content="线程安全1. 并发的风险 安全性问题  在没有充足同步的情况下, 多个线程的操作执行顺序是不可预测的, 有可能产生奇怪的结果, 比如: 123456789101112131415161718192021public class UnsafeSequence&amp;#123;    private int value;    public int getValue()&amp;#123;        retur">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-04-08T01:33:23.000Z">
-<meta property="article:modified_time" content="2020-04-08T07:21:46.984Z">
+<meta property="article:modified_time" content="2020-04-12T14:35:26.555Z">
 <meta property="article:author" content="Joe Mendez">
-<meta property="article:tag" content="Java">
+<meta property="article:tag" content="java">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
 
@@ -202,7 +202,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpg">
       <meta itemprop="name" content="Joe Mendez">
-      <meta itemprop="description" content="学习笔记">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -219,10 +219,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-04-08 09:33:23 / 修改时间：15:21:46" itemprop="dateCreated datePublished" datetime="2020-04-08T09:33:23+08:00">2020-04-08</time>
+              <time title="创建时间：2020-04-08 09:33:23" itemprop="dateCreated datePublished" datetime="2020-04-08T09:33:23+08:00">2020-04-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-12 22:35:26" itemprop="dateModified" datetime="2020-04-12T22:35:26+08:00">2020-04-12</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -260,14 +266,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>9.3k</span>
+              <span>9.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
+              <span>9 分钟</span>
             </span>
 
         </div>
@@ -425,7 +431,9 @@
 </ol>
 <p>Java利用CAS的乐观锁、原子性的特性高效解决了多线程的安全性问题，例如JDK1.8中的集合类<code>ConcurrentHashMap</code>、关键字<code>volatile</code>、<code>ReentrantLock</code>等</p>
 <blockquote>
-<p>参考文章:<br><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a><br><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a></p>
+<p>参考文章:  </p>
+<p><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a>  </p>
+<p><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a></p>
 </blockquote>
 <h4 id="竟态条件"><a href="#竟态条件" class="headerlink" title="竟态条件"></a>竟态条件</h4><ul>
 <li><p>由于不恰当的执行时序而出现不正确的结果就是竟态条件(Race Condition). 最常见的竟态条件类型就是”先检查后执行(check-then-Act)”操作, 即通过一个可能失效的观测结果来决定下一步的动作</p>
@@ -467,13 +475,22 @@
 <li><strong>同步代码块(Synchronized Block)</strong><br>同步代码块包括2部分, 一个作为锁的对象引用, 一个作为由这个锁保护的代码块.<br>同步代码块的锁就是方法调用所在的对象, 静态的<code>synchronized</code>方法以Class对象作为锁 <code>synchronized(lock) { // 由锁保护的共享状态 }</code><br>每个Java对象都可以用做一个实现同步的锁, 这些锁被称为<strong>内置锁(Intrinsic Lock)</strong>或<strong>监视器锁(Monitor Lock)</strong>, 线程在进入同步代码块之前会自动获得锁, 并且在退出同步代码块后自动释放锁, 无论是正常退出还是抛出异常.<br>Java的内置锁相当于一种互斥体, 即最多只有一个线程持有这种锁</li>
 </ul>
 </li>
-<li><p><strong>重入</strong><br> 当某个线程请求一个由其他线程持有的锁时, 发出的线程就会阻塞. 然而由于<strong>内置锁是可重入的</strong>(某个线程试图获取一个已经由他自己持有的锁, 那么这个请求会成功).  </p>
+<li><p><strong>重入</strong><br> 当某个线程请求一个由其他线程持有的锁时, 发出的线程就会阻塞. 然而由于<strong>内置锁是可重入的</strong>(某个线程试图获取一个已经由他自己持有的锁, 那么这个请求会成功).<br> 重入意味着获取锁的操作的粒度是”线程”,不是”调用”.</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.ou.println(<span class="string">"doSomething..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoggingWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(toString() + <span class="string">": calling doSomething"</span>);</span><br><span class="line">        <span class="keyword">super</span>.doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>子类重写了父类的<code>synchronized</code>方法, 然后调用父类的方法, 如果没有可重入的锁, 那么这段代码将会产生死锁, 由于<code>Widget</code>和<code>LoggingWidget</code>中的<code>doSomething</code>方法都是<code>synchronized</code>方法, 因此每个<code>doSomething</code>方法执行前都会获取<code>Widget</code>上的锁, 如果内置锁是不可重入的, 那么调用<code>super.doSomething</code>时将无法获得<code>Widget</code>上的锁, 因为这个锁已经被持有.</li>
+</ul>
 </li>
 </ol>
-<p>重入意味着获取锁的操作的粒度是”线程”,不是”调用”.</p>
-<pre><code><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.ou.println(<span class="string">"doSomething..."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">LoggingWidget</span> <span class="keyword">extends</span> <span class="title">Widget</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(toString() + <span class="string">": calling doSomething"</span>);</span><br><span class="line">            <span class="keyword">super</span>.doSomething();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>参考资料:  </p>
+<blockquote>
+<p><a href="https://juejin.im/post/5c87afa06fb9a049f1550b04" target="_blank" rel="noopener">CAS原理分析及ABA问题</a>  </p>
+<p><a href="https://objcoding.com/2018/11/29/cas/#aba-%E9%97%AE%E9%A2%98" target="_blank" rel="noopener">Java并发之CAS原理分析</a>  </p>
+<p>Java Concurrency in Practice(Java并发编程实践) [作者: Brian Goetz]</p>
+</blockquote>
 
-- 子类重写了父类的`synchronized`方法, 然后调用父类的方法, 如果没有可重入的锁, 那么这段代码将会产生死锁, 由于`Widget`和`LoggingWidget`中的`doSomething`方法都是`synchronized`方法, 因此每个`doSomething`方法执行前都会获取`Widget`上的锁, 如果内置锁是不可重入的, 那么调用`super.doSomething`时将无法获得`Widget`上的锁, 因为这个锁已经被持有.</code></pre>
     </div>
 
     
@@ -492,7 +509,7 @@
   <p><span>本文标题:</span><a href="/posts/41c3286f.html">并发编程实践笔记(1)--线程安全</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
   <p><span>发布时间:</span>2020年04月08日 - 09:04</p>
-  <p><span>最后更新:</span>2020年04月08日 - 15:04</p>
+  <p><span>最后更新:</span>2020年04月12日 - 22:04</p>
   <p><span>原始链接:</span><a href="/posts/41c3286f.html" title="并发编程实践笔记(1)--线程安全">https://joemendezckh.github.io/posts/41c3286f.html</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/41c3286f.html"  aria-label="复制成功！"></i></span>
   </p>
@@ -517,7 +534,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/java/" rel="tag"># java</a>
               <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
           </div>
 
@@ -531,8 +548,8 @@
       <i class="fa fa-chevron-left"></i> MySQL学习笔记
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/48123146.html" rel="next" title="并发编程实践笔记2-对象的共享">
-      并发编程实践笔记2-对象的共享 <i class="fa fa-chevron-right"></i>
+    <a href="/posts/48123146.html" rel="next" title="并发编程实践笔记(2)-对象的共享">
+      并发编程实践笔记(2)-对象的共享 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -603,7 +620,7 @@
     <img class="site-author-image" itemprop="image" alt="Joe Mendez"
       src="/images/header.jpg">
   <p class="site-author-name" itemprop="name">Joe Mendez</p>
-  <div class="site-description" itemprop="description">学习笔记</div>
+  <div class="site-description" itemprop="description">和大家分享自己的学习笔记</div>
 </div>
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
@@ -623,7 +640,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -667,12 +684,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">121k</span>
+    <span title="站点总字数">129k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:50</span>
+    <span title="站点阅读时长">1:57</span>
 </div>
   <!--
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
