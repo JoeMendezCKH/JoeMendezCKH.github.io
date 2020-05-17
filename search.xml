@@ -11,7 +11,7 @@
 <li>首先, 官方的帮助文档将流程介绍的已经很详细了, 在此不做赘述</li>
 <li>直接从Java实现写起</li>
 </ul>
-<h3 id="0-如何实现-run-sh-调用我们的函数"><a href="#0-如何实现-run-sh-调用我们的函数" class="headerlink" title="0. 如何实现 run.sh 调用我们的函数"></a>0. 如何实现 run.sh 调用我们的函数</h3><ol>
+<h3 id="如何实现-run-sh-调用我们的函数"><a href="#如何实现-run-sh-调用我们的函数" class="headerlink" title="如何实现 run.sh 调用我们的函数"></a>如何实现 run.sh 调用我们的函数</h3><ol>
 <li>一个 web 工程, 通过 curl 发送 get 请求调用函数<ul>
 <li>优点: 可以重复调用</li>
 <li>缺点: 感觉有点跑题, 目的是学习docker, 不是web…</li>
@@ -23,7 +23,9 @@
 </li>
 </ol>
 <p>综上: 我选择了方案 2 (中间有个小坑)</p>
-<h3 id="1-新建一个-maven-工程"><a href="#1-新建一个-maven-工程" class="headerlink" title="1. 新建一个 maven 工程"></a>1. 新建一个 maven 工程</h3><ul>
+<a id="more"></a>
+
+<h3 id="新建一个-maven-工程"><a href="#新建一个-maven-工程" class="headerlink" title="新建一个 maven 工程"></a>新建一个 maven 工程</h3><ul>
 <li><p>编写实现功能的代码</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String NUM_LIST = <span class="string">"/tcdata/num_list.csv"</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PATH = <span class="string">"result.json"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    File resultFile = <span class="keyword">new</span> File(PATH);</span><br><span class="line">    File numFile = <span class="keyword">new</span> File(NUM_LIST);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!resultFile.exists()) &#123;</span><br><span class="line">            resultFile.createNewFile();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        JSONObject jsonObject = <span class="keyword">new</span> JSONObject();</span><br><span class="line">        jsonObject.put(<span class="string">"Q1"</span>, <span class="string">"Hello world"</span>);</span><br><span class="line">        <span class="keyword">final</span> List&lt;String&gt; list = FileUtils.readLines(numFile, <span class="string">"UTF-8"</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">final</span> ArrayList&lt;Integer&gt; integers = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">10</span>);</span><br><span class="line">        </span><br><span class="line">        list.forEach(num -&gt; integers.add(Integer.parseInt(num)));</span><br><span class="line">        <span class="keyword">int</span> sum = integers.stream().mapToInt(num -&gt; num).sum();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span>[] result = integers.stream()</span><br><span class="line">            .sorted(Comparator.comparing(Integer::intValue).reversed())</span><br><span class="line">            .mapToInt(n -&gt; n).limit(<span class="number">10</span>).toArray();</span><br><span class="line"></span><br><span class="line">        jsonObject.put(<span class="string">"Q2"</span>, sum);</span><br><span class="line">        jsonObject.put(<span class="string">"Q3"</span>, result);</span><br><span class="line"></span><br><span class="line">        FileOutputStream fileOutputStream = <span class="keyword">new</span> FileOutputStream(resultFile);</span><br><span class="line">        fileOutputStream.write(jsonObject.toJSONString().getBytes());</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"success"</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        System.out.println(<span class="string">"failed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -54,9 +56,9 @@
 
 </li>
 </ul>
-<h3 id="2-编写run-sh"><a href="#2-编写run-sh" class="headerlink" title="2. 编写run.sh"></a>2. 编写run.sh</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">java -jar tcdata-1.0.0.jar &gt; tcdata.log</span><br></pre></td></tr></table></figure>
+<h3 id="编写run-sh"><a href="#编写run-sh" class="headerlink" title="编写run.sh"></a>编写run.sh</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">java -jar tcdata-1.0.0.jar &gt; tcdata.log</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-编写Dockerfile"><a href="#3-编写Dockerfile" class="headerlink" title="3. 编写Dockerfile"></a>3. 编写Dockerfile</h3><figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span>            registry.cn-shanghai.aliyuncs.com/tcc-public/java:jdk_13.<span class="number">0.2</span></span><br><span class="line"><span class="keyword">MAINTAINER</span>      作者&lt;作者邮箱&gt;</span><br><span class="line"><span class="comment"># 添加当前文件夹下所有内容(包括 jar包和 run.sh) 到 container 的 / 目录</span></span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> 			. /</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> 		/</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> 			[<span class="string">"sh"</span>, <span class="string">"run.sh"</span>]</span></span><br></pre></td></tr></table></figure>
+<h3 id="编写Dockerfile"><a href="#编写Dockerfile" class="headerlink" title="编写Dockerfile"></a>编写Dockerfile</h3><figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span>            registry.cn-shanghai.aliyuncs.com/tcc-public/java:jdk_13.<span class="number">0.2</span></span><br><span class="line"><span class="keyword">MAINTAINER</span>      作者&lt;作者邮箱&gt;</span><br><span class="line"><span class="comment"># 添加当前文件夹下所有内容(包括 jar包和 run.sh) 到 container 的 / 目录</span></span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> 		. /</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> 	/</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> 		[<span class="string">"sh"</span>, <span class="string">"run.sh"</span>]</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li><p>注意:</p>
@@ -65,15 +67,15 @@
 <p>也就是说, 需要提前在本地测试好 jar 包没有问题, 这样提交后出现错误才是 docker 方面的问题</p>
 </li>
 </ul>
-<h3 id="4-推送到自己的仓库"><a href="#4-推送到自己的仓库" class="headerlink" title="4. 推送到自己的仓库"></a>4. 推送到自己的仓库</h3><p>这一步可以看官方的指导, 很详细</p>
-<h4 id="1-登录阿里云Docker-Registry"><a href="#1-登录阿里云Docker-Registry" class="headerlink" title="1. 登录阿里云Docker Registry"></a>1. 登录阿里云Docker Registry</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker login --username&#x3D;用户名 registry.cn-shanghai.aliyuncs.com</span><br></pre></td></tr></table></figure>
+<h3 id="推送到自己的仓库"><a href="#推送到自己的仓库" class="headerlink" title="推送到自己的仓库"></a>推送到自己的仓库</h3><p>这一步可以看官方的指导, 很详细</p>
+<h4 id="登录阿里云Docker-Registry"><a href="#登录阿里云Docker-Registry" class="headerlink" title="登录阿里云Docker Registry"></a>登录阿里云Docker Registry</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker login --username&#x3D;用户名 registry.cn-shanghai.aliyuncs.com</span><br></pre></td></tr></table></figure>
 
 <p>用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。</p>
-<h4 id="2-从Registry中拉取镜像"><a href="#2-从Registry中拉取镜像" class="headerlink" title="2. 从Registry中拉取镜像"></a>2. 从Registry中拉取镜像</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker pull registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br></pre></td></tr></table></figure>
+<h4 id="从Registry中拉取镜像"><a href="#从Registry中拉取镜像" class="headerlink" title="从Registry中拉取镜像"></a>从Registry中拉取镜像</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker pull registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br></pre></td></tr></table></figure>
 
-<h4 id="3-将镜像推送到Registry"><a href="#3-将镜像推送到Registry" class="headerlink" title="3. 将镜像推送到Registry"></a>3. 将镜像推送到Registry</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker login --username&#x3D;用户名 registry.cn-shanghai.aliyuncs.com</span><br><span class="line">$ sudo docker tag [ImageId] registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br><span class="line">$ sudo docker push registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br></pre></td></tr></table></figure>
+<h4 id="将镜像推送到Registry"><a href="#将镜像推送到Registry" class="headerlink" title="将镜像推送到Registry"></a>将镜像推送到Registry</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ sudo docker login --username&#x3D;用户名 registry.cn-shanghai.aliyuncs.com</span><br><span class="line">$ sudo docker tag [ImageId] registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br><span class="line">$ sudo docker push registry.cn-shanghai.aliyuncs.com&#x2F;用户名&#x2F;仓库名:[镜像版本号]</span><br></pre></td></tr></table></figure>
 
-<h3 id="5-提交回答"><a href="#5-提交回答" class="headerlink" title="5. 提交回答"></a>5. 提交回答</h3><ul>
+<h3 id="提交回答"><a href="#提交回答" class="headerlink" title="提交回答"></a>提交回答</h3><ul>
 <li>建议将该仓库设置为公有仓库, 这样比较省事, 不然要写用户名和密码, 可能出错</li>
 </ul>
 <p><img src="https://i.loli.net/2020/05/17/zemPk7FcIG3ErWg.png" alt="image-20200517130659535.png"></p>
