@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>记录vim配置</title>
+    <url>/posts/687ddbf0.html</url>
+    <content><![CDATA[<h2 id="备份自己的vim设置"><a href="#备份自己的vim设置" class="headerlink" title="备份自己的vim设置"></a>备份自己的vim设置</h2><ul>
+<li><p>因为经常装完系统后, vim设置总是比较烦, 所以干脆做个备份, 一劳永逸</p>
+</li>
+<li><p>首先更新vim</p>
+<p><code>yum install -y vim</code></p>
+</li>
+<li><p>编辑个人配置</p>
+<ul>
+<li><code>vim ~/.vimrc</code></li>
+</ul>
+<a id="more"></a>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">" 语法高亮</span><br><span class="line">syntax on</span><br><span class="line">" 设置编码</span><br><span class="line">set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936</span><br><span class="line">set termencoding=utf-8</span><br><span class="line">set encoding=utf-8</span><br><span class="line">" 开启行号</span><br><span class="line">set number</span><br><span class="line">"  突出显示当前行</span><br><span class="line">set cul </span><br><span class="line">" 开启鼠标</span><br><span class="line">set mouse=a</span><br><span class="line">set selection=exclusive</span><br><span class="line">set selectmode=mouse,key</span><br><span class="line">" 显示括号匹配</span><br><span class="line">set showmatch</span><br><span class="line">" 设置Tab长度为4空格</span><br><span class="line">set tabstop=4</span><br><span class="line">" 设置自动缩进长度为4空格</span><br><span class="line">set shiftwidth=4</span><br><span class="line">" 继承前一行的缩进方式，适用于多行注释</span><br><span class="line">set autoindent</span><br><span class="line">" 设置粘贴模式</span><br><span class="line">set paste</span><br><span class="line">" 总是显示状态栏</span><br><span class="line">set laststatus=2</span><br><span class="line">" 打开文件类型检测</span><br><span class="line">filetype plugin indent on</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>效果如下</p>
+<p><img src="https://i.loli.net/2020/05/22/NBvwlUGLh29qSXY.png" alt="image-20200522105126848.png"></p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>实践</category>
+      </categories>
+      <tags>
+        <tag>vim</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>阿里云Docker新人赛记录</title>
     <url>/posts/249f9dc1.html</url>
     <content><![CDATA[<blockquote>
