@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>安装 Zookeeper 启动报错</title>
+    <url>/posts/50e22a29.html</url>
+    <content><![CDATA[<h3 id="Error-contacting-service-It-is-probably-not-running"><a href="#Error-contacting-service-It-is-probably-not-running" class="headerlink" title="Error contacting service. It is probably not running."></a>Error contacting service. It is probably not running.</h3><ul>
+<li>记录在安装启动Zookeeper 3.6.1 时遇到的问题与解决方法</li>
+</ul>
+<blockquote>
+<p>环境信息:</p>
+<p>CentOS Linux release 7.8.2003 </p>
+<p>java version “1.8.0_161”</p>
+<p>apache-zookeeper-3.6.1-bin.tar.gz</p>
+</blockquote>
+<ul>
+<li><p>安装过程</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tar -zxvf /opt/apache-zookeeper-3.6.1-bin.tar.gz -C ./</span><br><span class="line">mv apache-zookeeper-3.6.1-bin zookeeper-3.6.1</span><br><span class="line">cd zookeeper-3.6.1</span><br><span class="line">" 创建 dataDir, 在 zoo.cfg 中修改 dataDir</span><br><span class="line">mkdir data</span><br><span class="line">cd zookeeper-3.6.1/conf</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line">vim zoo.cfg</span><br><span class="line">" 修改 dataDir 为上面创建的 data 目录</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<ul>
+<li>至此, 安装结束, 进行启动</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[zookeeper-3.6.1]# ./bin/zkServer.sh start</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Starting zookeeper ... STARTED</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动正常, 查看状态</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[zookeeper-3.6.1]# ./bin/zkServer.sh status</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Error contacting service. It is probably not running</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看状态错误, 使用 ps 命令和 netstat 命令查看2181端口均没有显示, 说明启动失败</li>
+</ul>
+<p>查阅相关资料后, 解释的原因有下面几种: </p>
+<ol>
+<li>没有创建<code>dataDir</code>目录</li>
+<li>没有关闭防火墙</li>
+<li>2181端口被占用</li>
+<li><code>zoo.cfg</code>文件中主机名出错</li>
+<li><code>myid</code>文件中的整数格式不对，或者与<code>zoo.cfg</code>中的<code>server</code>整数不对应</li>
+</ol>
+</li>
+<li><p>经过排查上述原因, 均为解决</p>
+</li>
+</ul>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><ul>
+<li><p>最终发现, <strong>直接查看日志文件即可</strong></p>
+<p><strong>查看位于<code>zookeeper-3.6.1/logs</code>下的<code>.out</code>文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[myid:] - ERROR [main:ZooKeeperServerMain@85] - Unable to start AdminServer, exiting abnormally                </span><br><span class="line">org.apache.zookeeper.server.admin.AdminServer$AdminServerException: Problem starting AdminServer on address 0.0.0.0, port 8080 and comm</span><br><span class="line">and URL &#x2F;commands</span><br><span class="line">    at org.apache.zookeeper.server.admin.JettyAdminServer.start(JettyAdminServer.java:176)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:153)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:112)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:67)</span><br><span class="line">    at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:140)</span><br><span class="line">    at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:90)</span><br><span class="line">Caused by: java.io.IOException: Failed to bind to &#x2F;0.0.0.0:8080</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:346)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.open(ServerConnector.java:307)</span><br><span class="line">    at org.eclipse.jetty.server.AbstractNetworkConnector.doStart(AbstractNetworkConnector.java:80)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.doStart(ServerConnector.java:231)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:72)</span><br><span class="line">    at org.eclipse.jetty.server.Server.doStart(Server.java:385)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:72)</span><br><span class="line">    at org.apache.zookeeper.server.admin.JettyAdminServer.start(JettyAdminServer.java:167)</span><br><span class="line">    ... 5 more</span><br><span class="line">Caused by: java.net.BindException: 地址已在使用</span><br><span class="line">    at sun.nio.ch.Net.bind0(Native Method)</span><br><span class="line">    at sun.nio.ch.Net.bind(Net.java:433)</span><br><span class="line">    at sun.nio.ch.Net.bind(Net.java:425)</span><br><span class="line">    at sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:223)</span><br><span class="line">    at sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:74)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:342)</span><br><span class="line">    ... 12 more</span><br><span class="line">Unable to start AdminServer, exiting abnormally</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>显而易见, 是因为8080端口被占用, 解决端口占用后, 即可正常启动</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Mode: standalone</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以后出现问题, 不要忙着google, 看看日志文件, 就可以解决大部分问题, 如果不行再google</p>
+]]></content>
+      <categories>
+        <category>实践</category>
+      </categories>
+      <tags>
+        <tag>Zookeeper</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>记录vim配置</title>
     <url>/posts/687ddbf0.html</url>
     <content><![CDATA[<h2 id="备份自己的vim设置"><a href="#备份自己的vim设置" class="headerlink" title="备份自己的vim设置"></a>备份自己的vim设置</h2><ul>
