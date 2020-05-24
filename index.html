@@ -223,7 +223,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-24 12:50:22" itemprop="dateModified" datetime="2020-05-24T12:50:22+08:00">2020-05-24</time>
+                <time title="修改时间：2020-05-24 13:06:50" itemprop="dateModified" datetime="2020-05-24T13:06:50+08:00">2020-05-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -274,353 +274,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="服务器软件安装实录"><a href="#服务器软件安装实录" class="headerlink" title="服务器软件安装实录"></a>服务器软件安装实录</h2><blockquote>
-<p>centos 7.8</p>
-<p>以下操作均在 root 用户执行, 省略了 sudo</p>
+          <blockquote>
+<p>由于最近经常配置服务器, 每次总是东拼西凑, 装完就忘, 说不上有什么技术含量,但是就是比较费时间, 刚好我一直关注的<code>CodeSheep</code>羊哥推出了一篇服务器安装文章, 我就顺水推舟, 顺便记录自己的安装过程. 这样以后在安装时就很省时间了</p>
+<p>本文所有用到的安装包, 都已经放在尾部链接了, 有需要自取</p>
+<p>注: </p>
+<p>  本文是在 centos 7.8 下进行安装的</p>
+<p>  以下操作均在 root 用户执行, 省略了 sudo</p>
 </blockquote>
 <h3 id="配置-Linux"><a href="#配置-Linux" class="headerlink" title="配置 Linux"></a>配置 Linux</h3><h4 id="查看-ip-地址-使用-Xshell-工具连接"><a href="#查看-ip-地址-使用-Xshell-工具连接" class="headerlink" title="查看 ip 地址, 使用 Xshell 工具连接"></a>查看 ip 地址, 使用 Xshell 工具连接</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 ~]# ip addr</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000</span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: ens33: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">    link/ether 00:0c:29:36:25:d0 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.150.129/24 brd 192.168.150.255 scope global noprefixroute dynamic ens33</span><br><span class="line">       valid_lft 1646sec preferred_lft 1646sec</span><br><span class="line">    inet6 fd15:4ba5:5a2b:1008:d3c3:20d9:3634:da84/64 scope global noprefixroute dynamic </span><br><span class="line">       valid_lft 86385sec preferred_lft 14385sec</span><br><span class="line">    inet6 fe80::484c:a2cf:4ef5:72e6/64 scope link noprefixroute </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
-
-<h4 id="修改-ip-配置-配置DHCP与DNS等信息"><a href="#修改-ip-配置-配置DHCP与DNS等信息" class="headerlink" title="修改 ip 配置, 配置DHCP与DNS等信息"></a>修改 ip 配置, 配置DHCP与DNS等信息</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/sysconfig/network-scripts/ifcfg-ens33</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 固定ip</span></span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=ip地址</span><br><span class="line">GATEWAY=网关</span><br><span class="line">DNS1=DNS</span><br><span class="line">IPV6_PRIVACY=no</span><br></pre></td></tr></table></figure>
-
-<h4 id="关闭-SELINUX"><a href="#关闭-SELINUX" class="headerlink" title="关闭 SELINUX"></a>关闭 SELINUX</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setenforce 0</span><br><span class="line"></span><br><span class="line">vi /etc/selinux/config</span><br><span class="line">SELINUX=disabled</span><br></pre></td></tr></table></figure>
-
-<h4 id="可以下载一些小工具"><a href="#可以下载一些小工具" class="headerlink" title="可以下载一些小工具"></a>可以下载一些小工具</h4><ul>
-<li><p><code>ifconfig , locate, lsof</code></p>
-<p><code>yum -y install net-tools mlocate lsof</code></p>
-<p><code>locate</code>安装后, 第一次使用还需要执行<code>updatedb</code> 建立索引</p>
-<p><code>lsof -i:端口号</code> 查看端口占用</p>
-</li>
-</ul>
-<h4 id="修改一下vim配置"><a href="#修改一下vim配置" class="headerlink" title="修改一下vim配置"></a>修改一下vim配置</h4><ul>
-<li><p>要先更新一下 vim, 如果是最小安装的话, 有些配置不生效</p>
-<p><code>yum install vim</code></p>
-<p>参考: <a href="https://joemendezckh.github.io/posts/687ddbf0.html">vim配置</a></p>
-</li>
-</ul>
-<h4 id="切换yum源并更新"><a href="#切换yum源并更新" class="headerlink" title="切换yum源并更新"></a>切换yum源并更新</h4><ol>
-<li><p>首先备份本身的yum源</p>
-<p><code>cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup</code></p>
-</li>
-<li><p>进入yum源的目录, 下载阿里云的yum源</p>
-<p><code>cd /etc/yum.repos.d/</code></p>
-<p><code>wget http://mirrors.aliyun.com/repo/Centos-7.repo</code></p>
-<p>如果提示没有<code>wget</code>工具, 则<code>yum install wget</code></p>
-</li>
-<li><p>用阿里云的源替换Base</p>
-<p><code>mv Centos-7.repo CentOS-Base.repo</code></p>
-</li>
-<li><p>重新清除并生成缓存</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum clean all</span><br><span class="line">yum makecache</span><br><span class="line">yum update</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除旧的kernel (不必须)</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看当前核心</span></span><br><span class="line">[root@docker001 ~]<span class="comment"># uname -a</span></span><br><span class="line">Linux docker001 3.10.0-1127.8.2.el7.x86_64 <span class="comment">#1 SMP Tue May 12 16:57:42 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux</span></span><br><span class="line"><span class="comment"># 查询所有核心</span></span><br><span class="line">[root@docker001 ~]<span class="comment"># rpm -qa|grep kernel</span></span><br><span class="line">kernel-headers-3.10.0-1127.8.2.el7.x86_64</span><br><span class="line">kernel-3.10.0-1127.8.2.el7.x86_64</span><br><span class="line">kernel-3.10.0-957.el7.x86_64</span><br><span class="line">kernel-tools-libs-3.10.0-1127.8.2.el7.x86_64</span><br><span class="line">kernel-tools-3.10.0-1127.8.2.el7.x86_64</span><br><span class="line"><span class="comment"># 卸载不要的</span></span><br><span class="line">[root@docker001 ~]<span class="comment"># yum remove kernel-3.10.0-957.el7.x86_64</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ol>
-<h4 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h4><ul>
-<li><p>该服务器为自学使用, 为方便使用, 关闭防火墙, 否则每次要开放相应的端口, 比较繁琐</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 防火墙添加端口</span></span><br><span class="line">firewall-cmd --zone=public --add-port=15672/tcp --permanent</span><br><span class="line">firewall-cmd --reload</span><br><span class="line">firewall-cmd --list-all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭防火墙</span></span><br><span class="line">systemctl stop firewalld</span><br><span class="line"><span class="comment"># 关闭开机启动</span></span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><a href="https://www.jianshu.com/p/411274f96492" target="_blank" rel="noopener">firewall-cmd命令简单使用</a></li>
-</ul>
-</li>
-</ul>
-<h3 id="安装-JDK-1-8"><a href="#安装-JDK-1-8" class="headerlink" title="安装 JDK-1.8"></a>安装 JDK-1.8</h3><h4 id="准备工作-卸载openjdk-解压"><a href="#准备工作-卸载openjdk-解压" class="headerlink" title="准备工作: 卸载openjdk, 解压"></a>准备工作: 卸载openjdk, 解压</h4><ul>
-<li><p>安装包<code>jdk-8u251-linux-x64.tar.gz</code></p>
-</li>
-<li><p>首先卸载已安装的 <code>openjdk</code>(如果有)</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rpm -qa | grep java</span><br><span class="line"><span class="meta">#</span><span class="bash"> 卸载java开头的, javapackages- 不算</span></span><br><span class="line">yum remove -y javaxxx</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在<code>/usr/local</code>下创建目录, 并将压缩包解压至此</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/local/java</span><br><span class="line">tar -zxvf jdk-8u251-linux-x64.tar.gz</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在当前目录得到一个新的目录 /usr/<span class="built_in">local</span>/java/jdk1.8.0_251</span></span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<h4 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h4><ul>
-<li><p>在<code>/etc/profile</code>中配置环境变量</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"></span><br><span class="line">JAVA_HOME=/usr/local/java/jdk1.8.0_251 # 改为你自己的路径</span><br><span class="line">JRE_HOME=$JAVA_HOME/jre</span><br><span class="line">JAVA_BIN=$JAVA_HOME/bin</span><br><span class="line">CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">PATH=$PATH:$JAVA_HOME/bin</span><br><span class="line"></span><br><span class="line">export PATH JAVA_HOME CLASSPATH JRE_HOME JAVA_BIN</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>激活环境变量, 让改动生效</p>
-<p><code>source /etc/profile</code></p>
-</li>
-</ul>
-<h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 ~]# java -version</span><br><span class="line">java version "1.8.0_251"</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_251-b08)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)</span><br><span class="line"></span><br><span class="line">[root@docker001 ~]# javac</span><br><span class="line">Usage: javac &lt;options&gt; &lt;source files&gt;</span><br><span class="line">where possible options include:</span><br><span class="line">  -g                         Generate all debugging info</span><br><span class="line">  -g:none                    Generate no debugging info</span><br><span class="line">  -g:&#123;lines,vars,source&#125;     Generate only some debugging info</span><br><span class="line">  -nowarn                    Generate no warnings</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-Git"><a href="#安装-Git" class="headerlink" title="安装 Git"></a>安装 Git</h3><h4 id="准备工作-安装依赖与解压"><a href="#准备工作-安装依赖与解压" class="headerlink" title="准备工作: 安装依赖与解压"></a>准备工作: 安装依赖与解压</h4><ul>
-<li><p>通过源码编译安装</p>
-<p>在官网下载需要的包</p>
-<p><a href="https://mirrors.edge.kernel.org/pub/software/scm/git/" target="_blank" rel="noopener">官网下载链接</a></p>
-<p>解压 <code>tar -zxvf v2.26.2.tar.gz</code></p>
-</li>
-<li><p>提前安装可能会用到的依赖</p>
-<p><code>yum install curl-devel expat-devel gettext-devel openssl-devel zlib-devel gcc-c++ perl-ExtUtils-MakeMaker autoconf automake libtool</code> </p>
-</li>
-</ul>
-<h4 id="编译安装并配置环境变量"><a href="#编译安装并配置环境变量" class="headerlink" title="编译安装并配置环境变量"></a>编译安装并配置环境变量</h4><ul>
-<li><p>进入对应目录, 执⾏配置、编译、安装命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 git-2.26.2]#cd git-2.26.2/</span><br><span class="line">[root@docker001 git-2.26.2]# make configure</span><br><span class="line">[root@docker001 git-2.26.2]# ./configure --prefix=/usr/local/git</span><br><span class="line">[root@docker001 git-2.26.2]# make profix=/usr/local/git</span><br><span class="line">[root@docker001 git-2.26.2]# make install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将 Git 加入环境变量</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/profile</span><br><span class="line"></span><br><span class="line">export GIT_HOME=/usr/local/git</span><br><span class="line">export PATH=$PATH:$GIT_HOME/bin</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>最后激活 <code>source /etc/profile</code></p>
-</li>
-</ul>
-<h4 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 git-2.26.2]# git --version</span><br><span class="line">git version 2.26.2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果是 1.8.3 版本的, 则是系统自带的, 可以手动卸载</span></span><br><span class="line">yum list git</span><br><span class="line">yum remove 查出来的git信息</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-Maven-项目管理工具"><a href="#安装-Maven-项目管理工具" class="headerlink" title="安装 Maven 项目管理工具"></a>安装 Maven 项目管理工具</h3><h4 id="安装前的准备工作-解压"><a href="#安装前的准备工作-解压" class="headerlink" title="安装前的准备工作: 解压"></a>安装前的准备工作: 解压</h4><ul>
-<li>下载<code>apache-maven-3.6.3-bin.tar.gz</code>安装包, 放在/opt目录下</li>
-<li>进行解压 <code>tar -zxvf apache-maven-3.6.3-bin.tar.gz</code></li>
-<li>改名 <code>mv apache-maven-3.6.3-bin/ maven-3.6.3</code></li>
-</ul>
-<h4 id="配置阿里云镜像-环境变量"><a href="#配置阿里云镜像-环境变量" class="headerlink" title="配置阿里云镜像, 环境变量"></a>配置阿里云镜像, 环境变量</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 修改 /opt/maven-3.6.3/conf/settings.xml 文件 --&gt;</span> </span><br><span class="line"><span class="comment">&lt;!-- 在 mirrors 标签中添加下面标签即可 --&gt;</span> </span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>alimaven<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>aliyun maven<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.aliyun.com/nexus/content/groups/public/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>配置环境变量并激活文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/profile</span><br><span class="line"></span><br><span class="line">export MAVEN_HOME=/opt/maven/apache-maven-3.6.3</span><br><span class="line">export PATH=$MAVEN_HOME/bin:$PATH</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>验证</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 git-2.26.2]# mvn -v</span><br><span class="line">Apache Maven 3.6.3</span><br><span class="line">Maven home: /opt/maven-3.6.3</span><br><span class="line">Java version: 1.8.0_251, vendor: Oracle Corporation, runtime: /usr/local/java/jdk1.8.0_251/jre</span><br><span class="line">Default locale: en_US, platform encoding: UTF-8</span><br><span class="line">OS name: "linux", version: "3.10.0-957.el7.x86_64", arch: "amd64", family: "unix"</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h3 id="安装-Node-环境"><a href="#安装-Node-环境" class="headerlink" title="安装 Node 环境"></a>安装 Node 环境</h3><h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载好<code>node-v12.16.3-linux-x64.tar.xz</code>安装包,  放在<code>/opt</code>目录下</p>
-</li>
-<li><p>创建<code>/usr/local/node</code>目录, 在该目录执行下面命令, 解压下载好的安装包</p>
-<p><code>tar -xJvf /opt/node-v12.16.3-linux-x64.tar.xz -C ./</code></p>
-<p>解压后, 会出现<code>/usr/local/node/node-v12.16.3-linux-x64</code>目录</p>
-</li>
-</ul>
-<h4 id="配置-NODE-环境变量"><a href="#配置-NODE-环境变量" class="headerlink" title="配置 NODE 环境变量"></a>配置 NODE 环境变量</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在 ~/.bash_profile 文件末尾添加如下信息, 并重新激活文件</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Nodejs</span></span><br><span class="line">export PATH=/usr/local/node/node-v12.16.3-linux-x64/bin:$PATH</span><br><span class="line"></span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure>
-
-<h4 id="验证-2"><a href="#验证-2" class="headerlink" title="验证"></a>验证</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm version</span><br><span class="line">npx -v</span><br><span class="line"></span><br><span class="line">[root@docker001 node]# node -v</span><br><span class="line">v12.16.3</span><br><span class="line">[root@docker001 node]# npm version</span><br><span class="line">&#123;</span><br><span class="line">  npm: '6.14.4',</span><br><span class="line">  ares: '1.16.0',</span><br><span class="line">  brotli: '1.0.7',</span><br><span class="line">  cldr: '36.0',</span><br><span class="line">  http_parser: '2.9.3',</span><br><span class="line">  icu: '65.1',</span><br><span class="line">  llhttp: '2.0.4',</span><br><span class="line">  modules: '72',</span><br><span class="line">  napi: '5',</span><br><span class="line">  nghttp2: '1.40.0',</span><br><span class="line">  node: '12.16.3',</span><br><span class="line">  openssl: '1.1.1g',</span><br><span class="line">  tz: '2019c',</span><br><span class="line">  unicode: '12.1',</span><br><span class="line">  uv: '1.34.2',</span><br><span class="line">  v8: '7.8.279.23-node.35',</span><br><span class="line">  zlib: '1.2.11'</span><br><span class="line">&#125;</span><br><span class="line">[root@docker001 node]# npx -v</span><br><span class="line">6.14.4</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="安装-Python-3"><a href="#安装-Python-3" class="headerlink" title="安装 Python 3"></a>安装 Python 3</h3><h4 id="准备工作-1"><a href="#准备工作-1" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>系统自带了<code>python2.7.5</code>, 可通过<code>python -V</code>查看</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 node]<span class="comment"># python -V</span></span><br><span class="line">Python 2.7.5</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装一个 python3, 与python2共存</p>
-<ul>
-<li><p>下载安装包<code>Python-3.8.3.tgz</code>, 放在 <code>/opt</code>目录下</p>
-</li>
-<li><p>执行命令解压 <code>tar -zxvf Python-3.8.2.tgz</code></p>
-<p>得到 <code>/opt/Python-3.8.3</code>目录</p>
-</li>
-</ul>
-</li>
-<li><p>安装需要的依赖</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="编译安装-python-并添加软链接"><a href="#编译安装-python-并添加软链接" class="headerlink" title="编译安装 python, 并添加软链接"></a>编译安装 python, 并添加软链接</h4><ul>
-<li><p>指定安装目录为 <code>/usr/local/python3</code>, 可以根据自己的需要指定</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd Python-3.8.3/</span><br><span class="line">./configure prefix=/usr/local/python3</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>等待安装完毕, 生成 <code>/usr/local/python3</code>目录</p>
-</li>
-<li><p>添加软链接, 方便后续使用</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ln -s /usr/<span class="built_in">local</span>/python3/bin/python3 /usr/bin/python3</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/python3/bin/pip3 /usr/bin/pip3</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="验证-3"><a href="#验证-3" class="headerlink" title="验证"></a>验证</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">python3 -V</span><br><span class="line">pip3 -V</span><br><span class="line"></span><br><span class="line">[root@docker001 node]<span class="comment"># pip3 -V</span></span><br><span class="line">pip 19.2.3 from /usr/<span class="built_in">local</span>/python3/lib/python3.8/site-packages/pip (python 3.8)</span><br><span class="line">[root@docker001 node]<span class="comment"># python3 -V</span></span><br><span class="line">Python 3.8.3</span><br></pre></td></tr></table></figure>
-
-<h4 id="切换pip源为阿里云源"><a href="#切换pip源为阿里云源" class="headerlink" title="切换pip源为阿里云源"></a>切换pip源为阿里云源</h4><ul>
-<li><p>创建配置文件</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 ~]<span class="comment"># mkdir -p ~/.pip</span></span><br><span class="line">[root@docker001 ~]<span class="comment"># vi  ~/.pip/pip.conf</span></span><br><span class="line"></span><br><span class="line">[global]</span><br><span class="line">timeout = 6000</span><br><span class="line">index-url = https://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">trusted-host = mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>验证</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 .pip]<span class="comment"># pip3 install --upgrade pip</span></span><br><span class="line">Looking <span class="keyword">in</span> indexes: https://mirrors.aliyun.com/pypi/simple/</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h3 id="安装-Docker-环境"><a href="#安装-Docker-环境" class="headerlink" title="安装 Docker 环境"></a>安装 Docker 环境</h3><ul>
-<li>完全按官网的步骤来就可以, 唯一需要改动的就是 修改 repo 源和配置阿里云加速</li>
-</ul>
-<h4 id="申请阿里云的容器镜像服务"><a href="#申请阿里云的容器镜像服务" class="headerlink" title="申请阿里云的容器镜像服务"></a>申请阿里云的容器镜像服务</h4><ul>
-<li><p>申请阿里云的容器镜像服务(免费)</p>
-<ul>
-<li><p><a href="https://cr.console.aliyun.com/cn-shanghai/instances/mirrors" target="_blank" rel="noopener">容器镜像服务</a></p>
-<p><img src="https://i.loli.net/2020/05/24/lfxOBDA7XgZQSeJ.png" alt="image-20200524102808707.png"></p>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="正式安装"><a href="#正式安装" class="headerlink" title="正式安装"></a>正式安装</h4><p><a href="https://docs.docker.com/engine/install/centos/" target="_blank" rel="noopener">Docker官网教程</a></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 卸载旧的docker, 安装yum-utils</span></span><br><span class="line">yum remove docker docker-client \</span><br><span class="line">                  docker-client-latest \</span><br><span class="line">                  docker-common \</span><br><span class="line">                  docker-latest \</span><br><span class="line">                  docker-latest-logrotate \</span><br><span class="line">                  docker-logrotate \</span><br><span class="line">                  docker-engine                  </span><br><span class="line">yum install -y yum-utils</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加阿里云的repo源</span></span><br><span class="line">yum-config-manager --add-repo \</span><br><span class="line">     http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br><span class="line"><span class="comment"># 生成缓存</span></span><br><span class="line">yum makecache fast</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装docker</span></span><br><span class="line">yum install docker-ce docker-ce-cli containerd.io</span><br><span class="line"></span><br><span class="line">systemctl start docker</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置阿里云镜像加速, 以下部分为阿里云的镜像仓库</span></span><br><span class="line">mkdir -p /etc/docker</span><br><span class="line"></span><br><span class="line">tee /etc/docker/daemon.json &lt;&lt;-<span class="string">'EOF'</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"registry-mirrors"</span>: [<span class="string">"你自己的地址"</span>]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart docker</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证安装</span></span><br><span class="line">docker run hello-world</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证结果</span></span><br><span class="line">[root@docker001 node]<span class="comment"># docker run hello-world</span></span><br><span class="line">Unable to find image <span class="string">'hello-world:latest'</span> locally</span><br><span class="line">latest: Pulling from library/hello-world</span><br><span class="line">0e03bdcc26d7: Pull complete </span><br><span class="line">Digest: sha256:6a65f928fb91fcfbc963f7aa6d57c8eeb426ad9a20c7ee045538ef34847f44f1</span><br><span class="line">Status: Downloaded newer image <span class="keyword">for</span> hello-world:latest</span><br><span class="line"></span><br><span class="line">Hello from Docker!</span><br><span class="line">This message shows that your installation appears to be working correctly.</span><br><span class="line"></span><br><span class="line">To generate this message, Docker took the following steps:</span><br><span class="line"> 1. The Docker client contacted the Docker daemon.</span><br><span class="line"> 2. The Docker daemon pulled the <span class="string">"hello-world"</span> image from the Docker Hub.</span><br><span class="line">    (amd64)</span><br><span class="line"> 3. The Docker daemon created a new container from that image <span class="built_in">which</span> runs the</span><br><span class="line">    executable that produces the output you are currently reading.</span><br><span class="line"> 4. The Docker daemon streamed that output to the Docker client, <span class="built_in">which</span> sent it</span><br><span class="line">    to your terminal.</span><br><span class="line"></span><br><span class="line">To try something more ambitious, you can run an Ubuntu container with:</span><br><span class="line"> $ docker run -it ubuntu bash</span><br><span class="line"></span><br><span class="line">Share images, automate workflows, and more with a free Docker ID:</span><br><span class="line"> https://hub.docker.com/</span><br><span class="line"></span><br><span class="line">For more examples and ideas, visit:</span><br><span class="line"> https://docs.docker.com/get-started/</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-MySQL-数据库"><a href="#安装-MySQL-数据库" class="headerlink" title="安装 MySQL 数据库"></a>安装 MySQL 数据库</h3><h4 id="准备工作-2"><a href="#准备工作-2" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载安装包<code>mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz</code>, 放在 <code>/opt</code>目录下</p>
-</li>
-<li><p>卸载系统自带的<code>Mariadb</code>(如果有)</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum remove $(rpm -qa|grep mariadb)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解压 MySQL到 <code>/usr/local</code>, 并重命名</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf /opt/mysql-5.7.30-linux-glibc2.12-x86_64.tar.gz -C /usr/<span class="built_in">local</span>/</span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span></span><br><span class="line">mv mysql-5.7.30-linux-glibc2.12-x86_64 mysql</span><br><span class="line"><span class="comment"># 创建 data 目录, 存放mysql数据, 根据自己需要指定</span></span><br><span class="line">mkdir /usr/<span class="built_in">local</span>/mysql/data</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>创建mysql用户和用户组, 并修改从属关系</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">groupadd mysql</span><br><span class="line">useradd -g mysql mysql</span><br><span class="line"></span><br><span class="line">chown -R mysql:mysql /usr/local/mysql</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>创建<code>mysql</code>配置文件<code>my.cnf</code></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/my.cnf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 简单配置如下, 更多详细的自己根据需要配置</span></span><br><span class="line"></span><br><span class="line">[mysql]</span><br><span class="line"><span class="comment"># 设置mysql客户端默认字符集</span></span><br><span class="line">default-character-set=utf8</span><br><span class="line">socket=/var/lib/mysql/mysql.sock</span><br><span class="line">[mysqld]</span><br><span class="line">skip-name-resolve</span><br><span class="line"><span class="comment">#设置3306端口</span></span><br><span class="line">port = 3306</span><br><span class="line">socket=/var/lib/mysql/mysql.sock</span><br><span class="line"><span class="comment"># 设置mysql的安装目录</span></span><br><span class="line">basedir=/usr/<span class="built_in">local</span>/mysql</span><br><span class="line"><span class="comment"># 设置mysql数据库的数据的存放目录</span></span><br><span class="line">datadir=/usr/<span class="built_in">local</span>/mysql/data</span><br><span class="line"><span class="comment"># 允许最大连接数</span></span><br><span class="line">max_connections=200</span><br><span class="line"><span class="comment"># 服务端使用的字符集默认为8比特编码的latin1字符集, 指定为utf-8</span></span><br><span class="line">character-set-server=utf8</span><br><span class="line"><span class="comment"># 创建新表时将使用的默认存储引擎</span></span><br><span class="line">default-storage-engine=INNODB</span><br><span class="line"><span class="comment"># 驼峰命名与下划线</span></span><br><span class="line">lower_case_table_names=1</span><br><span class="line">max_allowed_packet=16M</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>创建 <code>/var/lib/mysql</code> ⽬录，并修改权限</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir /var/lib/mysql</span><br><span class="line">chmod 777 /var/lib/mysql</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="正式开始安装Mysql"><a href="#正式开始安装Mysql" class="headerlink" title="正式开始安装Mysql"></a>正式开始安装Mysql</h4><ul>
-<li><p>安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/mysql</span><br><span class="line">./bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql \ </span><br><span class="line">--datadir=/usr/local/mysql/data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 完成后会在终端打印出初始密码</span></span><br><span class="line">[Note] A temporary password is generated for root@docker001: UDF*s23_13sc</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置启动脚本, 在 <code>/usr/local/mysql</code>目录下执行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 mysql]# cp ./support-files/mysql.server /etc/init.d/mysqld</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改 /etc/init.d/mysqld 的内容为正确路径</span></span><br><span class="line">vi /etc/init.d/mysqld</span><br><span class="line"></span><br><span class="line">basedir=/usr/local/mysql</span><br><span class="line">datadir=/usr/local/mysql/data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 增加执行权限</span></span><br><span class="line">chmod +x /etc/init.d/mysqld</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将 mysqld 服务加入到系统服务, 并检查是否生效</span></span><br><span class="line">chkconfig --add mysqld</span><br><span class="line"></span><br><span class="line">chkconfig --list mysqld</span><br><span class="line"></span><br><span class="line">mysqld  	0:off	1:off	2:on	3:on	4:on	5:on	6:off</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这就表示mysqld生效了</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以用 service mysqld start 启动服务</span></span><br><span class="line">[root@docker001 ~]# service mysqld start</span><br><span class="line">Starting MySQL.</span><br><span class="line"></span><br><span class="line">SUCCESS!</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置msql环境变量</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.bash_profile</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/mysql/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> ~/.bash_profile</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="第一次启动MySQL"><a href="#第一次启动MySQL" class="headerlink" title="第一次启动MySQL"></a>第一次启动MySQL</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql -u root -p <span class="comment"># 使用上面安装后打印出的密码</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt;alter user user() identified by <span class="string">"密码"</span>;</span><br><span class="line">mysql&gt;flush privileges;</span><br><span class="line"><span class="comment"># 设置主机远程登录</span></span><br><span class="line">mysql&gt; use mysql;</span><br><span class="line">mysql&gt; update user <span class="built_in">set</span> user.Host=<span class="string">'%'</span> <span class="built_in">where</span> user.User=<span class="string">'root'</span>;</span><br><span class="line">mysql&gt; flush privileges;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>此时就可以正常使用了</li>
-</ul>
-<h3 id="安装-Redis"><a href="#安装-Redis" class="headerlink" title="安装 Redis"></a>安装 Redis</h3><h4 id="准备工作-3"><a href="#准备工作-3" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载 <code>redis-5.0.8.tar.gz</code>安装包, 放在<code>/usr/local/redis</code> 目录下</p>
-<p><code>tar -zxvf redis-5.0.8.tar.gz</code></p>
-</li>
-<li><p>会解压出一个 <code>/usr/local/redis/redis-5.0.8</code>目录</p>
-</li>
-</ul>
-<h4 id="编译安装与设置开机自启"><a href="#编译安装与设置开机自启" class="headerlink" title="编译安装与设置开机自启"></a>编译安装与设置开机自启</h4><ul>
-<li><p>编译安装</p>
-<ul>
-<li>执行前确保安装了<code>gcc</code>等环境, 因为在安装<code>python3</code>时已经安装了依赖,所以在此可以直接编译安装</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在 /usr/<span class="built_in">local</span>/redis/redis-5.0.8 目录下执行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译安装</span></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设为后台服务, 并自启</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">mkdir /etc/redis</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在 /usr/<span class="built_in">local</span>/redis/redis-5.0.8 目录下执行</span></span><br><span class="line">cp redis.conf /etc/redis/6379.conf</span><br><span class="line"></span><br><span class="line">vi /etc/redis/6379.conf</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改下面几项内容</span></span><br><span class="line">daemonize no =&gt; daemonize yes</span><br><span class="line">bind 127.0.0.1 =&gt; bind 0.0.0.0</span><br><span class="line">requirepass 你的密码</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在 /usr/<span class="built_in">local</span>/bin 目录下执行, 启动服务端</span></span><br><span class="line">./redis-server /etc/redis/6379.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后ps查看redis</span></span><br><span class="line">[root@docker001 bin]# ps -ef |grep redis</span><br><span class="line">root       7373      1  0 23:09 ?        00:00:01 *:6379</span><br><span class="line"></span><br><span class="line">[root@docker001 bin]# ./redis-cli -p 6379</span><br><span class="line">127.0.0.1:6379&gt; ping</span><br><span class="line">(error) NOAUTH Authentication required.</span><br><span class="line">127.0.0.1:6379&gt; auth 你的密码</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; ping</span><br><span class="line">PONG</span><br><span class="line">127.0.0.1:6379&gt; exit</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置开机自启, 在/usr/<span class="built_in">local</span>/redis/redis-5.0.8/utils 目录下执行</span></span><br><span class="line">[root@docker001 utils]# cp redis_init_script /etc/init.d/redis_6379</span><br><span class="line">[root@docker001 utils]# vi /etc/init.d/redis_6379</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改对应内容为自己设置的内容</span></span><br><span class="line">REDISPORT=6379</span><br><span class="line">EXEC=/usr/local/bin/redis-server</span><br><span class="line">CLIEXEC=/usr/local/bin/redis-cli</span><br><span class="line">PIDFILE=/var/run/redis_$&#123;REDISPORT&#125;.pid</span><br><span class="line">CONF="/etc/redis/$&#123;REDISPORT&#125;.conf"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 为了更快的启动, 可以在第38行 添加密码</span></span><br><span class="line">37  	echo "Stopping ..."</span><br><span class="line">38	    $CLIEXEC -p $REDISPORT -a 你的密码 shutdown  </span><br><span class="line"></span><br><span class="line">[root@docker001 init.d]# chmod +x redis_6379</span><br><span class="line">[root@docker001 init.d]# chkconfig --add redis_6379</span><br><span class="line">[root@docker001 init.d]# chkconfig redisd on </span><br><span class="line">[root@docker001 init.d]# chkconfig --list redis_6379 </span><br><span class="line">redis_6379     	0:off	1:off	2:on	3:on	4:on	5:on	6:off</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<h3 id="安装-Nginx-Web服务器"><a href="#安装-Nginx-Web服务器" class="headerlink" title="安装 Nginx Web服务器"></a>安装 Nginx Web服务器</h3><h4 id="准备工作-4"><a href="#准备工作-4" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载安装包<code>nginx-1.17.10.tar.gz</code>并放入<code>/opt</code>目录</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/<span class="built_in">local</span>/nginx</span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/nginx</span><br><span class="line">tar -zxvf /opt/nginx-1.17.10.tar.gz -C ./</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解压完成后会生成 <code>/usr/local/nginx/nginx-1.17.10</code>目录</p>
-</li>
-<li><p>安装需要的依赖</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install gcc pcre-devel zlib-devel openssl openssl-devel</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h4><ul>
-<li><p>编译安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nginx/nginx-1.17.10</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装 ssl 模块, 如果不需要的话, 可以不带参数</span></span><br><span class="line">./configure --with-http_stub_status_module --with-http_ssl_module</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装完成后, nginx启动文件位于 <code>/usr/local/nginx/sbin/nginx</code></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置文件</span></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/java/nginx/conf</span><br><span class="line">vi nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 简单配置</span></span><br><span class="line">user root;</span><br><span class="line">error_log  logs/error.log  info;</span><br><span class="line">pid        logs/nginx.pid;</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/nginx</span><br><span class="line"><span class="comment"># 第一次启动</span></span><br><span class="line">./sbin/nginx </span><br><span class="line"><span class="comment"># 重新加载配置文件</span></span><br><span class="line">./sbin/nginx -s reload</span><br><span class="line"><span class="comment"># 停止</span></span><br><span class="line">./sbin/nginx -s stop</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置开机自启</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># NGINX 开机自启</span></span><br><span class="line">vim /etc/rc.d/rc.local</span><br><span class="line"><span class="comment"># 添加下面这个路径,启动路径</span></span><br><span class="line">/usr/<span class="built_in">local</span>/nginx/sbin/nginx </span><br><span class="line"></span><br><span class="line">chmod +x /etc/rc.d/rc.local</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="验证-4"><a href="#验证-4" class="headerlink" title="验证"></a>验证</h4><p>在浏览器输入服务器的ip, 可以看到 <code>welcome to nginx</code></p>
-<h3 id="安装-RabbitMQ"><a href="#安装-RabbitMQ" class="headerlink" title="安装 RabbitMQ"></a>安装 RabbitMQ</h3><h4 id="准备工作-5"><a href="#准备工作-5" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>添加<code>repo</code>, 安装<code>erlong</code></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | sudo bash</span><br><span class="line"></span><br><span class="line">yum install erlang-22.3.3-1.el7.x86_64</span><br><span class="line"><span class="comment"># 如果上一句有问题了, 执行这个</span></span><br><span class="line">yum load-transaction /tmp/yum_save_tx.2020-05-14.22-21.n0cwzm.yumtx</span><br><span class="line"></span><br><span class="line">erl <span class="comment"># 查看是否成功</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装<code>rabbitmq</code>的<code>yum</code>源</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | sudo bash</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="正式安装与配置"><a href="#正式安装与配置" class="headerlink" title="正式安装与配置"></a>正式安装与配置</h4><ul>
-<li><p>安装<code>rabbitmq-server-3.8.3</code></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install rabbitmq-server-3.8.3-1.el7.noarch</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置开机自启与可视化插件</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 打开服务</span></span><br><span class="line">chkconfig rabbitmq-server on</span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">systemctl start rabbitmq-server.service</span><br><span class="line"><span class="comment"># 开启可视化插件</span></span><br><span class="line">rabbitmq-plugins <span class="built_in">enable</span> rabbitmq_management</span><br><span class="line"><span class="comment"># 添加用户</span></span><br><span class="line">rabbitmqctl add_user 用户名 密码</span><br><span class="line">eg: </span><br><span class="line">	rabbitmqctl add_user admin admin</span><br><span class="line"><span class="comment"># 设置管理员</span></span><br><span class="line">rabbitmqctl set_user_tags 用户名 administrator</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="验证-5"><a href="#验证-5" class="headerlink" title="验证"></a>验证</h4><p>访问: IP:15672, 可以看到RabbitMQ的界面</p>
-<h3 id="安装-Tomcat-应用服务器"><a href="#安装-Tomcat-应用服务器" class="headerlink" title="安装 Tomcat 应用服务器"></a>安装 Tomcat 应用服务器</h3><h4 id="准备工作-6"><a href="#准备工作-6" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载安装包 <code>apache-tomcat-8.5.55.tar.gz</code>, 放在<code>/opt</code>目录</p>
-</li>
-<li><p>解压</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/tomcat</span><br><span class="line">tar -zxvf /opt/apache-tomcat-8.5.55.tar.gz -C ./</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>会生成<code>/usr/local/tomcat/apache-tomcat-8.5.55</code>目录</p>
-</li>
-</ul>
-<h4 id="配置及设置启动脚本"><a href="#配置及设置启动脚本" class="headerlink" title="配置及设置启动脚本"></a>配置及设置启动脚本</h4><ul>
-<li><p>配置</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/<span class="built_in">local</span>/tomcat/apache-tomcat-8.5.55/conf/server.xml</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改默认端口 8080 为自己指定的端口, 否则会与zookeeper冲突, 这一点是坑</span></span><br><span class="line">&lt;Connector port=<span class="string">"8000"</span> protocol=<span class="string">"HTTP/1.1"</span></span><br><span class="line">            connectionTimeout=<span class="string">"20000"</span></span><br><span class="line">            redirectPort=<span class="string">"8443"</span> /&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置启动脚本</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/local/tomcat/apache-tomcat-8.5.55/bin/setclasspath.sh</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加 Java 路径, 否则加入服务时找不到 java</span></span><br><span class="line">export JAVA_HOME=/usr/local/java/jdk1.8.0_251</span><br><span class="line">export JRE_HOME=/usr/local/java/jdk1.8.0_251/jre</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 测试启动与关闭</span></span><br><span class="line">[root@docker001 bin]# ./startup.sh </span><br><span class="line">Using CATALINA_BASE:   /usr/local/tomcat/apache-tomcat-8.5.55</span><br><span class="line">Using CATALINA_HOME:   /usr/local/tomcat/apache-tomcat-8.5.55</span><br><span class="line">Using CATALINA_TMPDIR: /usr/local/tomcat/apache-tomcat-8.5.55/temp</span><br><span class="line">Using JRE_HOME:        /usr/local/java/jdk1.8.0_251/jre</span><br><span class="line">Using CLASSPATH:       /usr/local/tomcat/apache-tomcat-8.5.55/bin/bootstrap.jar:/usr/local/tomcat/apache-tomcat-8.5.55/bin/tomcat-juli.jar</span><br><span class="line">Tomcat started.</span><br><span class="line">[root@docker001 bin]# ./shutdown.sh </span><br><span class="line">Using CATALINA_BASE:   /usr/local/tomcat/apache-tomcat-8.5.55</span><br><span class="line">Using CATALINA_HOME:   /usr/local/tomcat/apache-tomcat-8.5.55</span><br><span class="line">Using CATALINA_TMPDIR: /usr/local/tomcat/apache-tomcat-8.5.55/temp</span><br><span class="line">Using JRE_HOME:        /usr/local/java/jdk1.8.0_251/jre</span><br><span class="line">Using CLASSPATH:       /usr/local/tomcat/apache-tomcat-8.5.55/bin/bootstrap.jar:/usr/local/tomcat/apache-tomcat-8.5.55/bin/tomcat-juli.jar</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置开机自启</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/rc.d/init.d/</span><br><span class="line">vi tomcat</span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#chkconfig:- 20 90</span></span><br><span class="line"><span class="comment">#description:tomcat</span></span><br><span class="line"><span class="comment">#processname:tomcat</span></span><br><span class="line">TOMCAT_HOME=/usr/<span class="built_in">local</span>/tomcat/apache-tomcat-8.5.55<span class="comment"># 你的tomcat路径</span></span><br><span class="line"><span class="keyword">case</span> <span class="variable">$1</span> <span class="keyword">in</span></span><br><span class="line">	start) su root <span class="variable">$TOMCAT_HOME</span>/bin/startup.sh;;</span><br><span class="line">	stop) su root <span class="variable">$TOMCAT_HOME</span>/bin/shutdown.sh;;</span><br><span class="line">	*) <span class="built_in">echo</span> <span class="string">"require start|stop"</span> ;;</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line">chmod +x tomcat</span><br><span class="line"></span><br><span class="line"><span class="comment"># 此时可以执行下面的命令进行启动和关闭</span></span><br><span class="line">service tomcat start</span><br><span class="line">service tomcat stop</span><br><span class="line"><span class="comment"># 加入系统服务</span></span><br><span class="line">chkconfig --add tomcat</span><br><span class="line">chkconfig tomcat on</span><br><span class="line">chkchkconfig --list tomcat</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h3 id="安装-Zookeeper"><a href="#安装-Zookeeper" class="headerlink" title="安装 Zookeeper"></a>安装 Zookeeper</h3><h4 id="准备工作-7"><a href="#准备工作-7" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>下载安装包<code>apache-zookeeper-3.6.1-bin.tar.gz</code>放在<code>/opt</code>下</p>
-</li>
-<li><p>解压</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/<span class="built_in">local</span>/zookeeper</span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/zookeeper</span><br><span class="line">tar -zxvf /opt/apache-zookeeper-3.6.1-bin.tar.gz -C ./</span><br><span class="line"><span class="comment"># 会生成一个/usr/local/zookeeper/apache-zookeeper-3.6.1-bin目录</span></span><br><span class="line"><span class="comment"># 创建一个data目录</span></span><br><span class="line">mkdir /usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin/data</span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="安装与配置"><a href="#安装与配置" class="headerlink" title="安装与配置"></a>安装与配置</h4><ul>
-<li><p>配置</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin/conf</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line">vi zoo.cfg</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改dataDir为上面创建的data目录</span></span><br><span class="line">dataDir=/usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin/data</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@docker001 apache-zookeeper-3.6.1-bin]<span class="comment"># ./bin/zkServer.sh start</span></span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin/bin/../conf/zoo.cfg</span><br><span class="line">Starting zookeeper ... STARTED</span><br><span class="line"></span><br><span class="line">[root@docker001 apache-zookeeper-3.6.1-bin]<span class="comment"># ./bin/zkServer.sh status</span></span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Mode: standalone</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置环境变量</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/profile</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> ZOOKEEPER_HOME=/usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$ZOOKEEPER_HOME</span>/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>设置开机自启</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/init.d/</span><br><span class="line">vi zookeeper</span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#chkconfig:- 20 90</span></span><br><span class="line"><span class="comment">#description:zookeeper</span></span><br><span class="line"><span class="comment">#processname:zookeeper</span></span><br><span class="line">ZOOKEEPER_HOME=/usr/<span class="built_in">local</span>/zookeeper/apache-zookeeper-3.6.1-bin <span class="comment"># 此处根据你的实际情况更换对应</span></span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/usr/<span class="built_in">local</span>/java/jdk1.8.0_251 <span class="comment"># 此处根据你的实际情况更换对应</span></span><br><span class="line"><span class="keyword">case</span> <span class="variable">$1</span> <span class="keyword">in</span></span><br><span class="line">	start) su root <span class="variable">$ZOOKEEPER_HOME</span>/bin/zkServer.sh start;;</span><br><span class="line">	stop) su root <span class="variable">$ZOOKEEPER_HOME</span>/bin/zkServer.sh stop;;</span><br><span class="line">	status) su root <span class="variable">$ZOOKEEPER_HOME</span>/bin/zkServer.sh status;;</span><br><span class="line">	restart) su root <span class="variable">$ZOOKEEPER_HOME</span>/bin/zkServer.sh restart;;</span><br><span class="line">	*) <span class="built_in">echo</span> <span class="string">"require start|stop|status|restart"</span> ;;</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line">chmod +x zookeeper</span><br><span class="line"><span class="comment"># 加入开机启动</span></span><br><span class="line">chkconfig --add zookeeper</span><br><span class="line">chkconfig zookeeper on</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h3 id="安装-Thefuck-工具"><a href="#安装-Thefuck-工具" class="headerlink" title="安装 Thefuck 工具"></a>安装 Thefuck 工具</h3><ul>
-<li>安装这个工具纯属娱乐 : )  <a href="https://github.com/nvbn/thefuck" target="_blank" rel="noopener">thefuck</a></li>
-</ul>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">yum -y install epel-release python3-devel</span><br><span class="line">pip3 install --upgrade pip</span><br><span class="line"></span><br><span class="line">Successfully installed colorama-0.4.3 decorator-4.4.2 psutil-5.7.0 pyte-0.8.0 six-1.15.0 thefuck-3.30 wcwidth-0.1.9</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑 .bashrc 配置文件</span></span><br><span class="line">vim ~/.bashrc</span><br><span class="line"></span><br><span class="line"><span class="built_in">eval</span> <span class="string">"<span class="variable">$(thefuck --alias fuck)</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzU4ODI1MjA3NQ==&mid=2247486646&idx=1&sn=2e4f946f2ac7889991e872d1c885eb44&chksm=fddeda72caa953643fd8d2af385e1ad973b7b4ebe59585fb23072b851fe4a5c0bfb2442573ae&scene=0&xtrack=1&key=cf6ab1fd6f95a270dfefa6b2f3f4eb1fb6e8176dd7c366fa5194889c8b9a9e882d5e0bd45e20e943929ed45b875cc1533d20ba028783a0ff9691e1481387f535a7993f1a75d53d1a001e147bd22b6562&ascene=1&uin=MTI0NDQ3NzIwNw%3D%3D&devicetype=Windows+10&version=62070158&lang=zh_CN&exportkey=A9pb1wEuSza6ydZuqGd3jb0%3D&pass_ticket=TOgG0xj3EwqhuL%2F3G1yPG42n1a7FIgWBlXzGD%2B0tdnR7hQwiMNVDdaeetDZ7BYN5" target="_blank" rel="noopener"><strong>CodeSheep</strong>公众号</a></p>
-<p><a href="https://cloud.tencent.com/developer/article/1520882" target="_blank" rel="noopener">pip pip3 替换国内镜像源</a></p>
-<p><a href="https://blog.csdn.net/inslow/article/details/54177191" target="_blank" rel="noopener">修改CentOS默认yum源为国内yum镜像源</a></p>
-<blockquote>
-<p>非常感谢羊哥的手册, 按照羊哥的手册, 对我个人而言, 大部分不用一点修改, 小的部分进行了修改, 特此记录</p>
-</blockquote>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> </span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/b5b62e3d.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1881,12 +1550,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">153k</span>
+    <span title="站点总字数">154k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:19</span>
+    <span title="站点阅读时长">2:20</span>
 </div>
   <!--
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0

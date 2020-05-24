@@ -3,11 +3,16 @@
   <entry>
     <title>服务器软件安装实录</title>
     <url>/posts/b5b62e3d.html</url>
-    <content><![CDATA[<h2 id="服务器软件安装实录"><a href="#服务器软件安装实录" class="headerlink" title="服务器软件安装实录"></a>服务器软件安装实录</h2><blockquote>
-<p>centos 7.8</p>
-<p>以下操作均在 root 用户执行, 省略了 sudo</p>
+    <content><![CDATA[<blockquote>
+<p>由于最近经常配置服务器, 每次总是东拼西凑, 装完就忘, 说不上有什么技术含量,但是就是比较费时间, 刚好我一直关注的<code>CodeSheep</code>羊哥推出了一篇服务器安装文章, 我就顺水推舟, 顺便记录自己的安装过程. 这样以后在安装时就很省时间了</p>
+<p>本文所有用到的安装包, 都已经放在尾部链接了, 有需要自取</p>
+<p>注: </p>
+<p>  本文是在 centos 7.8 下进行安装的</p>
+<p>  以下操作均在 root 用户执行, 省略了 sudo</p>
 </blockquote>
 <h3 id="配置-Linux"><a href="#配置-Linux" class="headerlink" title="配置 Linux"></a>配置 Linux</h3><h4 id="查看-ip-地址-使用-Xshell-工具连接"><a href="#查看-ip-地址-使用-Xshell-工具连接" class="headerlink" title="查看 ip 地址, 使用 Xshell 工具连接"></a>查看 ip 地址, 使用 Xshell 工具连接</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[root@docker001 ~]# ip addr</span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000</span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: ens33: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">    link/ether 00:0c:29:36:25:d0 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.150.129/24 brd 192.168.150.255 scope global noprefixroute dynamic ens33</span><br><span class="line">       valid_lft 1646sec preferred_lft 1646sec</span><br><span class="line">    inet6 fd15:4ba5:5a2b:1008:d3c3:20d9:3634:da84/64 scope global noprefixroute dynamic </span><br><span class="line">       valid_lft 86385sec preferred_lft 14385sec</span><br><span class="line">    inet6 fe80::484c:a2cf:4ef5:72e6/64 scope link noprefixroute </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
 
 <h4 id="修改-ip-配置-配置DHCP与DNS等信息"><a href="#修改-ip-配置-配置DHCP与DNS等信息" class="headerlink" title="修改 ip 配置, 配置DHCP与DNS等信息"></a>修改 ip 配置, 配置DHCP与DNS等信息</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vi /etc/sysconfig/network-scripts/ifcfg-ens33</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 固定ip</span></span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=ip地址</span><br><span class="line">GATEWAY=网关</span><br><span class="line">DNS1=DNS</span><br><span class="line">IPV6_PRIVACY=no</span><br></pre></td></tr></table></figure>
 
@@ -343,13 +348,20 @@
 
 
 
-<h3 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzU4ODI1MjA3NQ==&mid=2247486646&idx=1&sn=2e4f946f2ac7889991e872d1c885eb44&chksm=fddeda72caa953643fd8d2af385e1ad973b7b4ebe59585fb23072b851fe4a5c0bfb2442573ae&scene=0&xtrack=1&key=cf6ab1fd6f95a270dfefa6b2f3f4eb1fb6e8176dd7c366fa5194889c8b9a9e882d5e0bd45e20e943929ed45b875cc1533d20ba028783a0ff9691e1481387f535a7993f1a75d53d1a001e147bd22b6562&ascene=1&uin=MTI0NDQ3NzIwNw%3D%3D&devicetype=Windows+10&version=62070158&lang=zh_CN&exportkey=A9pb1wEuSza6ydZuqGd3jb0%3D&pass_ticket=TOgG0xj3EwqhuL%2F3G1yPG42n1a7FIgWBlXzGD%2B0tdnR7hQwiMNVDdaeetDZ7BYN5" target="_blank" rel="noopener"><strong>CodeSheep</strong>公众号</a></p>
-<p><a href="https://cloud.tencent.com/developer/article/1520882" target="_blank" rel="noopener">pip pip3 替换国内镜像源</a></p>
-<p><a href="https://blog.csdn.net/inslow/article/details/54177191" target="_blank" rel="noopener">修改CentOS默认yum源为国内yum镜像源</a></p>
+<h3 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h3><ul>
+<li><p><a href="https://mp.weixin.qq.com/s?__biz=MzU4ODI1MjA3NQ==&mid=2247486646&idx=1&sn=2e4f946f2ac7889991e872d1c885eb44&chksm=fddeda72caa953643fd8d2af385e1ad973b7b4ebe59585fb23072b851fe4a5c0bfb2442573ae&scene=0&xtrack=1&key=cf6ab1fd6f95a270dfefa6b2f3f4eb1fb6e8176dd7c366fa5194889c8b9a9e882d5e0bd45e20e943929ed45b875cc1533d20ba028783a0ff9691e1481387f535a7993f1a75d53d1a001e147bd22b6562&ascene=1&uin=MTI0NDQ3NzIwNw%3D%3D&devicetype=Windows+10&version=62070158&lang=zh_CN&exportkey=A9pb1wEuSza6ydZuqGd3jb0%3D&pass_ticket=TOgG0xj3EwqhuL%2F3G1yPG42n1a7FIgWBlXzGD%2B0tdnR7hQwiMNVDdaeetDZ7BYN5" target="_blank" rel="noopener"><strong>CodeSheep</strong>公众号</a></p>
+</li>
+<li><p><a href="https://cloud.tencent.com/developer/article/1520882" target="_blank" rel="noopener">pip pip3 替换国内镜像源</a></p>
+</li>
+<li><p><a href="https://blog.csdn.net/inslow/article/details/54177191" target="_blank" rel="noopener">修改CentOS默认yum源为国内yum镜像源</a></p>
+</li>
+<li><p>非常感谢<code>CodeSheep</code>羊哥, 按照羊哥的手册, 对我个人而言, 大部分不用一点修改, 小的部分进行了修改, 特此记录</p>
+</li>
+</ul>
 <blockquote>
-<p>非常感谢羊哥的手册, 按照羊哥的手册, 对我个人而言, 大部分不用一点修改, 小的部分进行了修改, 特此记录</p>
+<p>下载链接：<a href="https://pan.baidu.com/s/1t_LOlTrdVvC481j1AsS6Xw" target="_blank" rel="noopener">https://pan.baidu.com/s/1t_LOlTrdVvC481j1AsS6Xw</a><br>提取码：xti8 </p>
 </blockquote>
-  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"> </span><br></pre></td></tr></table></figure>]]></content>
+]]></content>
       <categories>
         <category>实践</category>
       </categories>
