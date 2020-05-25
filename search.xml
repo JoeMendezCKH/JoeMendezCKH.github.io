@@ -1,6 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CentOS 编译 OpenJDK-7u75</title>
+    <url>/posts/35ab761c.html</url>
+    <content><![CDATA[<blockquote>
+<p>实践 深入理解Java虚拟机 一书第一章的手动编译 JDK</p>
+<p>环境信息:</p>
+<ul>
+<li>CentOS 7.8</li>
+<li><a href="https://download.java.net/openjdk/jdk7u75/ri/openjdk-7u75-src-b13-18_dec_2014.zip" target="_blank" rel="noopener">OpenJDK7u75</a></li>
+<li>jdk1.7.0_81</li>
+</ul>
+</blockquote>
+<h3 id="准备工作与开始编译"><a href="#准备工作与开始编译" class="headerlink" title="准备工作与开始编译"></a>准备工作与开始编译</h3><ul>
+<li><p>安装所需要的依赖</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 需要的依赖 </span></span><br><span class="line">yum -y install gawk m4 binutils libstdc++-static ant gcc gcc-c++ cups-devel alsa-lib-devel libX* zip unzip glibc-static</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备 bootjdk</p>
+<ul>
+<li>即下载一个正常使用的 jdk 版本, 要与编译的 openjdk 版本相同</li>
+</ul>
+</li>
+<li><p>测试安装环境是否完善</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 以下操作在解压的openjdk目录下操作</span></span><br><span class="line">make sanity</span><br><span class="line"><span class="comment"># 有一个 waring</span></span><br><span class="line">[WARNING]: LANG has been <span class="built_in">set</span> to zh_CN.UTF-8, this can cause build failures.</span><br><span class="line">         Try setting LANG to <span class="string">'C'</span>.</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决办法</span></span><br><span class="line"><span class="built_in">export</span> LANG=C</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重新执行</span></span><br><span class="line">make sanity</span><br><span class="line"><span class="comment"># 看到只有</span></span><br><span class="line">Sanity check passed.</span><br><span class="line"><span class="comment"># 说明环境准备好了</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li><p>编写启动脚本</p>
+<ul>
+<li>还是在上文解压的 openjdk 目录下</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim compile.sh</span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># 语言选项, 这个必须设置, 否则编译好后会出现一个HashTable的NPE错</span></span><br><span class="line"><span class="built_in">export</span> LANG=C</span><br><span class="line"></span><br><span class="line"><span class="comment"># Bootstrap JDK的安装路径. 必须设置.  </span></span><br><span class="line"><span class="comment"># export ALT_BOOTDIR=/opt/jdk1.8.0_221</span></span><br><span class="line"><span class="built_in">export</span> ALT_BOOTDIR=/opt/jdk1.7.0_81</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许自动下载依赖</span></span><br><span class="line"><span class="built_in">export</span> ALLOW_DOWNLOADS=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 并行编译的线程数, 设置为和CPU内核数量一致即可</span></span><br><span class="line"><span class="built_in">export</span> HOTSPOT_BUILD_JOBS=4</span><br><span class="line"><span class="built_in">export</span> ALT_PARALLEL_COMPILE_JOBS=4</span><br><span class="line"></span><br><span class="line"><span class="comment"># 比较本次build出来的映像与先前版本的差异. 这个对我们来说没有意义, 必须设置为false，否则sanity检查会报缺少先前版本JDK的映像. 如果有设置dev或者DEV_ONLY=true的话这个不显式设置也行.  </span></span><br><span class="line"><span class="built_in">export</span> SKIP_COMPARE_IMAGES=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用预编译头文件, 不加这个编译会更慢一些</span></span><br><span class="line"><span class="built_in">export</span> USE_PRECOMPILED_HEADER=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 要编译的内容</span></span><br><span class="line"><span class="built_in">export</span> BUILD_LANGTOOLS=<span class="literal">true</span> </span><br><span class="line"><span class="comment"># export BUILD_JAXP=false</span></span><br><span class="line"><span class="comment"># export BUILD_JAXWS=false </span></span><br><span class="line"><span class="comment"># export BUILD_CORBA=false</span></span><br><span class="line"><span class="built_in">export</span> BUILD_HOTSPOT=<span class="literal">true</span> </span><br><span class="line"><span class="built_in">export</span> BUILD_JDK=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 要编译的版本</span></span><br><span class="line"><span class="built_in">export</span> SKIP_DEBUG_BUILD=<span class="literal">false</span></span><br><span class="line"><span class="built_in">export</span> SKIP_FASTDEBUG_BUILD=<span class="literal">true</span></span><br><span class="line"><span class="built_in">export</span> DEBUG_NAME=debug</span><br><span class="line"></span><br><span class="line"><span class="comment"># 把它设置为false可以避开javaws和浏览器Java插件之类的部分的build。 </span></span><br><span class="line">BUILD_DEPLOY=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把它设置为false就不会build出安装包. 因为安装包里有些奇怪的依赖, 但即便不build出它也已经能得到完整的JDK映像, 所以还是别build它好了. </span></span><br><span class="line">BUILD_INSTALL=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> COMPILER_WARNINGS_FATAL=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译结果存放的路径</span></span><br><span class="line"><span class="comment"># export ALT_OUTPUTDIR=/tmp/server/jdk1.7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这两个环境变量必须去掉, 不然会有很诡异的事情发生(我没有具体查过这些“”诡异的事情”，Makefile脚本检查到有这2个变量就会提示警告“)</span></span><br><span class="line"><span class="built_in">unset</span> JAVA_HOME</span><br><span class="line"><span class="built_in">unset</span> CLASSPATH</span><br><span class="line"></span><br><span class="line">make 2&gt;&amp;1 | tee <span class="variable">$ALT_OUTPUTDIR</span>/build.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># =======================end compile==================</span></span><br><span class="line"></span><br><span class="line">chmod +x compile.sh</span><br><span class="line">./compile.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果一切顺利的话, 会出现如下结果</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt;Finished making images @ Mon May 25 15:56:48 CST 2020 ...</span><br><span class="line">make[2]: Leaving directory `/opt/openjdk/jdk/make<span class="string">'</span></span><br><span class="line"><span class="string">########################################################################</span></span><br><span class="line"><span class="string">##### Leaving jdk for target(s) sanity all docs images             #####</span></span><br><span class="line"><span class="string">########################################################################</span></span><br><span class="line"><span class="string">##### Build time 00:10:07 jdk for target(s) sanity all docs images #####</span></span><br><span class="line"><span class="string">########################################################################</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#-- Build times ----------</span></span><br><span class="line"><span class="string">Target all_product_build</span></span><br><span class="line"><span class="string">Start 2020-05-25 15:46:00</span></span><br><span class="line"><span class="string">End   2020-05-25 15:56:48</span></span><br><span class="line"><span class="string">00:00:16 corba</span></span><br><span class="line"><span class="string">00:00:15 hotspot</span></span><br><span class="line"><span class="string">00:00:03 jaxp</span></span><br><span class="line"><span class="string">00:00:04 jaxws</span></span><br><span class="line"><span class="string">00:10:07 jdk</span></span><br><span class="line"><span class="string">00:00:03 langtools</span></span><br><span class="line"><span class="string">00:10:48 TOTAL</span></span><br><span class="line"><span class="string">-------------------------</span></span><br><span class="line"><span class="string">make[1]: Leaving directory `/opt/openjdk'</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="编译完成后的测试"><a href="#编译完成后的测试" class="headerlink" title="编译完成后的测试"></a>编译完成后的测试</h3><ul>
+<li><p>还是在 openjdk 目录下操作</p>
+<ul>
+<li>验证编译成功</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> build/linux-amd64/j2sdk-image/bin</span><br><span class="line"></span><br><span class="line">[root@jvm bin]<span class="comment"># ./java -version</span></span><br><span class="line">openjdk version <span class="string">"1.7.0-internal"</span></span><br><span class="line">OpenJDK Runtime Environment (build 1.7.0-internal-root_2020_05_25_15_25-b00)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 24.75-b04, mixed mode)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将之前安装 ant 时安装的 openjdk 卸载掉 (可选)</p>
+</li>
+<li><p>将 build/linux-amd64/j2sdk-image 放在 JAVA_HOME 下, 配置好环境变量后, 即可正常使用自己编译的 jdk (可选)</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">[root@jvm bin]<span class="comment"># source /etc/profile</span></span><br><span class="line">[root@jvm bin]<span class="comment"># java -version</span></span><br><span class="line">openjdk version <span class="string">"1.7.0-internal"</span></span><br><span class="line">OpenJDK Runtime Environment (build 1.7.0-internal-root_2020_05_25_15_25-b00)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 24.75-b04, mixed mode)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="编译中出现的错误"><a href="#编译中出现的错误" class="headerlink" title="编译中出现的错误"></a>编译中出现的错误</h3><p>大部分错误的导致原因都是由于缺少相应的依赖, 但是本文在开始已经下载好了所需要的依赖, 所以出现的错误不多, 如果有出现其他错误的, 可以参考文章结束部分的参考资料</p>
+<h4 id="build-bootstrap-javac"><a href="#build-bootstrap-javac" class="headerlink" title="build-bootstrap-javac"></a>build-bootstrap-javac</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">build-bootstrap-javac:</span><br><span class="line">    [mkdir] Created dir: /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/gensrc</span><br><span class="line">    [mkdir] Created dir: /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/classes</span><br><span class="line"> [pcompile] Generating 7 resource files to /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/gensrc</span><br><span class="line">     [copy] Copying 1 file to /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/gensrc</span><br><span class="line"> [pcompile] Generating 1 resource files to /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/gensrc</span><br><span class="line">    [javac] Compiling 298 <span class="built_in">source</span> files to /opt/openjdk/build/linux-amd64/langtools/build/bootstrap/classes</span><br><span class="line">    [javac] /opt/openjdk/langtools/src/share/classes/com/sun/tools/javac/comp/Resolve.java:2182: warning: [overrides] Class Resolve.InapplicableSymbolsError.Candidate overrides equals, but neither it nor any superclass overrides hashCode method</span><br><span class="line">    [javac]         private class Candidate &#123;</span><br><span class="line">    [javac]                 ^</span><br><span class="line">    [javac] error: warnings found and -Werror specified</span><br><span class="line">    [javac] 1 error</span><br><span class="line">    [javac] 1 warning</span><br><span class="line"></span><br><span class="line">BUILD FAILED</span><br><span class="line">/opt/openjdk/langtools/make/build.xml:452: The following error occurred <span class="keyword">while</span> executing this line:</span><br><span class="line">/opt/openjdk/langtools/make/build.xml:795: Compile failed; see the compiler error output <span class="keyword">for</span> details.</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>解决办法:<ul>
+<li>之前使用的是 jdk 1.8 查阅资料发现, 是版本的问题, 换成 jdk1.7 即可</li>
+<li><a href="https://download.oracle.com/otn/java/jdk/7u80-b15/jdk-7u80-linux-x64.tar.gz" target="_blank" rel="noopener">jdk1.7下载链接</a></li>
+</ul>
+</li>
+</ul>
+<h4 id="Error-time-is-more-than-10-years-from-present-1136059200000"><a href="#Error-time-is-more-than-10-years-from-present-1136059200000" class="headerlink" title="Error: time is more than 10 years from present: 1136059200000"></a>Error: time is more than 10 years from present: 1136059200000</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">Error: time is more than 10 years from present: 1136059200000</span><br><span class="line">java.lang.RuntimeException: time is more than 10 years from present: 1136059200000</span><br><span class="line">at build.tools.generatecurrencydata.GenerateCurrencyData.makeSpecialCaseEntry(GenerateCurrencyData.java:285)</span><br><span class="line">at build.tools.generatecurrencydata.GenerateCurrencyData.buildMainAndSpecialCaseTables(GenerateCurrencyData.java:225)</span><br><span class="line">at build.tools.generatecurrencydata.GenerateCurrencyData.main(GenerateCurrencyData.java:154)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>解决方法</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 修改配置文件  在 openjdk 下</span></span><br><span class="line">vi openjdk/jdk/src/share/classes/java/util/CurrencyData.properties</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改108行</span></span><br><span class="line">AZ=AZM;2009-12-31-20-00-00;AZN</span><br><span class="line"><span class="comment"># 修改381行</span></span><br><span class="line">MZ=MZM;2009-06-30-22-00-00;MZN</span><br><span class="line"><span class="comment"># 修改443行</span></span><br><span class="line">RO=ROL;2009-06-30-21-00-00;RON</span><br><span class="line"><span class="comment"># 修改535行</span></span><br><span class="line">TR=TRL;2009-12-31-22-00-00;TRY</span><br><span class="line"><span class="comment"># 修改561行</span></span><br><span class="line">VE=VEB;2009-01-01-04-00-00;VEF</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改年份至今小于 10 年 :)</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><ul>
+<li><p><a href="https://book.douban.com/subject/24722612/" target="_blank" rel="noopener">深入理解Java虚拟机</a></p>
+</li>
+<li><p><a href="https://axboy.github.io/java/2018/12/21/openjdk7-centos/" target="_blank" rel="noopener">CentOS7下编译OpenJDK</a> – 更多的错误处理可以看这篇文章</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>实践</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>服务器软件安装实录</title>
     <url>/posts/b5b62e3d.html</url>
     <content><![CDATA[<blockquote>
