@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Bug之路-SpringBoot拦截自定义注解</title>
+    <url>/posts/be3e954d.html</url>
+    <content><![CDATA[<blockquote>
+<p>背景: HandlerInterceptor + 自定义注解 用作权限拦截, 但是在测试时发现, 有的方法能获取到, 有的方法获取不到方法上的注解</p>
+</blockquote>
+<p>最后发现, 是因为请求发错, 本来应该报 405 , Method not allow,  但是由于在拦截器中加入了判断, 直接返回了别的信息, 所以看不到 405, 导致以为是没有获取到注解</p>
+<a id="more"></a>
+
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><p>过滤器</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Joe</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccessFilter</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 如果不是映射到方法，直接通过</span></span><br><span class="line">        <span class="keyword">if</span> (!(handler <span class="keyword">instanceof</span> HandlerMethod)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果是方法探测，直接通过</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"OPTIONS"</span>.equals(request.getMethod())) &#123;</span><br><span class="line">            response.setStatus(HttpServletResponse.SC_OK);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果方法有JwtIgnore注解，直接通过</span></span><br><span class="line">        HandlerMethod handlerMethod = (HandlerMethod) handler;</span><br><span class="line">        Method method = handlerMethod.getMethod();</span><br><span class="line">        JwtIgnore annotation = AnnotationUtils.findAnnotation(method, JwtIgnore<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span> (annotation != <span class="keyword">null</span> &amp;&amp; annotation.value()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String header = request.getHeader(JwtTokenUtil.AUTH_HEADER_KEY);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isBlank(header) || !header.startsWith(JwtTokenUtil.TOKEN_PREFIX)) &#123;</span><br><span class="line">            returnJson(response, HttpServletResponse.SC_UNAUTHORIZED, <span class="string">"error"</span>, <span class="string">"Invalid authorization code"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        String token = header.substring(<span class="number">7</span>);</span><br><span class="line">        <span class="keyword">if</span> (!JwtTokenUtil.verifyToke(token)) &#123;</span><br><span class="line">            returnJson(response, HttpServletResponse.SC_UNAUTHORIZED, <span class="string">"error"</span>, <span class="string">"Authorization code expire, please refresh token"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">returnJson</span><span class="params">(HttpServletResponse response, Integer code, String msg, String result)</span> </span>&#123;</span><br><span class="line">        response.setCharacterEncoding(<span class="string">"UTF-8"</span>);</span><br><span class="line">        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);</span><br><span class="line">        response.setStatus(code);</span><br><span class="line">        <span class="keyword">try</span> (PrintWriter writer = response.getWriter()) &#123;</span><br><span class="line">            JSONObject message = <span class="keyword">new</span> JSONObject();</span><br><span class="line">            message.put(<span class="string">"msg"</span>, msg);</span><br><span class="line">            message.put(<span class="string">"result"</span>, result);</span><br><span class="line">            String s = message.toJSONString();</span><br><span class="line">            writer.print(s);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.getMessage();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自定义注解</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> JwtIgnore &#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">true</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>拦截器配置</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">        InterceptorRegistration interceptor = registry.addInterceptor(<span class="keyword">new</span> AccessFilter());</span><br><span class="line">        interceptor.addPathPatterns(<span class="string">"/**"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>要细心 ⊙﹏⊙∥, 不然就这个问题调试了半天</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Bug 之路</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>spring boot</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CentOS 编译 OpenJDK-7u75</title>
     <url>/posts/35ab761c.html</url>
     <content><![CDATA[<blockquote>
@@ -302,7 +335,7 @@
 </ul>
 <h4 id="正式开始安装Mysql"><a href="#正式开始安装Mysql" class="headerlink" title="正式开始安装Mysql"></a>正式开始安装Mysql</h4><ul>
 <li><p>安装</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /usr/local/mysql</span><br><span class="line">./bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql \ </span><br><span class="line">--datadir=/usr/local/mysql/data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 完成后会在终端打印出初始密码</span></span><br><span class="line">[Note] A temporary password is generated for root@docker001: UDF*s23_13sc</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /usr/local/mysql</span><br><span class="line">./bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql \ </span><br><span class="line">--datadir=/usr/local/mysql/mysqlData</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 完成后会在终端打印出初始密码</span></span><br><span class="line">[Note] A temporary password is generated for root@docker001: UDF*s23_13sc</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>设置启动脚本, 在 <code>/usr/local/mysql</code>目录下执行</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[root@docker001 mysql]# cp ./support-files/mysql.server /etc/init.d/mysqld</span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改 /etc/init.d/mysqld 的内容为正确路径</span></span><br><span class="line">vi /etc/init.d/mysqld</span><br><span class="line"></span><br><span class="line">basedir=/usr/local/mysql</span><br><span class="line">datadir=/usr/local/mysql/data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 增加执行权限</span></span><br><span class="line">chmod +x /etc/init.d/mysqld</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将 mysqld 服务加入到系统服务, 并检查是否生效</span></span><br><span class="line">chkconfig --add mysqld</span><br><span class="line"></span><br><span class="line">chkconfig --list mysqld</span><br><span class="line"></span><br><span class="line">mysqld  	0:off	1:off	2:on	3:on	4:on	5:on	6:off</span><br><span class="line"><span class="meta">#</span><span class="bash"> 这就表示mysqld生效了</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以用 service mysqld start 启动服务</span></span><br><span class="line">[root@docker001 ~]# service mysqld start</span><br><span class="line">Starting MySQL.</span><br><span class="line"></span><br><span class="line">SUCCESS!</span><br></pre></td></tr></table></figure>
@@ -431,7 +464,7 @@
 <h3 id="安装-Thefuck-工具"><a href="#安装-Thefuck-工具" class="headerlink" title="安装 Thefuck 工具"></a>安装 Thefuck 工具</h3><ul>
 <li>安装这个工具纯属娱乐 : )  <a href="https://github.com/nvbn/thefuck" target="_blank" rel="noopener">thefuck</a></li>
 </ul>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yum -y install epel-release python3-devel</span><br><span class="line">pip3 install --upgrade pip</span><br><span class="line"></span><br><span class="line">Successfully installed colorama-0.4.3 decorator-4.4.2 psutil-5.7.0 pyte-0.8.0 six-1.15.0 thefuck-3.30 wcwidth-0.1.9</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑 .bashrc 配置文件</span></span><br><span class="line">vim ~/.bashrc</span><br><span class="line"></span><br><span class="line"><span class="built_in">eval</span> <span class="string">"<span class="variable">$(thefuck --alias fuck)</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">yum -y install epel-release python3-devel</span><br><span class="line">pip3 install --upgrade pip</span><br><span class="line"></span><br><span class="line">pip3 install thefuck </span><br><span class="line"></span><br><span class="line">Successfully installed colorama-0.4.3 decorator-4.4.2 psutil-5.7.0 pyte-0.8.0 six-1.15.0 thefuck-3.30 wcwidth-0.1.9</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑 .bashrc 配置文件</span></span><br><span class="line">vim ~/.bashrc</span><br><span class="line"></span><br><span class="line"><span class="built_in">eval</span> <span class="string">"<span class="variable">$(thefuck --alias fuck)</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
 
 
 
@@ -654,7 +687,7 @@
 </li>
 <li><strong>非原子的64位操作</strong><ul>
 <li>当线程在没有同步的情况下, 可能会读取到失效值, 但是这个值至少是之前某个线程设置的值, 而不是一个随机值.这种安全性称为最低安全性(<code>out-of-thin-airsafety</code>)</li>
-<li>最低安全行适用于绝大多数变量, 但是存在例外: 非volatile的64位数值变量(double,long). JVM允许将64位的读/写操作分解为2个32位的操作, 如果对改变量的读写分别在不同的线程种, 可能会读取到某个值的高32位和另一个值的低32位, 这就导致严重的错误</li>
+<li>最低安全行适用于绝大多数变量, 但是存在例外: 非volatile的64位数值变量(double,long). JVM允许将64位的读/写操作分解为2个32位的操作, 如果对改变量的读写分别在不同的线程中, 可能会读取到某个值的高32位和另一个值的低32位, 这就导致严重的错误</li>
 <li>因此在多线程中使用共享且可变的long/double类型的变量是不安全的, 要用volatile声明或锁保护.</li>
 </ul>
 </li>
