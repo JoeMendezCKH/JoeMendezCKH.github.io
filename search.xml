@@ -1,6 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Java位运算总结&amp;分析tableSizeFor方法</title>
+    <url>/posts/3feabb4b.html</url>
+    <content><![CDATA[<blockquote>
+<p>在看源码的过程中, 总是会遇到各种位运算, 借此机会总结一下</p>
+</blockquote>
+<h2 id="位运算总结"><a href="#位运算总结" class="headerlink" title="位运算总结"></a>位运算总结</h2><h3 id="字节长度"><a href="#字节长度" class="headerlink" title="字节长度"></a>字节长度</h3><ul>
+<li><p>由于 Java 是跨平台的语言, 所以 JVM 中基本数据类型的字节长度是一致的</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	int: 		4 个字节</span></span><br><span class="line"><span class="comment">	short: 		2 个字节</span></span><br><span class="line"><span class="comment">	long: 		8 个字节</span></span><br><span class="line"><span class="comment">	byte: 		1 个字节</span></span><br><span class="line"><span class="comment">	float: 		4 个字节</span></span><br><span class="line"><span class="comment">	double: 	8 个字节</span></span><br><span class="line"><span class="comment">	char: 		2 个字节</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	boolean：    boolean属于布尔类型，在存储的时候不使用字节，仅仅使用 1 位来存储，范围仅仅为0和1，其字面量为true和false。</span></span><br><span class="line"><span class="comment">	</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="原码-补码-反码"><a href="#原码-补码-反码" class="headerlink" title="原码, 补码, 反码"></a>原码, 补码, 反码</h3><ul>
+<li>最高位是符号位。<ul>
+<li>最高位为0表示正数。</li>
+<li>最高位为1表示负数</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li><p>正数</p>
+<p>原码 ==  反码 == 补码</p>
+</li>
+<li><p>负数</p>
+<p>反码 == 原码按位取反</p>
+<p>补码 == 反码 + 1</p>
+</li>
+<li><p><strong>计算机在进行数值运算的时候，是通过补码表示每个数值的</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">5 - 3 &#x3D; 5 + ( -3 )</span><br><span class="line">相当于 0000 0000 0000 0101 + 1111 1111 1111 1101</span><br><span class="line">    &#x3D; 1 0000 0000 0000 0010</span><br><span class="line">    </span><br><span class="line">由于 int 类型只有 4 byte，所以最高位产生了溢出，进位 1 被丢弃。</span><br><span class="line">结果就变成了 0010 也就是 2</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<blockquote>
+<p>更详细的原码,反码, 补码知识可以看<a href="https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html" target="_blank" rel="noopener">原码, 反码, 补码 详解</a></p>
+</blockquote>
+<h3 id="位运算符-amp-、-、-、-、-gt-gt-、-lt-lt-、-gt-gt-gt"><a href="#位运算符-amp-、-、-、-、-gt-gt-、-lt-lt-、-gt-gt-gt" class="headerlink" title="位运算符 &amp;、|、~、^、&gt;&gt;、&lt;&lt;、&gt;&gt;&gt;"></a>位运算符 &amp;、|、~、^、&gt;&gt;、&lt;&lt;、&gt;&gt;&gt;</h3><blockquote>
+<p>&amp;  与;  |  或;  ~  非; ^  异或</p>
+</blockquote>
+<h4 id="gt-gt-右移运算符"><a href="#gt-gt-右移运算符" class="headerlink" title="&gt;&gt; 右移运算符"></a>&gt;&gt; 右移运算符</h4><ul>
+<li><p>数值的补码向右移 n 位，符号位不变（左边补上符号位）</p>
+<ul>
+<li>右移n位就相当于除以2的n次方</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt; <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]　 <span class="number">7</span> 的补码</span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0011</span> ]　 a &gt;&gt; <span class="number">1</span> 向右移 <span class="number">1</span> 位</span><br><span class="line">  正数的补码就是原码, 所以 a &gt;&gt; <span class="number">1</span> == <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt; <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]　-<span class="number">7</span> 的原码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1000</span> ]　-<span class="number">7</span> 的反码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ]　-<span class="number">7</span> 的补码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1100</span> ]  a &gt;&gt; <span class="number">1</span> 向右移<span class="number">1</span>位</span><br><span class="line"></span><br><span class="line"><span class="comment">// 负数的补码转原码: 真值的部分 取反 + 1</span></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0011</span> ]</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0100</span> ] 　得到a &gt;&gt; <span class="number">1</span>的原码</span><br><span class="line">   即 a &gt;&gt; <span class="number">1</span> == -<span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="lt-lt-左移运算符"><a href="#lt-lt-左移运算符" class="headerlink" title="&lt;&lt; 左移运算符"></a>&lt;&lt; 左移运算符</h4><ul>
+<li><p>数值的补码全部往左移动 n 位，符号位和最高位都舍弃，最低位补 0</p>
+<ul>
+<li>左移 n 位就相当于乘以 2 的 n 次方</li>
+</ul>
+</li>
+<li><p>正数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &lt;&lt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ] <span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1100</span> ] 对于正数而言，补码就是原码</span><br><span class="line">即 a &lt;&lt; <span class="number">2</span> = <span class="number">28</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span> ;</span><br><span class="line"><span class="keyword">int</span> b = a &lt;&lt; <span class="number">2</span> ;</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ] -<span class="number">7</span>的原码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1000</span> ] -<span class="number">7</span>的反码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ] -<span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1110</span> <span class="number">0100</span> ] a &lt;&lt; <span class="number">2</span>左移<span class="number">2</span>位</span><br><span class="line"><span class="comment">// 补码转反码</span></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1011</span> ]</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1100</span> ] 得到a &lt;&lt; <span class="number">2</span>的原码</span><br><span class="line"> 即 a &lt;&lt; <span class="number">2</span> = -<span class="number">28</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="gt-gt-gt-无符号右移"><a href="#gt-gt-gt-无符号右移" class="headerlink" title="&gt;&gt;&gt; 无符号右移"></a>&gt;&gt;&gt; 无符号右移</h4><ul>
+<li><p>忽略符号位，空位都以0补齐</p>
+</li>
+<li><p>正数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]  <span class="number">7</span>的补码</span><br><span class="line">[   <span class="number">00</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> ]  a &gt;&gt;&gt; <span class="number">2</span> == <span class="number">1</span></span><br><span class="line"> 其实前面<span class="number">2</span>位还是<span class="number">0</span>, 但是这样看的更明显</span><br><span class="line"> 相当于直接右移n位</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ]  -<span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">0011</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1110</span> ]  a &gt;&gt;&gt; <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="分析-tableSizeFor-int-cap-方法"><a href="#分析-tableSizeFor-int-cap-方法" class="headerlink" title="分析 tableSizeFor(int cap) 方法"></a>分析 tableSizeFor(int cap) 方法</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Returns a power of two size for the given target capacity.</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * MAXIMUM_CAPACITY == 2^30</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回大于输入参数且最近的2的整数次幂的数。比如10，则返回16</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">tableSizeFor</span><span class="params">(<span class="keyword">int</span> cap)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = cap - <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">4</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">8</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">return</span> (n &lt; <span class="number">0</span>) ? <span class="number">1</span> : (n &gt;= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>该方法是 jdk1.8 HashMap 中的一个方法</p>
+</li>
+<li><p>首先明确: 2 的整数次幂, 从二进制上表示即第 i 位上为 1, 其他位均为 0, 表示 $$2^i$$</p>
+</li>
+<li><p>传入的是一个 int 值, 4 byte , 32 bit</p>
+<p>先来假设 n 的二进制为 01xxx…xxx, </p>
+<p>对 n 右移 1 位：001xx…xxx，再位或：011xx…xxx</p>
+<p>对 n 右移 2 位：00011…xxx，再位或：01111…xxx</p>
+<p>此时前面已经有 4 个 1了，再右移 4 位且位或可得 8 个 1</p>
+<p>同理，有 8 个1 后，右移 8 位会让后 8 位也为1</p>
+<p>最后右移 16 位 , 则保证从最高位的 1 开始, 后面全是 1</p>
+</li>
+<li><p>也就是将 0…01xxx..xx变为 0…0111..111 这样的形式, 然后 n + 1, 产生了<strong>进位</strong></p>
+<p>得到了 2 的整数次幂的值</p>
+</li>
+<li><p>让<code>cap - 1</code>再赋值给 n 的目的是另找到的目标值大于或<strong>等于</strong>原值。</p>
+<p>例如二进制 <code>1000</code>，十进制数值为 8。如果不对它减 1 而直接操作，将得到答案 <code>10000</code>，即16。</p>
+<p>显然不是结果。减 1 后二进制为 <code>111</code>，再进行操作则会得到原来的数值 <code>1000</code>，即 8</p>
+<blockquote>
+<p>参考: <a href="https://www.cnblogs.com/loading4/p/6239441.html" target="_blank" rel="noopener">Java8 HashMap之tableSizeFor</a></p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Bug之路-SpringBoot拦截自定义注解</title>
     <url>/posts/be3e954d.html</url>
     <content><![CDATA[<blockquote>

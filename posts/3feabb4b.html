@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon16x16.png">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在看源码的过程中, 总是会遇到各种位运算, 借此机会总结一下  位运算总结字节长度 由于 Java 是跨平台的语言, 所以 JVM 中基本数据类型的字节长度是一致的 123456789101112&#x2F;*	int: 		4 个字节	short: 		2 个字节	long: 		8 个字节	byte: 		1 个字节	float: 		4 个字节	double: 	8 个字节	char: 		2 个字">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java位运算总结&amp;分析tableSizeFor方法">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/3feabb4b.html">
+<meta property="og:site_name" content="JoeMendez&#39;s Blog">
+<meta property="og:description" content="在看源码的过程中, 总是会遇到各种位运算, 借此机会总结一下  位运算总结字节长度 由于 Java 是跨平台的语言, 所以 JVM 中基本数据类型的字节长度是一致的 123456789101112&#x2F;*	int: 		4 个字节	short: 		2 个字节	long: 		8 个字节	byte: 		1 个字节	float: 		4 个字节	double: 	8 个字节	char: 		2 个字">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-15T02:19:56.000Z">
+<meta property="article:modified_time" content="2020-07-15T03:40:26.671Z">
+<meta property="article:author" content="Joe Mendez">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://joemendezckh.github.io/posts/3feabb4b.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java位运算总结&分析tableSizeFor方法 | JoeMendez's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">JoeMendez's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">用学习驱动自己的生活.</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/3feabb4b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JoeMendez's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Java位运算总结&分析tableSizeFor方法
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-15 10:19:56 / 修改时间：11:40:26" itemprop="dateCreated datePublished" datetime="2020-07-15T10:19:56+08:00">2020-07-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/3feabb4b.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/3feabb4b.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在看源码的过程中, 总是会遇到各种位运算, 借此机会总结一下</p>
+</blockquote>
+<h2 id="位运算总结"><a href="#位运算总结" class="headerlink" title="位运算总结"></a>位运算总结</h2><h3 id="字节长度"><a href="#字节长度" class="headerlink" title="字节长度"></a>字节长度</h3><ul>
+<li><p>由于 Java 是跨平台的语言, 所以 JVM 中基本数据类型的字节长度是一致的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	int: 		4 个字节</span></span><br><span class="line"><span class="comment">	short: 		2 个字节</span></span><br><span class="line"><span class="comment">	long: 		8 个字节</span></span><br><span class="line"><span class="comment">	byte: 		1 个字节</span></span><br><span class="line"><span class="comment">	float: 		4 个字节</span></span><br><span class="line"><span class="comment">	double: 	8 个字节</span></span><br><span class="line"><span class="comment">	char: 		2 个字节</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	boolean：    boolean属于布尔类型，在存储的时候不使用字节，仅仅使用 1 位来存储，范围仅仅为0和1，其字面量为true和false。</span></span><br><span class="line"><span class="comment">	</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="原码-补码-反码"><a href="#原码-补码-反码" class="headerlink" title="原码, 补码, 反码"></a>原码, 补码, 反码</h3><ul>
+<li>最高位是符号位。<ul>
+<li>最高位为0表示正数。</li>
+<li>最高位为1表示负数</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li><p>正数</p>
+<p>原码 ==  反码 == 补码</p>
+</li>
+<li><p>负数</p>
+<p>反码 == 原码按位取反</p>
+<p>补码 == 反码 + 1</p>
+</li>
+<li><p><strong>计算机在进行数值运算的时候，是通过补码表示每个数值的</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">5 - 3 &#x3D; 5 + ( -3 )</span><br><span class="line">相当于 0000 0000 0000 0101 + 1111 1111 1111 1101</span><br><span class="line">    &#x3D; 1 0000 0000 0000 0010</span><br><span class="line">    </span><br><span class="line">由于 int 类型只有 4 byte，所以最高位产生了溢出，进位 1 被丢弃。</span><br><span class="line">结果就变成了 0010 也就是 2</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<blockquote>
+<p>更详细的原码,反码, 补码知识可以看<a href="https://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html" target="_blank" rel="noopener">原码, 反码, 补码 详解</a></p>
+</blockquote>
+<h3 id="位运算符-amp-、-、-、-、-gt-gt-、-lt-lt-、-gt-gt-gt"><a href="#位运算符-amp-、-、-、-、-gt-gt-、-lt-lt-、-gt-gt-gt" class="headerlink" title="位运算符 &amp;、|、~、^、&gt;&gt;、&lt;&lt;、&gt;&gt;&gt;"></a>位运算符 &amp;、|、~、^、&gt;&gt;、&lt;&lt;、&gt;&gt;&gt;</h3><blockquote>
+<p>&amp;  与;  |  或;  ~  非; ^  异或</p>
+</blockquote>
+<h4 id="gt-gt-右移运算符"><a href="#gt-gt-右移运算符" class="headerlink" title="&gt;&gt; 右移运算符"></a>&gt;&gt; 右移运算符</h4><ul>
+<li><p>数值的补码向右移 n 位，符号位不变（左边补上符号位）</p>
+<ul>
+<li>右移n位就相当于除以2的n次方</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt; <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]　 <span class="number">7</span> 的补码</span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0011</span> ]　 a &gt;&gt; <span class="number">1</span> 向右移 <span class="number">1</span> 位</span><br><span class="line">  正数的补码就是原码, 所以 a &gt;&gt; <span class="number">1</span> == <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt; <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]　-<span class="number">7</span> 的原码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1000</span> ]　-<span class="number">7</span> 的反码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ]　-<span class="number">7</span> 的补码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1100</span> ]  a &gt;&gt; <span class="number">1</span> 向右移<span class="number">1</span>位</span><br><span class="line"></span><br><span class="line"><span class="comment">// 负数的补码转原码: 真值的部分 取反 + 1</span></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0011</span> ]</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0100</span> ] 　得到a &gt;&gt; <span class="number">1</span>的原码</span><br><span class="line">   即 a &gt;&gt; <span class="number">1</span> == -<span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="lt-lt-左移运算符"><a href="#lt-lt-左移运算符" class="headerlink" title="&lt;&lt; 左移运算符"></a>&lt;&lt; 左移运算符</h4><ul>
+<li><p>数值的补码全部往左移动 n 位，符号位和最高位都舍弃，最低位补 0</p>
+<ul>
+<li>左移 n 位就相当于乘以 2 的 n 次方</li>
+</ul>
+</li>
+<li><p>正数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &lt;&lt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ] <span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1100</span> ] 对于正数而言，补码就是原码</span><br><span class="line">即 a &lt;&lt; <span class="number">2</span> = <span class="number">28</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span> ;</span><br><span class="line"><span class="keyword">int</span> b = a &lt;&lt; <span class="number">2</span> ;</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ] -<span class="number">7</span>的原码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1000</span> ] -<span class="number">7</span>的反码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ] -<span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1110</span> <span class="number">0100</span> ] a &lt;&lt; <span class="number">2</span>左移<span class="number">2</span>位</span><br><span class="line"><span class="comment">// 补码转反码</span></span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1011</span> ]</span><br><span class="line">[ <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> <span class="number">1100</span> ] 得到a &lt;&lt; <span class="number">2</span>的原码</span><br><span class="line"> 即 a &lt;&lt; <span class="number">2</span> = -<span class="number">28</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="gt-gt-gt-无符号右移"><a href="#gt-gt-gt-无符号右移" class="headerlink" title="&gt;&gt;&gt; 无符号右移"></a>&gt;&gt;&gt; 无符号右移</h4><ul>
+<li><p>忽略符号位，空位都以0补齐</p>
+</li>
+<li><p>正数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0111</span> ]  <span class="number">7</span>的补码</span><br><span class="line">[   <span class="number">00</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0001</span> ]  a &gt;&gt;&gt; <span class="number">2</span> == <span class="number">1</span></span><br><span class="line"> 其实前面<span class="number">2</span>位还是<span class="number">0</span>, 但是这样看的更明显</span><br><span class="line"> 相当于直接右移n位</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>负数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = -<span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> b = a &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">[ <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1001</span> ]  -<span class="number">7</span>的补码</span><br><span class="line">[ <span class="number">0011</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1110</span> ]  a &gt;&gt;&gt; <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="分析-tableSizeFor-int-cap-方法"><a href="#分析-tableSizeFor-int-cap-方法" class="headerlink" title="分析 tableSizeFor(int cap) 方法"></a>分析 tableSizeFor(int cap) 方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Returns a power of two size for the given target capacity.</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * MAXIMUM_CAPACITY == 2^30</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回大于输入参数且最近的2的整数次幂的数。比如10，则返回16</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">tableSizeFor</span><span class="params">(<span class="keyword">int</span> cap)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = cap - <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">4</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">8</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">return</span> (n &lt; <span class="number">0</span>) ? <span class="number">1</span> : (n &gt;= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>该方法是 jdk1.8 HashMap 中的一个方法</p>
+</li>
+<li><p>首先明确: 2 的整数次幂, 从二进制上表示即第 i 位上为 1, 其他位均为 0, 表示 $$2^i$$</p>
+</li>
+<li><p>传入的是一个 int 值, 4 byte , 32 bit</p>
+<p>先来假设 n 的二进制为 01xxx…xxx, </p>
+<p>对 n 右移 1 位：001xx…xxx，再位或：011xx…xxx</p>
+<p>对 n 右移 2 位：00011…xxx，再位或：01111…xxx</p>
+<p>此时前面已经有 4 个 1了，再右移 4 位且位或可得 8 个 1</p>
+<p>同理，有 8 个1 后，右移 8 位会让后 8 位也为1</p>
+<p>最后右移 16 位 , 则保证从最高位的 1 开始, 后面全是 1</p>
+</li>
+<li><p>也就是将 0…01xxx..xx变为 0…0111..111 这样的形式, 然后 n + 1, 产生了<strong>进位</strong></p>
+<p>得到了 2 的整数次幂的值</p>
+</li>
+<li><p>让<code>cap - 1</code>再赋值给 n 的目的是另找到的目标值大于或<strong>等于</strong>原值。</p>
+<p>例如二进制 <code>1000</code>，十进制数值为 8。如果不对它减 1 而直接操作，将得到答案 <code>10000</code>，即16。</p>
+<p>显然不是结果。减 1 后二进制为 <code>111</code>，再进行操作则会得到原来的数值 <code>1000</code>，即 8</p>
+<blockquote>
+<p>参考: <a href="https://www.cnblogs.com/loading4/p/6239441.html" target="_blank" rel="noopener">Java8 HashMap之tableSizeFor</a></p>
+</blockquote>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+    
+    <div>
+        
+          
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/3feabb4b.html">Java位运算总结&分析tableSizeFor方法</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
+  <p><span>发布时间:</span>2020年07月15日 - 10:07</p>
+  <p><span>最后更新:</span>2020年07月15日 - 11:07</p>
+  <p><span>原始链接:</span><a href="/posts/3feabb4b.html" title="Java位运算总结&分析tableSizeFor方法">https://joemendezckh.github.io/posts/3feabb4b.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/3feabb4b.html"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+        
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/be3e954d.html" rel="prev" title="Bug之路-SpringBoot拦截自定义注解">
+      <i class="fa fa-chevron-left"></i> Bug之路-SpringBoot拦截自定义注解
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#位运算总结"><span class="nav-number">1.</span> <span class="nav-text">位运算总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字节长度"><span class="nav-number">1.1.</span> <span class="nav-text">字节长度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原码-补码-反码"><span class="nav-number">1.2.</span> <span class="nav-text">原码, 补码, 反码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位运算符-amp-、-、-、-、-gt-gt-、-lt-lt-、-gt-gt-gt"><span class="nav-number">1.3.</span> <span class="nav-text">位运算符 &amp;、|、~、^、&gt;&gt;、&lt;&lt;、&gt;&gt;&gt;</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#gt-gt-右移运算符"><span class="nav-number">1.3.1.</span> <span class="nav-text">&gt;&gt; 右移运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-lt-左移运算符"><span class="nav-number">1.3.2.</span> <span class="nav-text">&lt;&lt; 左移运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gt-gt-gt-无符号右移"><span class="nav-number">1.3.3.</span> <span class="nav-text">&gt;&gt;&gt; 无符号右移</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析-tableSizeFor-int-cap-方法"><span class="nav-number">2.</span> <span class="nav-text">分析 tableSizeFor(int cap) 方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Joe Mendez"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">Joe Mendez</p>
+  <div class="site-description" itemprop="description">和大家分享自己的学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JoeMendezCKH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JoeMendezCKH" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:joemendez@163.com" title="E-Mail → mailto:joemendez@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe Mendez</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">164k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:29</span>
+</div>
+  <!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+  -->
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='105,105,105' opacity='0.5' zIndex='-1' count='120' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QU0nXYxiBIrF3PXjxqyqkKEh-gzGzoHsz',
+      appKey     : '3CJah6GE4jkGjgb7k5HIbSz4',
+      placeholder: "今天你摸鱼<。)#)))≦了嘛!",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
