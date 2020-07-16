@@ -19,20 +19,31 @@
     var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="在jdk1.8中, HashMap中更新了几个关于更新映射项的方法, 个人觉得很好用,于是写个笔记小记一下.  public V getOrDefault(Object key, V defaultValue) public V putIfAbsent(K key, V value)   public V merge(K key, V value, BiFunction&lt;? super V">
+  <meta name="description" content="参考内容:Red-Black Tree | Set 2 (Insert)  红黑树的插入在 AVL 树中, 通过”旋转”的方式来保证插入结点后的平衡, 但是在 红黑树中通过 2 种方式来实现平衡  Recoloring Rotation  首先尝试改变颜色, 如果改变颜色无效, 则进行旋转.  Following is detailed algorithm. The algorithms has">
 <meta property="og:type" content="article">
-<meta property="og:title" content="jdk8中HashMap更新映射项的方法(merge)笔记">
-<meta property="og:url" content="https://joemendezckh.github.io/posts/85124b9.html">
+<meta property="og:title" content="数据结构学习之-红黑树(2)">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/eab0ab25.html">
 <meta property="og:site_name" content="JoeMendez&#39;s Blog">
-<meta property="og:description" content="在jdk1.8中, HashMap中更新了几个关于更新映射项的方法, 个人觉得很好用,于是写个笔记小记一下.  public V getOrDefault(Object key, V defaultValue) public V putIfAbsent(K key, V value)   public V merge(K key, V value, BiFunction&lt;? super V">
+<meta property="og:description" content="参考内容:Red-Black Tree | Set 2 (Insert)  红黑树的插入在 AVL 树中, 通过”旋转”的方式来保证插入结点后的平衡, 但是在 红黑树中通过 2 种方式来实现平衡  Recoloring Rotation  首先尝试改变颜色, 如果改变颜色无效, 则进行旋转.  Following is detailed algorithm. The algorithms has">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2019-11-20T05:59:01.000Z">
-<meta property="article:modified_time" content="2020-03-20T15:03:14.920Z">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716151833.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152856.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152912.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153143.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153007.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153646.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153740.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161429.jpg">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161532.jpg">
+<meta property="article:published_time" content="2020-07-16T06:29:59.000Z">
+<meta property="article:modified_time" content="2020-07-16T10:58:34.013Z">
 <meta property="article:author" content="Joe Mendez">
-<meta property="article:tag" content="java">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="红黑树">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716151833.png">
 
-<link rel="canonical" href="https://joemendezckh.github.io/posts/85124b9.html">
+<link rel="canonical" href="https://joemendezckh.github.io/posts/eab0ab25.html">
 
 
 <script id="page-configurations">
@@ -45,7 +56,7 @@
   };
 </script>
 
-  <title>jdk8中HashMap更新映射项的方法(merge)笔记 | JoeMendez's Blog</title>
+  <title>数据结构学习之-红黑树(2) | JoeMendez's Blog</title>
   
 
 
@@ -194,7 +205,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/85124b9.html">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/eab0ab25.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpg">
@@ -207,7 +218,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          jdk8中HashMap更新映射项的方法(merge)笔记
+          数据结构学习之-红黑树(2)
         </h2>
 
         <div class="post-meta">
@@ -216,7 +227,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-03-20 23:03:14" itemprop="dateModified" datetime="2020-03-20T23:03:14+08:00">2020-03-20</time>
+                <time title="修改时间：2020-07-16 18:58:34" itemprop="dateModified" datetime="2020-07-16T18:58:34+08:00">2020-07-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -224,7 +235,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
                 </span>
             </span>
 
@@ -244,8 +255,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/posts/85124b9.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/85124b9.html" itemprop="commentCount"></span>
+    <a title="valine" href="/posts/eab0ab25.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/eab0ab25.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -255,14 +266,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -274,55 +285,97 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <ul>
-<li><p>在jdk1.8中, HashMap中更新了几个关于更新映射项的方法, 个人觉得很好用,于是写个笔记小记一下.</p>
-<ul>
-<li><code>public V getOrDefault(Object key, V defaultValue)</code></li>
-<li><code>public V putIfAbsent(K key, V value)</code>  </li>
-<li><code>public V merge(K key, V value, BiFunction&lt;? super V,? super V,? extends V&gt; remappingFunction)</code></li>
-</ul>
-</li>
-<li><p>处理映射项的一个难点是更新映射项, 也就是我们常说的键值对中的值. 正常情况下, 可以通过<code>get(key)</code>方法获得值, 然后对其进行更新, 然后再放回更新的值. 但是要考虑到键第一次出现的时候. 比如, 再统计某个单词在文件中出现的频度.  </p>
-</li>
-<li><p>在看到一个单词(word)时, 将对应的计数器加1, 如下所示</p>
-  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; counts = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">String word = <span class="string">"word"</span>;</span><br><span class="line">counts.put(word, counts.get(word)+<span class="number">1</span>); <span class="comment">// NullPointerException, 第一次获取"1"时get返回null</span></span><br></pre></td></tr></table></figure>
-<a id="more"></a></li>
-<li><p>在jdk8之前我们解决这个问题, 应该就会在put前进行检测, 虽然不难, 但是当jdk8后可以更加便捷的方法.  </p>
-<ul>
-<li><p>第一种方法就是利用<code>getOrDefault</code>方法:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">counts.put(word, counts.getOrDefault(word, <span class="number">0</span>) + <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>api中的描述是:<blockquote>
-<p>Returns the value to which the specified key is mapped, or if this map contains no mapping for the key.</p>
+        <blockquote>
+<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-2-insert/" target="_blank" rel="noopener">Red-Black Tree | Set 2 (Insert)</a></p>
 </blockquote>
-</li>
-<li>直接看源码:</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">getOrDefault</span><span class="params">(Object key, V defaultValue)</span> </span>&#123;</span><br><span class="line">    V v;</span><br><span class="line">    <span class="keyword">return</span> (((v = get(key)) != <span class="keyword">null</span>) || containsKey(key)) ? v : defaultValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="红黑树的插入"><a href="#红黑树的插入" class="headerlink" title="红黑树的插入"></a>红黑树的插入</h2><p>在 AVL 树中, 通过”旋转”的方式来保证插入结点后的平衡, 但是在 红黑树中通过 2 种方式来实现平衡</p>
+<ol>
+<li>Recoloring</li>
+<li>Rotation</li>
+</ol>
+<p>首先尝试改变颜色, 如果改变颜色无效, 则进行旋转. </p>
+<p>Following is detailed algorithm. The algorithms has mainly two cases depending upon the color of uncle. If uncle is red, we do recoloring. If uncle is black, we do rotations and/or recoloring.<br>Color of a NULL node is considered as BLACK.</p>
+<a id="more"></a>
 
-<p>发现这个默认方法其实就是把我们之前做的事简单封装了一下, 简单明了</p>
+<h3 id="算法原理"><a href="#算法原理" class="headerlink" title="算法原理:"></a>算法原理:</h3><ul>
+<li>算法主要有 2 种情况, 具体取决于 叔叔结点(父结点的兄弟结点) 的颜色,</li>
+<li>如果叔叔结点是红色的, 改变颜色</li>
+<li>如果叔叔结点是黑色的, 则尝试 旋转 或/且 改变颜色</li>
+</ul>
+<p>Let x be the newly inserted node.</p>
+<ol>
+<li>Perform <a href="http://geeksquiz.com/binary-search-tree-set-1-search-and-insertion/" target="_blank" rel="noopener">standard BST insertion</a> and make the color of newly inserted nodes as RED.</li>
+<li>If x is root, change color of x as BLACK (Black height of complete tree increases by 1).</li>
+<li>Do following if color of x’s parent is not BLACK <strong>and</strong> x is not root.<ol>
+<li><strong>If x’s uncle is RED</strong> (Grand parent must have been black from <a href="https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/" target="_blank" rel="noopener">property 4</a>)<ol>
+<li>Change color of parent and uncle as BLACK.</li>
+<li>color of grand parent as RED.</li>
+<li>Change x = x’s grandparent, repeat steps 2 and 3 for new x.</li>
+</ol>
 </li>
-<li><p>第二种方法是先调用putIfAbsent方法, 只有当键存在时才放入一个值, 这跟我们之前的做法是一样的,只不过更加便捷.  </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">counts.putIfAbsent(word,<span class="number">0</span>); <span class="comment">// 直接看源代码, 清楚明白</span></span><br><span class="line">counts.put(word, counts.get(word)+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">putIfAbsent</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    V v = get(key);</span><br><span class="line">    <span class="keyword">if</span> (v == <span class="keyword">null</span>) &#123;</span><br><span class="line">        v = put(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><strong>If x’s uncle is BLACK</strong>, then there can be four configurations for x, x’s parent (<strong>p</strong>) and x’s grandparent (<strong>g</strong>) (This is similar to<a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion/" target="_blank" rel="noopener"> AVL Tree</a>)<ol>
+<li>Left Left Case (p is left child of g and x is left child of p)</li>
+<li>Left Right Case (p is left child of g and x is right child of p)</li>
+<li>Right Right Case (Mirror of case 1)</li>
+<li>Right Left Case (Mirror of case 2)</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="算法过程"><a href="#算法过程" class="headerlink" title="算法过程"></a>算法过程</h3><p>假设 x 是新插入的结点</p>
+<ol>
+<li><p>按照标准 BST 的方式插入, 并且设 x 的颜色为红色, (因为如果为黑色, 则一旦插入就要进行各种平衡, 所以先假设为红色)</p>
+</li>
+<li><p>如果 x 是根结点, 则直接将 x 变为黑色, 完成. 因为红黑树的根节点必须是黑色</p>
+</li>
+<li><p>如果 x 的父结点不是黑色, 且不是根结点, 则进行如下判断(如果 x 的父结点为黑色, x 为红色, 满足红黑树的性质, 不用进行任何操作)</p>
+<ol>
+<li><p>如果 x 的叔叔结点为红色, 则 x 的祖父结点一定为黑色</p>
+<ol>
+<li>将 x 的父结点和叔叔结点变为黑色</li>
+<li>将 x 的祖父结点变为红色</li>
+<li>此时 x 插入的操作已经平衡, 但是 x 的祖父结点状态变化了, 将 x 的祖父结点看为新插入的结点, 递归的进行重新调整, 直到根节点<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716151833.png" alt="uncle-red" style="zoom:80%;" />
+</li>
+</ol>
+</li>
+<li><p>如果 x 的叔叔结点是黑色, 那么 x 就有四种情况, 类似 AVL 树的4种情况, 用上图来说明,</p>
+<ol>
+<li><p>左-左  </p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152856.png" alt="LL" style="zoom:80%;" />
+</li>
+<li><p>左-右</p>
+</li>
+</ol>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152912.png" alt="LR" style="zoom:80%;" />
+
+<ol start="3">
+<li><p>右-右</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153143.png" alt="RR" style="zoom:80%;" />
+</li>
+<li><p>右-左</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153007.png" alt="RL" style="zoom:80%;" />
+
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="插入过程示例"><a href="#插入过程示例" class="headerlink" title="插入过程示例"></a>插入过程示例</h3><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153646.png" alt="ex-insert" style="zoom:80%;" />
 
 <ul>
-<li>看到源码, 我不知道怎么形容了, 就是2个字, 清晰</li>
-<li>第三种方法就是使用merge方法, 这也是最方便的方法, 强烈建议:</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">counts.merge(word, <span class="number">1</span>, Integer::sum);  </span><br><span class="line"></span><br><span class="line"><span class="comment">// 用方法引用传入sum方法, 当word第一次出现时, word的值被赋值为1,  </span></span><br><span class="line"><span class="comment">// 不是第一次出现时, 会将其值加1.</span></span><br><span class="line"><span class="comment">// 这是一个函数式接口, 用来写怎样处理默认值value和get方法得到的oldValue之间的关系</span></span><br><span class="line"><span class="function"><span class="keyword">default</span> V <span class="title">merge</span><span class="params">(K key, V value,  BiFunction&lt;? <span class="keyword">super</span> V, ? <span class="keyword">super</span> V, ? extends V&gt; remappingFunction)</span>   </span>&#123;</span><br><span class="line">    <span class="comment">// 确保remappingFunction 不是一个 null 值,  </span></span><br><span class="line">    <span class="comment">// 如果是null会直接抛异常, 不是null就返回对象本身.</span></span><br><span class="line">    Objects.requireNonNull(remappingFunction);  </span><br><span class="line">    Objects.requireNonNull(value);  </span><br><span class="line">    <span class="comment">// 获取当前key中的值, 如果是第一次出现的键, 会得到一个null</span></span><br><span class="line">    V oldValue = get(key);  </span><br><span class="line">    V newValue = (oldValue == <span class="keyword">null</span>) ? value :</span><br><span class="line">                remappingFunction.apply(oldValue, value);</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    当oldVlue为null时, 也就是说该键key第一次出现, 返回默认值value,</span></span><br><span class="line"><span class="comment">    不是第一次出现的时候, 交给函数式接口来处理, 在调用的时候可以用lambda表达式或方法引用来写</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">if</span>(newValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">        remove(key); <span class="comment">// 如果经过以上处理, 得到的newValue还是null的话, 删去该key, 否则就正常的添加该键值对,  </span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        put(key, newValue);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 方法最终返回我们想要的值</span></span><br><span class="line">    <span class="keyword">return</span> newValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><p>练习</p>
+<p>insert 2, 6, and 13 in below tree</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153740.png" alt="ex1" style="zoom:80%;" />
 
-<ul>
-<li>都在注释里写清楚了.</li>
-<li>综上, 以后再更新映射项就考虑merge吧!</li>
-</ul>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161429.jpg" alt="ex1" style="zoom:80%;" />
+
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161532.jpg" alt="微信图片_20200716161316" style="zoom:80%;" />
+
 </li>
 </ul>
-</li>
-</ul>
-<blockquote>
-<p><strong>参考文献</strong>:<br>Java核心技术 卷1 原书第10版 , 第9章</p>
-</blockquote>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文主要介绍了红黑树的插入过程原理.</p>
 
     </div>
 
@@ -339,12 +392,12 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/85124b9.html">jdk8中HashMap更新映射项的方法(merge)笔记</a></p>
+  <p><span>本文标题:</span><a href="/posts/eab0ab25.html">数据结构学习之-红黑树(2)</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
-  <p><span>发布时间:</span>2019年11月20日 - 13:11</p>
-  <p><span>最后更新:</span>2020年03月20日 - 23:03</p>
-  <p><span>原始链接:</span><a href="/posts/85124b9.html" title="jdk8中HashMap更新映射项的方法(merge)笔记">https://joemendezckh.github.io/posts/85124b9.html</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/85124b9.html"  aria-label="复制成功！"></i></span>
+  <p><span>发布时间:</span>2020年07月16日 - 14:07</p>
+  <p><span>最后更新:</span>2020年07月16日 - 18:07</p>
+  <p><span>原始链接:</span><a href="/posts/eab0ab25.html" title="数据结构学习之-红黑树(2)">https://joemendezckh.github.io/posts/eab0ab25.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/eab0ab25.html"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
 </div>
@@ -367,7 +420,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+              <a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/" rel="tag"># 红黑树</a>
           </div>
 
         
@@ -375,11 +429,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/posts/ccb0c92d.html" rel="next" title="redis基础学习笔记(一)">
-      redis基础学习笔记(一) <i class="fa fa-chevron-right"></i>
+    <a href="/posts/c19df8e6.html" rel="prev" title="数据结构学习之-红黑树(1)">
+      <i class="fa fa-chevron-left"></i> 数据结构学习之-红黑树(1)
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -440,6 +494,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树的插入"><span class="nav-number">1.</span> <span class="nav-text">红黑树的插入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法原理"><span class="nav-number">1.1.</span> <span class="nav-text">算法原理:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法过程"><span class="nav-number">1.2.</span> <span class="nav-text">算法过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入过程示例"><span class="nav-number">1.3.</span> <span class="nav-text">插入过程示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
