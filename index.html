@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="google-site-verification" content="TdaLzIg1aoDn_gAvCUV77pBCpUSCNTve1wSf65VBmUo" />
+  <meta name="google-site-verification" content="TdaLzIg1aoDn_gAvCUV77pBCpUSCNTve1wSf65VBmUo" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 4.2.0">
@@ -192,6 +192,410 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/98613aa6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JoeMendez's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/98613aa6.html" class="post-title-link" itemprop="url">Windows编译OpenJDK</a>
+        </h2>
+
+        <div class="post-meta">
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-18 17:01:14" itemprop="dateModified" datetime="2020-07-18T17:01:14+08:00">2020-07-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">实践</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/98613aa6.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/98613aa6.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>笔者之前为了阅读 jdk 的源码, 搭建了阅读源码的环境, 然后一通注释, 再次调试的时候, 发现错行了, 提示 <code>Source code does not match the bytecode</code><br>这是因为我们虽然修改了阅读的源码, 但是并没有重新编译而导致的, 相信也有很多同学遇到过, 话不多说, 开冲<br>参考的博客和用到的软件都在本章末尾</p>
+</blockquote>
+<h2 id="环境基础"><a href="#环境基础" class="headerlink" title="环境基础"></a>环境基础</h2><p>我的系统环境:</p>
+<ul>
+<li>win10 1903</li>
+<li>本机安装的 jdk: 1.8.0_221</li>
+</ul>
+<p>需要的软件:</p>
+<ol>
+<li><p><a href="https://cygwin.com/install.html" target="_blank" rel="noopener">cygwin x64</a></p>
+</li>
+<li><p><a href="https://download.savannah.gnu.org/releases/freetype/" target="_blank" rel="noopener">FreeType 2.7</a></p>
+<blockquote>
+<p>Sun公司在<a href="https://zh.wikipedia.org/wiki/OpenJDK" target="_blank" rel="noopener">OpenJDK</a>这个Java开发工具包中将专有的字体栅格化引擎变更为FreeType</p>
+</blockquote>
+</li>
+<li><p>Visual Studio 2010</p>
+<p>需要C++ x64位编译器模块还有 .NET FRAMEWORK 4</p>
+<blockquote>
+<p>建议一定 2010 版的, 否则会有各种麻烦, 主要是 .NET FRAMEWORK 4 的相关依赖很复杂</p>
+<p>因为我第一次就是用的 Visual Studio 2019, 后面各种报错, 心态爆炸</p>
+<p>换成 2010 后出现的问题就解决了</p>
+</blockquote>
+</li>
+<li><p><a href="https://jdk.java.net/java-se-ri/8-MR3" target="_blank" rel="noopener">openjdk8</a></p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718152748.png" alt="image-20200718152746400" style="zoom:50%;" />
+
+
+
+</li>
+</ol>
+<h3 id="安装-Cygwin"><a href="#安装-Cygwin" class="headerlink" title="安装 Cygwin"></a>安装 Cygwin</h3><p>用来在windows 上模拟 Linux 系统</p>
+<p>需要加选以下模块</p>
+<table>
+<thead>
+<tr>
+<th>Binary Name</th>
+<th>Category</th>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ar.exe</td>
+<td>Devel</td>
+<td>binutils</td>
+<td>The GNU assembler, linker and binary utilities</td>
+</tr>
+<tr>
+<td>make.exe</td>
+<td>Devel</td>
+<td>make</td>
+<td>The GNU version of the ‘make’ utility built for CYGWIN</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>zip.exe</td>
+<td>Archive</td>
+<td>zip</td>
+<td>Package and compress (archive) files</td>
+</tr>
+<tr>
+<td>unzip.exe</td>
+<td>Archive</td>
+<td>unzip</td>
+<td>Extract compressed files in a ZIP archive</td>
+</tr>
+<tr>
+<td>free.exe</td>
+<td>System</td>
+<td>procps</td>
+<td>Display amount of free and used memory in the system</td>
+</tr>
+</tbody></table>
+<ul>
+<li>上表是 OpenJDK 出自 README-builds.html#windows, 如果英文好的可以直接参考README文档</li>
+<li>如果有漏装的或者还想装的, 可以重新运行Cygwin的安装文件, 添加想要安装的模块即可</li>
+</ul>
+<h3 id="编译-FreeType"><a href="#编译-FreeType" class="headerlink" title="编译 FreeType"></a>编译 FreeType</h3><p>使用 VS 2010 打开<code>你的路径\freetype-2.7\builds\windows\vc2010</code> 目录下的 <code>freetype.sln</code> 文件</p>
+<p>等待 VS 2010 加载成功后, Build 生成 dll 和 lib 文件</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718154549.png" alt="image-20200718154547522" style="zoom:67%;" />
+
+<ul>
+<li>生成的文件在 <code>你的路径\freetype-2.7\objs\vc2010\x64</code> 下</li>
+<li>复制 dll 和 lib 文件到 <code>E:\myjdk\freetype-2.7\lib</code> 目录下, lib 目录需要手动创建</li>
+<li>然后 将 <code>~\freetype-2.7\include</code> <code>~\freetype-2.7\lib</code> 添加到 PATH 环境变量中</li>
+</ul>
+<h2 id="编译-OpenJDK"><a href="#编译-OpenJDK" class="headerlink" title="编译 OpenJDK"></a>编译 OpenJDK</h2><h4 id="OpenJDK-目录结构简单介绍"><a href="#OpenJDK-目录结构简单介绍" class="headerlink" title="OpenJDK 目录结构简单介绍"></a>OpenJDK 目录结构简单介绍</h4><figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">openjdk</span><br><span class="line">├── corba</span><br><span class="line">├── hotspot</span><br><span class="line">├── jaxp</span><br><span class="line">├── jaxws</span><br><span class="line">├── jdk</span><br><span class="line">├── langtools</span><br><span class="line">└── nashorn</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>Corba</p>
+<p>全称 Common Object Request Broker Architecture, 通用对象请求代理架构，是基于 对象-服务 机制设计得。与 JavaBean、COM 等是同种范畴</p>
+</li>
+<li><p>hotspot</p>
+<ul>
+<li>全称 Java HotSpot Performance Engine，是 Java 虚拟机的一个实现，包含了服务器版和桌面应用程序版。利用 JIT 及自适应优化技术 (自动查找性能热点并进行动态优化) 来提高性能。</li>
+</ul>
+</li>
+<li><p>jaxp</p>
+<p>全称 <code>Java API for XML Processing</code>，处理 XML 的 Java API，是 Java XML 程序设计的应用程序接口之一，它提供解析和验证XML文档的能力</p>
+</li>
+<li><p>jaxws</p>
+<p>全称 <code>Java API for Web Services</code>，<code>JAX-WS</code> 允许开发者选择 <code>RPC-oriented</code> (面向 RPC)  或者 <code>message-oriented</code> (消息通信，<code>erlang</code> 使用的就是消息通信，不过 Java 内存模型是内存共享) 来实现自己的 <code>web services</code></p>
+</li>
+<li><p>langtools</p>
+<p>Java 语言支持工具</p>
+</li>
+<li><p>JDK</p>
+<p>全称 <code>Java Development Kit</code>，即java开发工具包</p>
+<p>jdk 目录下的 <code>src/share</code>中的 <code>classes</code>目录里的是 Java 的实现，<code>native</code>目录里的是 C++ 的实现，两部分基本对应</p>
+</li>
+<li><p>Nashorn</p>
+<p><code>Nashorn</code> 项目的目的是基于 Java 在 JVM 上实现一个轻量级高性能的 <code>JavaScript</code>运行环境。基于 <code>JSR-223</code> 协议，Java 程序员可在 Java 程序中嵌入 JavaScript 代码</p>
+</li>
+</ul>
+<h4 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h4><ul>
+<li><p>打开 Cygwin 进入下载的  openjdk 目录, 可以  <code>cd &#39;E:/openjdk&#39;</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --with-freetype=<span class="string">'E:\myjdk\freetype-2.7'</span>  -with-target-bits=64 --<span class="built_in">enable</span>-debug</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于这是第二天写的.. 图片丢了, 直接参考我参考的博客把…</p>
+<p><a href="https://www.cnblogs.com/jpfss/p/11641045.html#problems" target="_blank" rel="noopener">win10 编译 openjdk</a></p>
+<p>遇到问题是肯定的, 一定要耐心, 多查查, 会有解决办法的, (ง •_•)ง</p>
+<p>心态要稳</p>
+</li>
+<li><p>如果上面的命令执行成功后, 便可以正式开始编译了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在 openjdk 的根目录执行</span></span><br><span class="line">make all	<span class="comment"># 全量编译, 也就是所有的openjdk的工具都进行编译, 耗时看电脑性能, 我编译了 23 分钟...</span></span><br><span class="line">make clean  <span class="comment"># 删除编译出来的文件, 不会删除 configure 的文件</span></span><br><span class="line">make images <span class="comment"># 只编译 jdk (但是如果之前没有make all 的话, 还是会编译所有有依赖的</span></span><br><span class="line">			<span class="comment"># 如果后面修改源码后, 可以执行 make images 命令, 会快一点</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译成功后的 jdk 在 <code>你的路径\openjdk\build\windows-x86_64-normal-server-fastdebug\images</code> 下</p>
+<p>有 j2re-image和 j2sdke-image, 分别就是 jre 和 jdk</p>
+</li>
+</ul>
+<h2 id="使用自己编译的jdk"><a href="#使用自己编译的jdk" class="headerlink" title="使用自己编译的jdk"></a>使用自己编译的jdk</h2><p>如果来到这一步基本上就算大功告成了,  因为此时已经根据你修改的源码编译出了自定义的 jdk</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>下面只是一个小小的验证</p>
+<ol>
+<li><p>在 IDEA 中创建一个最基本的 Java 工程</p>
+</li>
+<li><p>写一个 HelloWorld</p>
+</li>
+<li><p>选择我们自己编译的jdk</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163655.png" alt="image-20200718163654290" style="zoom:67%;" />
+</li>
+<li><p>如果还想一边调试一边修改源码的话, </p>
+<ol>
+<li>排除之前存在的源码</li>
+<li>添加 openjdk 的源码 <code>~\openjdk\jdk\src\share</code>, 此时就可以对源码进行修改了</li>
+</ol>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163911.png" alt="image-20200718163909448" style="zoom:67%;" />
+
+</li>
+</ol>
+<p>修改源码后, 则需要重新编译才能生效, 重新编译还是在之前编译的根目录, 只要执行 <code>make images</code> 即可, 会快不少</p>
+<h3 id="添加中文注释后的注意事项-要修改生成的编码"><a href="#添加中文注释后的注意事项-要修改生成的编码" class="headerlink" title="添加中文注释后的注意事项: 要修改生成的编码"></a>添加中文注释后的注意事项: 要修改生成的编码</h3><p>如果添加了中文注释, 一定要修改一个地方的编码, 否则会编译出错  /(ㄒoㄒ)/~~</p>
+<p>在 <code>~\openjdk\jdk\make\Setup.gmk</code> 中 修改<code>-encoding ascii -XDignore.symbol.file=true</code> 为 <code>-encoding utf-8 -XDignore.symbol.file=true</code></p>
+<p>一定要修改编码!!!</p>
+<p>如果不在这个文件中的话, 把 openjdk 目录导入到 vscode 中, 然后全局搜索一下 <code>-encoding ascii</code> 修改编码即可</p>
+<p>如果修改了源码, 但是没有重新编译的话, 是不会对运行产生影响的, 调试的时候会错行, 以及提示 <code>Source code does not match the bytecode</code></p>
+<h3 id="测试效果"><a href="#测试效果" class="headerlink" title="测试效果"></a>测试效果</h3><p>给源码加点料, O(∩_∩)O</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164653.png" alt="image-20200718164652172" style="zoom:67%;" />
+
+<p>效果如下: </p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164805.png" alt="image-20200718164803660" style="zoom:67%;" />
+
+
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>肝了半天, 总算出来了, 比较费时费力的主要就是解决编译时的报错, ┭┮﹏┭┮</p>
+<p>而且编译一次 23 分钟, 等的人心烦…</p>
+<p>不过最后成功了是真滴开心 o(<em>￣▽￣</em>)ブ</p>
+<p>如果你都看到这了, 太感谢了, 给你个赞, b(￣▽￣)d</p>
+<p>(ง •_•)ง</p>
+<blockquote>
+<p>参考文章:</p>
+<p><a href="https://blog.csdn.net/baichoufei90/article/details/85055655" target="_blank" rel="noopener">OpenJDK 源码的目录结构</a></p>
+<p><a href="https://blog.csdn.net/wqlinloveruby/article/details/80409031" target="_blank" rel="noopener">JVM学习——1. win10 下构建64位 openJDK8 完整篇</a></p>
+<p><a href="https://my.oschina.net/langxSpirit/blog/1624428" target="_blank" rel="noopener">OpenJDK8 Windows编译</a></p>
+<p>openjdk 的 Readme-Build 文件</p>
+</blockquote>
+<blockquote>
+<p>资源分享:</p>
+<p>链接: <a href="https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g" target="_blank" rel="noopener">https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g</a> 提取码: 8ru9 </p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+    
+    <div>
+        
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/55690cd4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JoeMendez's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/55690cd4.html" class="post-title-link" itemprop="url">数据结构学习之红黑树-3</a>
+        </h2>
+
+        <div class="post-meta">
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-16 22:54:52" itemprop="dateModified" datetime="2020-07-16T22:54:52+08:00">2020-07-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/55690cd4.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/55690cd4.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/" target="_blank" rel="noopener">Red-Black Tree | Set 3 (Delete)</a><br><a href="https://zhuanlan.zhihu.com/p/22800206" target="_blank" rel="noopener">数据结构: 红黑树的删除</a></p>
+</blockquote>
+<h2 id="红黑树的删除"><a href="#红黑树的删除" class="headerlink" title="红黑树的删除"></a>红黑树的删除</h2><p><strong>Insertion Vs Deletion:</strong><br>Like Insertion, recoloring and rotations are used to maintain the Red-Black properties.</p>
+<p>In insert operation, we check color of uncle to decide the appropriate case. In delete operation, <strong><em>we check color of sibling</em></strong> to decide the appropriate case.</p>
+<p>The main property that violates after insertion is two consecutive reds. In delete, the main violated property is, change of black height in subtrees as deletion of a black node may cause reduced black height in one root to leaf path</p>
+<h3 id="插入-VS-删除"><a href="#插入-VS-删除" class="headerlink" title="插入 VS 删除"></a>插入 VS 删除</h3><ul>
+<li>删除时进行的操作和插入一样, 也是改变颜色或旋转</li>
+<li>在插入过程中, 主要比较观察的叔叔结点的状态;<br>在删除的过程中, 主要<strong>检查的是兄弟结点的状态</strong>, 以此来决定进行的操作</li>
+<li>插入后违反的主要属性是 2 个连续的红色结点;<br>删除操作中主要违反的属性是: 子树中的黑色高度的变化, 因为删除黑色结点可能会导致从根结点到叶子结点的黑色高度降低</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/55690cd4.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+    
+    <div>
+        
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/eab0ab25.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -206,7 +610,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/eab0ab25.html" class="post-title-link" itemprop="url">数据结构学习之-红黑树(2)</a>
+            <a href="/posts/eab0ab25.html" class="post-title-link" itemprop="url">数据结构学习之红黑树(2)</a>
         </h2>
 
         <div class="post-meta">
@@ -215,7 +619,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 18:58:34" itemprop="dateModified" datetime="2020-07-16T18:58:34+08:00">2020-07-16</time>
+                <time title="修改时间：2020-07-16 20:33:53" itemprop="dateModified" datetime="2020-07-16T20:33:53+08:00">2020-07-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -247,7 +651,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>1.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -320,7 +724,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/c19df8e6.html" class="post-title-link" itemprop="url">数据结构学习之-红黑树(1)</a>
+            <a href="/posts/c19df8e6.html" class="post-title-link" itemprop="url">数据结构学习之红黑树(1)</a>
         </h2>
 
         <div class="post-meta">
@@ -329,7 +733,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 16:35:20" itemprop="dateModified" datetime="2020-07-16T16:35:20+08:00">2020-07-16</time>
+                <time title="修改时间：2020-07-16 20:33:46" itemprop="dateModified" datetime="2020-07-16T20:33:46+08:00">2020-07-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1122,238 +1526,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/249f9dc1.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.jpg">
-      <meta itemprop="name" content="Joe Mendez">
-      <meta itemprop="description" content="和大家分享自己的学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JoeMendez's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/249f9dc1.html" class="post-title-link" itemprop="url">阿里云Docker新人赛记录</a>
-        </h2>
-
-        <div class="post-meta">
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-17 13:24:50" itemprop="dateModified" datetime="2020-05-17T13:24:50+08:00">2020-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">实践</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/posts/249f9dc1.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/249f9dc1.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>本文主要是记录参加阿里云docker新人赛 <a href="https://tianchi.aliyun.com/competition/entrance/231759/information" target="_blank" rel="noopener">Docker练习场</a> 的过程以及自已遇到的一些坑</p>
-<p>使用 java 实现 </p>
-</blockquote>
-<h2 id="Docker练习场"><a href="#Docker练习场" class="headerlink" title="Docker练习场"></a>Docker练习场</h2><ul>
-<li>首先, 官方的帮助文档将流程介绍的已经很详细了, 在此不做赘述</li>
-<li>直接从Java实现写起</li>
-</ul>
-<h3 id="如何实现-run-sh-调用我们的函数"><a href="#如何实现-run-sh-调用我们的函数" class="headerlink" title="如何实现 run.sh 调用我们的函数"></a>如何实现 run.sh 调用我们的函数</h3><ol>
-<li>一个 web 工程, 通过 curl 发送 get 请求调用函数<ul>
-<li>优点: 可以重复调用</li>
-<li>缺点: 感觉有点跑题, 目的是学习docker, 不是web…</li>
-</ul>
-</li>
-<li>直接 main 函数, 打成jar包后直接运行<ul>
-<li>简单粗暴</li>
-</ul>
-</li>
-</ol>
-<p>综上: 我选择了方案 2 (中间有个小坑)</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/249f9dc1.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-    
-    <div>
-        
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/48123146.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.jpg">
-      <meta itemprop="name" content="Joe Mendez">
-      <meta itemprop="description" content="和大家分享自己的学习笔记">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JoeMendez's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/48123146.html" class="post-title-link" itemprop="url">并发编程实践笔记(2)-对象的共享</a>
-        </h2>
-
-        <div class="post-meta">
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-07 17:16:06" itemprop="dateModified" datetime="2020-07-07T17:16:06+08:00">2020-07-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/posts/48123146.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/48123146.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>7.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="2-对象的共享"><a href="#2-对象的共享" class="headerlink" title="2. 对象的共享"></a>2. 对象的共享</h2><p>我们知道同步代码块和同步方法可以保证原子性,但是还有重要的另一方面:<strong>内存可见性(Memory Visibility)</strong>, 确保当一个线程修改了对象状态后, 其他线程可以看到发生的状态变化,(即可以防止脏读)</p>
-<h3 id="1-可见性"><a href="#1-可见性" class="headerlink" title="1. 可见性"></a>1. 可见性</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoVisibility</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> ready;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> number;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReaderThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span> (!ready) &#123;</span><br><span class="line">                Thread.yield();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(number);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> ReaderThread().start();</span><br><span class="line">        number = <span class="number">42</span>;</span><br><span class="line">        ready = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上述程序中, 可能会持续循环下去, 因为可能看不到ready的值. 还有可能输出0, 即读线程看到了ready的值, 但是却没有看到之后写入number的值, 即”重排序(Reordering)”,如果有重排序情况, 那么就无法确定程序按照指定的顺序执行.</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/48123146.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-    
-    <div>
-        
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1426,7 +1598,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1483,12 +1655,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">169k</span>
+    <span title="站点总字数">176k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:33</span>
+    <span title="站点阅读时长">2:40</span>
 </div>
   <!--
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0

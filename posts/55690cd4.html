@@ -19,20 +19,28 @@
     var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Error contacting service. It is probably not running. 记录在安装启动Zookeeper 3.6.1 时遇到的问题与解决方法   环境信息: CentOS Linux release 7.8.2003  java version “1.8.0_161” apache-zookeeper-3.6.1-bin.tar.gz   安装过程 123456">
+  <meta name="description" content="参考内容:Red-Black Tree | Set 3 (Delete)数据结构: 红黑树的删除  红黑树的删除Insertion Vs Deletion:Like Insertion, recoloring and rotations are used to maintain the Red-Black properties. In insert operation, we check col">
 <meta property="og:type" content="article">
-<meta property="og:title" content="安装 Zookeeper 启动报错">
-<meta property="og:url" content="https://joemendezckh.github.io/posts/50e22a29.html">
+<meta property="og:title" content="数据结构学习之红黑树-3">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/55690cd4.html">
 <meta property="og:site_name" content="JoeMendez&#39;s Blog">
-<meta property="og:description" content="Error contacting service. It is probably not running. 记录在安装启动Zookeeper 3.6.1 时遇到的问题与解决方法   环境信息: CentOS Linux release 7.8.2003  java version “1.8.0_161” apache-zookeeper-3.6.1-bin.tar.gz   安装过程 123456">
+<meta property="og:description" content="参考内容:Red-Black Tree | Set 3 (Delete)数据结构: 红黑树的删除  红黑树的删除Insertion Vs Deletion:Like Insertion, recoloring and rotations are used to maintain the Red-Black properties. In insert operation, we check col">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-05-23T08:24:03.000Z">
-<meta property="article:modified_time" content="2020-05-23T09:02:41.832Z">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213508.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716215846.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716221652.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716222322.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716223147.png">
+<meta property="article:published_time" content="2020-07-16T14:13:09.000Z">
+<meta property="article:modified_time" content="2020-07-16T14:54:52.123Z">
 <meta property="article:author" content="Joe Mendez">
-<meta property="article:tag" content="Zookeeper">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png">
 
-<link rel="canonical" href="https://joemendezckh.github.io/posts/50e22a29.html">
+<link rel="canonical" href="https://joemendezckh.github.io/posts/55690cd4.html">
 
 
 <script id="page-configurations">
@@ -45,7 +53,7 @@
   };
 </script>
 
-  <title>安装 Zookeeper 启动报错 | JoeMendez's Blog</title>
+  <title>数据结构学习之红黑树-3 | JoeMendez's Blog</title>
   
 
 
@@ -194,7 +202,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/50e22a29.html">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/55690cd4.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpg">
@@ -207,7 +215,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          安装 Zookeeper 启动报错
+          数据结构学习之红黑树-3
         </h2>
 
         <div class="post-meta">
@@ -216,7 +224,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-23 17:02:41" itemprop="dateModified" datetime="2020-05-23T17:02:41+08:00">2020-05-23</time>
+                <time title="修改时间：2020-07-16 22:54:52" itemprop="dateModified" datetime="2020-07-16T22:54:52+08:00">2020-07-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -224,7 +232,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">实践</span></a>
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
                 </span>
             </span>
 
@@ -244,8 +252,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/posts/50e22a29.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/50e22a29.html" itemprop="commentCount"></span>
+    <a title="valine" href="/posts/55690cd4.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/55690cd4.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -255,7 +263,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.2k</span>
+              <span>3.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -274,59 +282,93 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="Error-contacting-service-It-is-probably-not-running"><a href="#Error-contacting-service-It-is-probably-not-running" class="headerlink" title="Error contacting service. It is probably not running."></a>Error contacting service. It is probably not running.</h3><ul>
-<li>记录在安装启动Zookeeper 3.6.1 时遇到的问题与解决方法</li>
-</ul>
-<blockquote>
-<p>环境信息:</p>
-<p>CentOS Linux release 7.8.2003 </p>
-<p>java version “1.8.0_161”</p>
-<p>apache-zookeeper-3.6.1-bin.tar.gz</p>
+        <blockquote>
+<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/" target="_blank" rel="noopener">Red-Black Tree | Set 3 (Delete)</a><br><a href="https://zhuanlan.zhihu.com/p/22800206" target="_blank" rel="noopener">数据结构: 红黑树的删除</a></p>
 </blockquote>
-<ul>
-<li><p>安装过程</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf /opt/apache-zookeeper-3.6.1-bin.tar.gz -C ./</span><br><span class="line">mv apache-zookeeper-3.6.1-bin zookeeper-3.6.1</span><br><span class="line">cd zookeeper-3.6.1</span><br><span class="line">" 创建 dataDir, 在 zoo.cfg 中修改 dataDir</span><br><span class="line">mkdir data</span><br><span class="line">cd zookeeper-3.6.1/conf</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line">vim zoo.cfg</span><br><span class="line">" 修改 dataDir 为上面创建的 data 目录</span><br></pre></td></tr></table></figure>
-
+<h2 id="红黑树的删除"><a href="#红黑树的删除" class="headerlink" title="红黑树的删除"></a>红黑树的删除</h2><p><strong>Insertion Vs Deletion:</strong><br>Like Insertion, recoloring and rotations are used to maintain the Red-Black properties.</p>
+<p>In insert operation, we check color of uncle to decide the appropriate case. In delete operation, <strong><em>we check color of sibling</em></strong> to decide the appropriate case.</p>
+<p>The main property that violates after insertion is two consecutive reds. In delete, the main violated property is, change of black height in subtrees as deletion of a black node may cause reduced black height in one root to leaf path</p>
+<h3 id="插入-VS-删除"><a href="#插入-VS-删除" class="headerlink" title="插入 VS 删除"></a>插入 VS 删除</h3><ul>
+<li>删除时进行的操作和插入一样, 也是改变颜色或旋转</li>
+<li>在插入过程中, 主要比较观察的叔叔结点的状态;<br>在删除的过程中, 主要<strong>检查的是兄弟结点的状态</strong>, 以此来决定进行的操作</li>
+<li>插入后违反的主要属性是 2 个连续的红色结点;<br>删除操作中主要违反的属性是: 子树中的黑色高度的变化, 因为删除黑色结点可能会导致从根结点到叶子结点的黑色高度降低</li>
+</ul>
 <a id="more"></a>
 
-<ul>
-<li>至此, 安装结束, 进行启动</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[zookeeper-3.6.1]# ./bin/zkServer.sh start</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Starting zookeeper ... STARTED</span><br></pre></td></tr></table></figure>
+<h3 id="删除的过程分析"><a href="#删除的过程分析" class="headerlink" title="删除的过程分析"></a>删除的过程分析</h3><p>Deletion is fairly complex process.  To understand deletion, notion of double black is used.  When a black node is deleted and replaced by a black child, the child is marked as double black. The main task now becomes to convert this double black to single black.</p>
+<p>删除是一个很复杂的过程. 为了理解删除, 使用了<strong>双重黑色</strong>的概念.<br>当删除黑色结点并用黑色子结点替换时该子结点被标记为双黑色。现在的主要任务是将这种双黑色转换为单黑色</p>
+<h4 id="删除时可能遇到的情况"><a href="#删除时可能遇到的情况" class="headerlink" title="删除时可能遇到的情况"></a>删除时可能遇到的情况</h4><ol>
+<li>Perform <a href="https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/" target="_blank" rel="noopener">standard BST delete</a>. When we perform standard delete operation in BST, we always end up deleting a node which is either leaf or has only one child (For an internal node, we copy the successor and then recursively call delete for successor, successor is always a leaf node or a node with one child). So we only need to handle cases where a node is leaf or has one child. Let v be the node to be deleted and u be the child that replaces v (Note that u is NULL when v is a leaf and color of NULL is considered as Black)<br> 按照 BST 删除节点的方法, 删除的节点实际上就是一个叶子结点或者只有一个子结点的结点(对于内部节点, 复制其右子树的最小值, 然后递归调用删除复制的那个结点, 实际上还是删除只有一个结点的情况)<br> 同理, 我们还是只用处理删除的结点为叶子结点或只有一个孩子的结点<br>设 v 为要删除的结点, 让 u 为替换 v 的子结点, (当 v 为叶子结点时, u 是 null, 且颜色为黑色)</li>
+</ol>
+<h4 id="简单情况"><a href="#简单情况" class="headerlink" title="简单情况"></a>简单情况</h4><ol>
+<li><p>Simple Case: <strong>If either u or v is red</strong>, we mark the replaced child as black (No change in black height). Note that both u and v cannot be red as v is parent of u and two consecutive reds are not allowed in red-black tree<br> 如果 u 或 v 为红色, 将替换后的子结点标记为黑色即可, 不会改变黑色高度<br> 注: u 和 v 不可能同时为红色  </p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png" alt="simpleCase" style="zoom:67%;" />
 
-<ul>
-<li>启动正常, 查看状态</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[zookeeper-3.6.1]# ./bin/zkServer.sh status</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Error contacting service. It is probably not running</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="复杂情况-Double-black"><a href="#复杂情况-Double-black" class="headerlink" title="复杂情况 Double black"></a>复杂情况 Double black</h4><p><strong>If Both u and v are Black</strong></p>
+<p>Color u as double black. Now our task reduces to convert this double black to single black. Note that If v is leaf, then u is NULL and color of NULL is considered as black. So the deletion of a black leaf also causes a double black.</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213508.png" alt="delete20" style="zoom:67%;" />
 
-<ul>
-<li>查看状态错误, 使用 ps 命令和 netstat 命令查看2181端口均没有显示, 说明启动失败</li>
-</ul>
-<p>查阅相关资料后, 解释的原因有下面几种: </p>
+<p>删除的 20 是黑色的叶子结点, 但是 null 也视为 黑色, 所以当删除 20 后, 该结点成为了 Double black, 这种情况就比较复杂了, 要进行如下的处理过程</p>
+<p><strong>Do following while the current node u is double black and it is not root</strong>. Let sibling of node be <strong>s</strong>.</p>
+<p>u 为 double black 的情况, 且不为 root , 则循环执行如下步骤, 设 u 的兄弟结点为 <strong>s</strong></p>
 <ol>
-<li>没有创建<code>dataDir</code>目录</li>
-<li>没有关闭防火墙</li>
-<li>2181端口被占用</li>
-<li><code>zoo.cfg</code>文件中主机名出错</li>
-<li><code>myid</code>文件中的整数格式不对，或者与<code>zoo.cfg</code>中的<code>server</code>整数不对应</li>
+<li><p>a) <strong>If sibling s is black and at least one of sibling’s children is red</strong>, perform rotation(s). Let the red child of s be <strong>r</strong>.<br> This case can be divided in four subcases depending upon positions of s and r.</p>
+<p> 如果 s 是黑色的, 并且至少有一个子结点为红色, 则旋转 s, 记 s 的红色子结点为 r, 此时 s 和 r 的关系有 4 种情况; (没错, 你猜对了, 还是一直在旋转中出现的那 4 种)<br> 易得, 情况1, 4 是对称的, 情况 2, 3 是对称的, 所以这里只分析 2 种情况</p>
+<ol>
+<li><p>Left Left Case (s is left child of its parent and r is left child of s or both children of s are red). This is mirror of right right case shown in below diagram</p>
+</li>
+<li><p>Left Right Case (s is left child of its parent and r is right child). This is mirror of right left case shown in below diagram. </p>
+</li>
+<li><p>Right Right Case (s is right child of its parent and r is right child of s or both children of s are red)</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716215846.png" alt="RR" style="zoom:67%;" />
+
+<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且有 2 个红色子结点, 为 RR case </p>
+<ul>
+<li><p>将父结点 p 的颜色赋予兄弟节点 s; </p>
+</li>
+<li><p>将父结点和<strong>兄弟节点的右子结点</strong>设为黑色;</p>
+</li>
+<li><p>对父结点进行<strong>左旋转</strong></p>
+<blockquote>
+<p>对称的情况, 把左变右, 右变左即可</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>Right Left Case (s is right child of its parent and r is left child of s)</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716221652.png" alt="RL" style="zoom:67%;" />
+
+<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且只有 1 个红色左子结点(必然为红色, 不然违规了), 该红色结点为 r, 为 RL case</p>
+<ul>
+<li>将该左子结点 r 变为黑色</li>
+<li>将兄弟节点 s 变为红色</li>
+<li>对兄弟节点执行右旋转</li>
+<li>回到了第3种情况, hhh</li>
+</ul>
+</li>
 </ol>
 </li>
-<li><p>经过排查上述原因, 均为解决</p>
-</li>
-</ul>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><ul>
-<li><p>最终发现, <strong>直接查看日志文件即可</strong></p>
-<p><strong>查看位于<code>zookeeper-3.6.1/logs</code>下的<code>.out</code>文件</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[myid:] - ERROR [main:ZooKeeperServerMain@85] - Unable to start AdminServer, exiting abnormally                </span><br><span class="line">org.apache.zookeeper.server.admin.AdminServer$AdminServerException: Problem starting AdminServer on address 0.0.0.0, port 8080 and comm</span><br><span class="line">and URL &#x2F;commands</span><br><span class="line">    at org.apache.zookeeper.server.admin.JettyAdminServer.start(JettyAdminServer.java:176)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:153)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:112)</span><br><span class="line">    at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:67)</span><br><span class="line">    at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:140)</span><br><span class="line">    at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:90)</span><br><span class="line">Caused by: java.io.IOException: Failed to bind to &#x2F;0.0.0.0:8080</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:346)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.open(ServerConnector.java:307)</span><br><span class="line">    at org.eclipse.jetty.server.AbstractNetworkConnector.doStart(AbstractNetworkConnector.java:80)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.doStart(ServerConnector.java:231)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:72)</span><br><span class="line">    at org.eclipse.jetty.server.Server.doStart(Server.java:385)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:72)</span><br><span class="line">    at org.apache.zookeeper.server.admin.JettyAdminServer.start(JettyAdminServer.java:167)</span><br><span class="line">    ... 5 more</span><br><span class="line">Caused by: java.net.BindException: 地址已在使用</span><br><span class="line">    at sun.nio.ch.Net.bind0(Native Method)</span><br><span class="line">    at sun.nio.ch.Net.bind(Net.java:433)</span><br><span class="line">    at sun.nio.ch.Net.bind(Net.java:425)</span><br><span class="line">    at sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:223)</span><br><span class="line">    at sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:74)</span><br><span class="line">    at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:342)</span><br><span class="line">    ... 12 more</span><br><span class="line">Unable to start AdminServer, exiting abnormally</span><br></pre></td></tr></table></figure>
+<li><p>b) <strong>If sibling is black and its both children are black</strong>, perform recoloring, and recur for the parent if parent is black.</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716222322.png" alt="bb" style="zoom:67%;" />
 
-<ul>
-<li>显而易见, 是因为8080端口被占用, 解决端口占用后, 即可正常启动</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper/zookeeper-3.6.1/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Mode: standalone</span><br></pre></td></tr></table></figure>
-
+<p> In this case, if parent was red, then we didn’t need to recur for parent, we can simply make it black<br> (red + double black = single black)</p>
+<p> 删除 v , 因为兄弟节点为黑色叶子节点, 将其设为红色即可; 然后将父结点设为当前节点递归, 直到根结点或遇到红色节点</p>
 </li>
-</ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以后出现问题, 不要忙着google, 看看日志文件, 就可以解决大部分问题, 如果不行再google</p>
+<li><p>c) <strong>If sibling is red</strong>, perform a rotation to move old sibling up, recolor the old sibling and parent. The new sibling is always black (See the below diagram). This mainly converts the tree to black sibling case (by rotation) and leads to case (a) or (b). </p>
+<p> This case can be divided in two subcases</p>
+<ol>
+<li><p>Left Case (s is left child of its parent). This is mirror of right right case shown in below diagram. We right rotate the parent p.</p>
+</li>
+<li><p>Right Case (s is right child of its parent). We left rotate the parent p</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716223147.png" alt="RightCase" style="zoom:67%;" />
+
+<p> 删除 10, 其兄弟节点为红色, 且子结点都为黑色, 则对父结点 p 执行右旋转, 并且改变他们的颜色, 然后就变成了上面的 b 情况</p>
+</li>
+</ol>
+</li>
+</ol>
 
     </div>
 
@@ -343,12 +385,12 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/50e22a29.html">安装 Zookeeper 启动报错</a></p>
+  <p><span>本文标题:</span><a href="/posts/55690cd4.html">数据结构学习之红黑树-3</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
-  <p><span>发布时间:</span>2020年05月23日 - 16:05</p>
-  <p><span>最后更新:</span>2020年05月23日 - 17:05</p>
-  <p><span>原始链接:</span><a href="/posts/50e22a29.html" title="安装 Zookeeper 启动报错">https://joemendezckh.github.io/posts/50e22a29.html</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/50e22a29.html"  aria-label="复制成功！"></i></span>
+  <p><span>发布时间:</span>2020年07月16日 - 22:07</p>
+  <p><span>最后更新:</span>2020年07月16日 - 22:07</p>
+  <p><span>原始链接:</span><a href="/posts/55690cd4.html" title="数据结构学习之红黑树-3">https://joemendezckh.github.io/posts/55690cd4.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/55690cd4.html"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
 </div>
@@ -371,7 +413,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
           </div>
 
         
@@ -380,12 +423,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/687ddbf0.html" rel="prev" title="记录vim配置">
-      <i class="fa fa-chevron-left"></i> 记录vim配置
+    <a href="/posts/eab0ab25.html" rel="prev" title="数据结构学习之红黑树(2)">
+      <i class="fa fa-chevron-left"></i> 数据结构学习之红黑树(2)
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/b5b62e3d.html" rel="next" title="服务器软件安装实录">
-      服务器软件安装实录 <i class="fa fa-chevron-right"></i>
+    <a href="/posts/98613aa6.html" rel="next" title="Windows编译OpenJDK">
+      Windows编译OpenJDK <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -447,7 +490,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Error-contacting-service-It-is-probably-not-running"><span class="nav-number">1.</span> <span class="nav-text">Error contacting service. It is probably not running.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树的删除"><span class="nav-number">1.</span> <span class="nav-text">红黑树的删除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入-VS-删除"><span class="nav-number">1.1.</span> <span class="nav-text">插入 VS 删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除的过程分析"><span class="nav-number">1.2.</span> <span class="nav-text">删除的过程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#删除时可能遇到的情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">删除时可能遇到的情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单情况"><span class="nav-number">1.2.2.</span> <span class="nav-text">简单情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复杂情况-Double-black"><span class="nav-number">1.2.3.</span> <span class="nav-text">复杂情况 Double black</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

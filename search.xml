@@ -2266,230 +2266,6 @@
       </tags>
   </entry>
   <entry>
-    <title>数据结构学习之-红黑树(1)</title>
-    <url>/posts/c19df8e6.html</url>
-    <content><![CDATA[<blockquote>
-<p>参考内容:<br>数据结构与算法分析 Java 语言描述 第 3 版<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/" target="_blank" rel="noopener">Red-Black Tree | Set 1 (Introduction)</a> 系列文章</p>
-</blockquote>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
-<li><p>红黑树是一种什么树?</p>
-<p><strong>平衡二叉搜索</strong>树;</p>
-<p>红黑树的目的是为了高效地进行增删改查，本质是一种二叉搜索树，其次也是一种完美平衡二叉树</p>
-</li>
-</ul>
-<h3 id="二叉查找树"><a href="#二叉查找树" class="headerlink" title="二叉查找树"></a>二叉查找树</h3><ul>
-<li><strong>二叉查找树的性质</strong>如下：<ol>
-<li>左子树上所有结点的值小于或等于它根结点得值</li>
-<li>右子树上所有结点的值大于或等于它根结点的值</li>
-<li>左右子树每个也必须是二叉查找树</li>
-</ol>
-</li>
-</ul>
-<p>那么根据这个性质我们就可以非常快的查找了——类似于二分查找。</p>
-<p>如果对一个有序的序列进行查找，那么效率非常低。二分查找的优势没有了，这种现象可以理解为失去了平衡。<strong>所以需要平衡二叉树来弥补这种缺陷</strong></p>
-<a id="more"></a>
-
-<h3 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h3><ul>
-<li><p>平衡二叉树的性质</p>
-<ol>
-<li>从任何一个结点出发，左右子树深度之差的绝对值不超过 1。</li>
-<li>左右子树仍然为平衡二叉树</li>
-</ol>
-</li>
-<li><p>平衡二叉树在查找的时候就有二叉查找树的优势，同时也保持了平衡。</p>
-</li>
-<li><p>但是平衡二叉树的劣势在于：</p>
-<ol>
-<li>删除：对于平衡二叉树来说，在最坏情况下，需要维护从被删结点到根结点这条路径上所有结点的平衡性，旋转的量级是 $OlogN$。但是红黑树就不一样了，最多只需 3 次旋转就会重新平衡，旋转的量级是 $O1$</li>
-<li>保持平衡：平衡二叉树高度平衡，这也就意味着在大量插入和删除结点的场景下，平衡二叉树为了保持平衡需要调整的频率会更高。</li>
-</ol>
-</li>
-<li><p>所以在大量查找的情况下，平衡二叉树的效率更高，也是首要选择。在大量增删的情况下，红黑树是首选</p>
-</li>
-</ul>
-<blockquote>
-<p>更详细的分析可以参考:<br><a href="https://www.cnblogs.com/idorax/p/6441043.html" target="_blank" rel="noopener">完美二叉树, 完全二叉树和完满二叉树</a></p>
-</blockquote>
-<h3 id="平衡树如何旋转"><a href="#平衡树如何旋转" class="headerlink" title="平衡树如何旋转"></a>平衡树如何旋转</h3><blockquote>
-<p>参考&lt;数据结构与算法分析 Java 语言描述 第 3 版&gt; 4.4 小节 AVL 树</p>
-</blockquote>
-<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716142650.png" alt="image-20200716103510941"></p>
-<p>把必须重新平衡的结点叫做 $\alpha$. 由于任意结点最多有 2 个儿子, 因此出现高度不平衡就需要 $\alpha$ 点的两棵子树的高度差 2, 容易得出, 这种不平衡的情况有以下 4 种:</p>
-<ol>
-<li>对 $\alpha$  的左儿子的左子树进行一次插入</li>
-<li>对 $\alpha$  的左儿子的右子树进行一次插入</li>
-<li>对 $\alpha$  的右儿子的左子树进行一次插入</li>
-<li>对 $\alpha$  的右儿子的右子树进行一次插入</li>
-</ol>
-<ul>
-<li><p>单旋转修复情况1 和情况4</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105012.png" alt="image-20200716105010604" style="zoom:67%;" />
-
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105038.png" alt="image-20200716105036878" style="zoom:67%;" />
-</li>
-<li><p>单旋转不能修复情况2和情况3, 要进行双旋转</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105237.png" alt="image-20200716105236215" style="zoom:67%;" />
-
-</li>
-</ul>
-<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>Red-Black Tree is a self-balancing Binary Search Tree (BST) where every node follows following rules.</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716110604.png" alt="red-black-tree" style="zoom:67%;" />
-
-<p><strong>1)</strong> Every node has a color either red or black.<br><strong>2)</strong> Root of tree is always black.<br><strong>3)</strong> There are no two adjacent red nodes (A red node cannot have a red parent or red child).<br><strong>4)</strong> Every path from a node (including root) to any of its descendant NULL node has the same number of black nodes.</p>
-<p><strong>1)</strong> 每个结点不是红色就是黑色<br><strong>2)</strong> 根结点必须是黑色<br><strong>3)</strong> 从每个叶子到根的所有路径上不能有两个连续的红色结点(红色结点的父结点和子结点都不能是红色的)<br><strong>4)</strong> 从任一节点到其每个叶子的所有不包含重复点的路径都包含相同数目的黑色结点.</p>
-<h3 id="红黑树是如何保证平衡的"><a href="#红黑树是如何保证平衡的" class="headerlink" title="红黑树是如何保证平衡的?"></a>红黑树是如何保证平衡的?</h3><ul>
-<li><p>一个简单的理解平衡的例子是，在红黑树中不可能有 3 个结点的链。我们可以尝试颜色的任意组合，并查看它们全部违反了Red-Black树的属性</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716111919.png" alt="image-20200716111918095" style="zoom:67%;" />
-
-<ul>
-<li>From the above examples, we get some idea how Red-Black trees ensure balance. Following is an important fact about balancing in Red-Black Trees.</li>
-</ul>
-</li>
-<li><p><strong>Black Height of a Red-Black Tree :</strong><br><em>Black height is number of black nodes on a path from root to a leaf. Leaf nodes are also counted black nodes. From above properties 3 and 4, we can derive(推出), <strong>a Red-Black Tree of height h has black-height &gt;= h/2</strong>.</em></p>
-<p>Number of nodes from a node to its farthest descendant leaf(最远的后代叶子结点) is no more than twice as the number of nodes to the nearest descendant leaf(最近的叶子结点).</p>
-</li>
-<li><p><strong><em>Every Red Black Tree with n nodes has height &lt;=</em></strong>  $2Log_2(n+1)$</p>
-<p>prove:</p>
-<ul>
-<li>For a general Binary Tree, let <strong>k</strong> be the minimum number of nodes on all root to NULL paths, then $n &gt;= 2^k – 1$ (Ex. If k is 3, then n is atleast 7).<br>This expression can also be written as $$k &lt;= Log_2(n+1)$$</li>
-<li>From property 4 of Red-Black trees and above claim, we can say in a Red-Black Tree with n nodes, there is a root to leaf path with at-most $Log_2(n+1)$ black nodes.</li>
-<li>From property 3 of Red-Black trees, we can claim that the number black nodes in a Red-Black tree is at least ⌊ n/2 ⌋ where n is the total number of nodes</li>
-</ul>
-<p>From above 2 points, we can conclude the fact that Red Black Tree with <strong>n</strong> nodes has $$height &lt;= 2Log_2(n+1)$$</p>
-<p>分析过程: </p>
-<ul>
-<li>对于一般的二叉树, 设 k 为所有从根结点到NULL路径上的最小节点数, n 为总结点数<br>k 相当于是最小的高度( 空树时, k = 0, 只有一个根节点, k = 1)<br>当 k = 3 时, 也就是说最少有 3 层, 又由于红黑树是保持一定平衡的(这里还不是很明白, 可以参考上面说的如何保持平衡), 则至少有 $2^k - 1$ 个结点</li>
-<li>结合第 4 点定义, n 个结点的红黑树最多有 $Log_2(n+1)$ 个黑色结点</li>
-<li>再结合第 3 点定义, 黑色节点至少是总结点 n 的一半, 即  n/2 个<br>综上: n 个结点的红黑树的高度 $&lt;= 2Log_2(n + 1)$  </li>
-</ul>
-</li>
-</ul>
-<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ul>
-<li><p>Is it possible to have all black nodes in a Red-Black tree?</p>
-<p><strong>Yes</strong>, a tree with all nodes black can be a red-black tree. The tree has to be a perfect binary tree (<em>all leaves are at the same depth or same level, and in which every parent has two children</em>) and so, it is the only tree whose <em>Black height</em> equals to its <em>tree height</em>.<br>来自: <a href="https://stackoverflow.com/questions/6406658/is-a-tree-with-all-black-nodes-a-red-black-tree" target="_blank" rel="noopener">https://stackoverflow.com/questions/6406658/is-a-tree-with-all-black-nodes-a-red-black-tree</a></p>
-</li>
-<li><p>How to draw a Red-Black Tree that is not an <a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion/" target="_blank" rel="noopener">AVL tree</a> structure wise?<br>Consider the following tree whose</p>
-<ul>
-<li>right sub-tree is a complete binary tree with depth <strong>d</strong>, in which every node is black</li>
-<li>left sub-tree is a complete binary tree with depth <strong>2d</strong>, in which every node odd depth is red and even depth is black<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716144000.png" alt="main-qimg-97101c464be4615dbe651aed59c1c547" style="zoom:30%;" /></li>
-<li>The above is a valid red-black tree but not an AVL tree (since the difference between heights of left and right sub-trees is more than one)<br>来自: <a href="https://www.quora.com/How-can-I-draw-a-red-black-tree-that-is-not-an-AVL-tree-structure-wise" target="_blank" rel="noopener">https://www.quora.com/How-can-I-draw-a-red-black-tree-that-is-not-an-AVL-tree-structure-wise</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>在这篇文章中，介绍了红黑树的基础,  复习了一下AVL树的旋转, 并介绍红黑树的性质, 以及如何确保平衡。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>数据结构</tag>
-        <tag>红黑树</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构学习之-红黑树(2)</title>
-    <url>/posts/eab0ab25.html</url>
-    <content><![CDATA[<blockquote>
-<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-2-insert/" target="_blank" rel="noopener">Red-Black Tree | Set 2 (Insert)</a></p>
-</blockquote>
-<h2 id="红黑树的插入"><a href="#红黑树的插入" class="headerlink" title="红黑树的插入"></a>红黑树的插入</h2><p>在 AVL 树中, 通过”旋转”的方式来保证插入结点后的平衡, 但是在 红黑树中通过 2 种方式来实现平衡</p>
-<ol>
-<li>Recoloring</li>
-<li>Rotation</li>
-</ol>
-<p>首先尝试改变颜色, 如果改变颜色无效, 则进行旋转. </p>
-<p>Following is detailed algorithm. The algorithms has mainly two cases depending upon the color of uncle. If uncle is red, we do recoloring. If uncle is black, we do rotations and/or recoloring.<br>Color of a NULL node is considered as BLACK.</p>
-<a id="more"></a>
-
-<h3 id="算法原理"><a href="#算法原理" class="headerlink" title="算法原理:"></a>算法原理:</h3><ul>
-<li>算法主要有 2 种情况, 具体取决于 叔叔结点(父结点的兄弟结点) 的颜色,</li>
-<li>如果叔叔结点是红色的, 改变颜色</li>
-<li>如果叔叔结点是黑色的, 则尝试 旋转 或/且 改变颜色</li>
-</ul>
-<p>Let x be the newly inserted node.</p>
-<ol>
-<li>Perform <a href="http://geeksquiz.com/binary-search-tree-set-1-search-and-insertion/" target="_blank" rel="noopener">standard BST insertion</a> and make the color of newly inserted nodes as RED.</li>
-<li>If x is root, change color of x as BLACK (Black height of complete tree increases by 1).</li>
-<li>Do following if color of x’s parent is not BLACK <strong>and</strong> x is not root.<ol>
-<li><strong>If x’s uncle is RED</strong> (Grand parent must have been black from <a href="https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/" target="_blank" rel="noopener">property 4</a>)<ol>
-<li>Change color of parent and uncle as BLACK.</li>
-<li>color of grand parent as RED.</li>
-<li>Change x = x’s grandparent, repeat steps 2 and 3 for new x.</li>
-</ol>
-</li>
-<li><strong>If x’s uncle is BLACK</strong>, then there can be four configurations for x, x’s parent (<strong>p</strong>) and x’s grandparent (<strong>g</strong>) (This is similar to<a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion/" target="_blank" rel="noopener"> AVL Tree</a>)<ol>
-<li>Left Left Case (p is left child of g and x is left child of p)</li>
-<li>Left Right Case (p is left child of g and x is right child of p)</li>
-<li>Right Right Case (Mirror of case 1)</li>
-<li>Right Left Case (Mirror of case 2)</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="算法过程"><a href="#算法过程" class="headerlink" title="算法过程"></a>算法过程</h3><p>假设 x 是新插入的结点</p>
-<ol>
-<li><p>按照标准 BST 的方式插入, 并且设 x 的颜色为红色, (因为如果为黑色, 则一旦插入就要进行各种平衡, 所以先假设为红色)</p>
-</li>
-<li><p>如果 x 是根结点, 则直接将 x 变为黑色, 完成. 因为红黑树的根节点必须是黑色</p>
-</li>
-<li><p>如果 x 的父结点不是黑色, 且不是根结点, 则进行如下判断(如果 x 的父结点为黑色, x 为红色, 满足红黑树的性质, 不用进行任何操作)</p>
-<ol>
-<li><p>如果 x 的叔叔结点为红色, 则 x 的祖父结点一定为黑色</p>
-<ol>
-<li>将 x 的父结点和叔叔结点变为黑色</li>
-<li>将 x 的祖父结点变为红色</li>
-<li>此时 x 插入的操作已经平衡, 但是 x 的祖父结点状态变化了, 将 x 的祖父结点看为新插入的结点, 递归的进行重新调整, 直到根节点<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716151833.png" alt="uncle-red" style="zoom:80%;" />
-</li>
-</ol>
-</li>
-<li><p>如果 x 的叔叔结点是黑色, 那么 x 就有四种情况, 类似 AVL 树的4种情况, 用上图来说明,</p>
-<ol>
-<li><p>左-左  </p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152856.png" alt="LL" style="zoom:80%;" />
-</li>
-<li><p>左-右</p>
-</li>
-</ol>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152912.png" alt="LR" style="zoom:80%;" />
-
-<ol start="3">
-<li><p>右-右</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153143.png" alt="RR" style="zoom:80%;" />
-</li>
-<li><p>右-左</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153007.png" alt="RL" style="zoom:80%;" />
-
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="插入过程示例"><a href="#插入过程示例" class="headerlink" title="插入过程示例"></a>插入过程示例</h3><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153646.png" alt="ex-insert" style="zoom:80%;" />
-
-<ul>
-<li><p>练习</p>
-<p>insert 2, 6, and 13 in below tree</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153740.png" alt="ex1" style="zoom:80%;" />
-
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161429.jpg" alt="ex1" style="zoom:80%;" />
-
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161532.jpg" alt="微信图片_20200716161316" style="zoom:80%;" />
-
-</li>
-</ul>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文主要介绍了红黑树的插入过程原理.</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>数据结构</tag>
-        <tag>红黑树</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>记录vim配置</title>
     <url>/posts/687ddbf0.html</url>
     <content><![CDATA[<h2 id="备份自己的vim设置"><a href="#备份自己的vim设置" class="headerlink" title="备份自己的vim设置"></a>备份自己的vim设置</h2><ul>
@@ -4866,6 +4642,530 @@
 ]]></content>
       <categories>
         <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构学习之红黑树-3</title>
+    <url>/posts/55690cd4.html</url>
+    <content><![CDATA[<blockquote>
+<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/" target="_blank" rel="noopener">Red-Black Tree | Set 3 (Delete)</a><br><a href="https://zhuanlan.zhihu.com/p/22800206" target="_blank" rel="noopener">数据结构: 红黑树的删除</a></p>
+</blockquote>
+<h2 id="红黑树的删除"><a href="#红黑树的删除" class="headerlink" title="红黑树的删除"></a>红黑树的删除</h2><p><strong>Insertion Vs Deletion:</strong><br>Like Insertion, recoloring and rotations are used to maintain the Red-Black properties.</p>
+<p>In insert operation, we check color of uncle to decide the appropriate case. In delete operation, <strong><em>we check color of sibling</em></strong> to decide the appropriate case.</p>
+<p>The main property that violates after insertion is two consecutive reds. In delete, the main violated property is, change of black height in subtrees as deletion of a black node may cause reduced black height in one root to leaf path</p>
+<h3 id="插入-VS-删除"><a href="#插入-VS-删除" class="headerlink" title="插入 VS 删除"></a>插入 VS 删除</h3><ul>
+<li>删除时进行的操作和插入一样, 也是改变颜色或旋转</li>
+<li>在插入过程中, 主要比较观察的叔叔结点的状态;<br>在删除的过程中, 主要<strong>检查的是兄弟结点的状态</strong>, 以此来决定进行的操作</li>
+<li>插入后违反的主要属性是 2 个连续的红色结点;<br>删除操作中主要违反的属性是: 子树中的黑色高度的变化, 因为删除黑色结点可能会导致从根结点到叶子结点的黑色高度降低</li>
+</ul>
+<a id="more"></a>
+
+<h3 id="删除的过程分析"><a href="#删除的过程分析" class="headerlink" title="删除的过程分析"></a>删除的过程分析</h3><p>Deletion is fairly complex process.  To understand deletion, notion of double black is used.  When a black node is deleted and replaced by a black child, the child is marked as double black. The main task now becomes to convert this double black to single black.</p>
+<p>删除是一个很复杂的过程. 为了理解删除, 使用了<strong>双重黑色</strong>的概念.<br>当删除黑色结点并用黑色子结点替换时该子结点被标记为双黑色。现在的主要任务是将这种双黑色转换为单黑色</p>
+<h4 id="删除时可能遇到的情况"><a href="#删除时可能遇到的情况" class="headerlink" title="删除时可能遇到的情况"></a>删除时可能遇到的情况</h4><ol>
+<li>Perform <a href="https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/" target="_blank" rel="noopener">standard BST delete</a>. When we perform standard delete operation in BST, we always end up deleting a node which is either leaf or has only one child (For an internal node, we copy the successor and then recursively call delete for successor, successor is always a leaf node or a node with one child). So we only need to handle cases where a node is leaf or has one child. Let v be the node to be deleted and u be the child that replaces v (Note that u is NULL when v is a leaf and color of NULL is considered as Black)<br> 按照 BST 删除节点的方法, 删除的节点实际上就是一个叶子结点或者只有一个子结点的结点(对于内部节点, 复制其右子树的最小值, 然后递归调用删除复制的那个结点, 实际上还是删除只有一个结点的情况)<br> 同理, 我们还是只用处理删除的结点为叶子结点或只有一个孩子的结点<br>设 v 为要删除的结点, 让 u 为替换 v 的子结点, (当 v 为叶子结点时, u 是 null, 且颜色为黑色)</li>
+</ol>
+<h4 id="简单情况"><a href="#简单情况" class="headerlink" title="简单情况"></a>简单情况</h4><ol>
+<li><p>Simple Case: <strong>If either u or v is red</strong>, we mark the replaced child as black (No change in black height). Note that both u and v cannot be red as v is parent of u and two consecutive reds are not allowed in red-black tree<br> 如果 u 或 v 为红色, 将替换后的子结点标记为黑色即可, 不会改变黑色高度<br> 注: u 和 v 不可能同时为红色  </p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png" alt="simpleCase" style="zoom:67%;" />
+
+</li>
+</ol>
+<h4 id="复杂情况-Double-black"><a href="#复杂情况-Double-black" class="headerlink" title="复杂情况 Double black"></a>复杂情况 Double black</h4><p><strong>If Both u and v are Black</strong></p>
+<p>Color u as double black. Now our task reduces to convert this double black to single black. Note that If v is leaf, then u is NULL and color of NULL is considered as black. So the deletion of a black leaf also causes a double black.</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213508.png" alt="delete20" style="zoom:67%;" />
+
+<p>删除的 20 是黑色的叶子结点, 但是 null 也视为 黑色, 所以当删除 20 后, 该结点成为了 Double black, 这种情况就比较复杂了, 要进行如下的处理过程</p>
+<p><strong>Do following while the current node u is double black and it is not root</strong>. Let sibling of node be <strong>s</strong>.</p>
+<p>u 为 double black 的情况, 且不为 root , 则循环执行如下步骤, 设 u 的兄弟结点为 <strong>s</strong></p>
+<ol>
+<li><p>a) <strong>If sibling s is black and at least one of sibling’s children is red</strong>, perform rotation(s). Let the red child of s be <strong>r</strong>.<br> This case can be divided in four subcases depending upon positions of s and r.</p>
+<p> 如果 s 是黑色的, 并且至少有一个子结点为红色, 则旋转 s, 记 s 的红色子结点为 r, 此时 s 和 r 的关系有 4 种情况; (没错, 你猜对了, 还是一直在旋转中出现的那 4 种)<br> 易得, 情况1, 4 是对称的, 情况 2, 3 是对称的, 所以这里只分析 2 种情况</p>
+<ol>
+<li><p>Left Left Case (s is left child of its parent and r is left child of s or both children of s are red). This is mirror of right right case shown in below diagram</p>
+</li>
+<li><p>Left Right Case (s is left child of its parent and r is right child). This is mirror of right left case shown in below diagram. </p>
+</li>
+<li><p>Right Right Case (s is right child of its parent and r is right child of s or both children of s are red)</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716215846.png" alt="RR" style="zoom:67%;" />
+
+<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且有 2 个红色子结点, 为 RR case </p>
+<ul>
+<li><p>将父结点 p 的颜色赋予兄弟节点 s; </p>
+</li>
+<li><p>将父结点和<strong>兄弟节点的右子结点</strong>设为黑色;</p>
+</li>
+<li><p>对父结点进行<strong>左旋转</strong></p>
+<blockquote>
+<p>对称的情况, 把左变右, 右变左即可</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>Right Left Case (s is right child of its parent and r is left child of s)</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716221652.png" alt="RL" style="zoom:67%;" />
+
+<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且只有 1 个红色左子结点(必然为红色, 不然违规了), 该红色结点为 r, 为 RL case</p>
+<ul>
+<li>将该左子结点 r 变为黑色</li>
+<li>将兄弟节点 s 变为红色</li>
+<li>对兄弟节点执行右旋转</li>
+<li>回到了第3种情况, hhh</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>b) <strong>If sibling is black and its both children are black</strong>, perform recoloring, and recur for the parent if parent is black.</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716222322.png" alt="bb" style="zoom:67%;" />
+
+<p> In this case, if parent was red, then we didn’t need to recur for parent, we can simply make it black<br> (red + double black = single black)</p>
+<p> 删除 v , 因为兄弟节点为黑色叶子节点, 将其设为红色即可; 然后将父结点设为当前节点递归, 直到根结点或遇到红色节点</p>
+</li>
+<li><p>c) <strong>If sibling is red</strong>, perform a rotation to move old sibling up, recolor the old sibling and parent. The new sibling is always black (See the below diagram). This mainly converts the tree to black sibling case (by rotation) and leads to case (a) or (b). </p>
+<p> This case can be divided in two subcases</p>
+<ol>
+<li><p>Left Case (s is left child of its parent). This is mirror of right right case shown in below diagram. We right rotate the parent p.</p>
+</li>
+<li><p>Right Case (s is right child of its parent). We left rotate the parent p</p>
+ <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716223147.png" alt="RightCase" style="zoom:67%;" />
+
+<p> 删除 10, 其兄弟节点为红色, 且子结点都为黑色, 则对父结点 p 执行右旋转, 并且改变他们的颜色, 然后就变成了上面的 b 情况</p>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>数据结构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构学习之红黑树(1)</title>
+    <url>/posts/c19df8e6.html</url>
+    <content><![CDATA[<blockquote>
+<p>参考内容:<br>数据结构与算法分析 Java 语言描述 第 3 版<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/" target="_blank" rel="noopener">Red-Black Tree | Set 1 (Introduction)</a> 系列文章</p>
+</blockquote>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li><p>红黑树是一种什么树?</p>
+<p><strong>平衡二叉搜索</strong>树;</p>
+<p>红黑树的目的是为了高效地进行增删改查，本质是一种二叉搜索树，其次也是一种完美平衡二叉树</p>
+</li>
+</ul>
+<h3 id="二叉查找树"><a href="#二叉查找树" class="headerlink" title="二叉查找树"></a>二叉查找树</h3><ul>
+<li><strong>二叉查找树的性质</strong>如下：<ol>
+<li>左子树上所有结点的值小于或等于它根结点得值</li>
+<li>右子树上所有结点的值大于或等于它根结点的值</li>
+<li>左右子树每个也必须是二叉查找树</li>
+</ol>
+</li>
+</ul>
+<p>那么根据这个性质我们就可以非常快的查找了——类似于二分查找。</p>
+<p>如果对一个有序的序列进行查找，那么效率非常低。二分查找的优势没有了，这种现象可以理解为失去了平衡。<strong>所以需要平衡二叉树来弥补这种缺陷</strong></p>
+<a id="more"></a>
+
+<h3 id="平衡二叉树"><a href="#平衡二叉树" class="headerlink" title="平衡二叉树"></a>平衡二叉树</h3><ul>
+<li><p>平衡二叉树的性质</p>
+<ol>
+<li>从任何一个结点出发，左右子树深度之差的绝对值不超过 1。</li>
+<li>左右子树仍然为平衡二叉树</li>
+</ol>
+</li>
+<li><p>平衡二叉树在查找的时候就有二叉查找树的优势，同时也保持了平衡。</p>
+</li>
+<li><p>但是平衡二叉树的劣势在于：</p>
+<ol>
+<li>删除：对于平衡二叉树来说，在最坏情况下，需要维护从被删结点到根结点这条路径上所有结点的平衡性，旋转的量级是 $OlogN$。但是红黑树就不一样了，最多只需 3 次旋转就会重新平衡，旋转的量级是 $O1$</li>
+<li>保持平衡：平衡二叉树高度平衡，这也就意味着在大量插入和删除结点的场景下，平衡二叉树为了保持平衡需要调整的频率会更高。</li>
+</ol>
+</li>
+<li><p>所以在大量查找的情况下，平衡二叉树的效率更高，也是首要选择。在大量增删的情况下，红黑树是首选</p>
+</li>
+</ul>
+<blockquote>
+<p>更详细的分析可以参考:<br><a href="https://www.cnblogs.com/idorax/p/6441043.html" target="_blank" rel="noopener">完美二叉树, 完全二叉树和完满二叉树</a></p>
+</blockquote>
+<h3 id="平衡树如何旋转"><a href="#平衡树如何旋转" class="headerlink" title="平衡树如何旋转"></a>平衡树如何旋转</h3><blockquote>
+<p>参考&lt;数据结构与算法分析 Java 语言描述 第 3 版&gt; 4.4 小节 AVL 树</p>
+</blockquote>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716142650.png" alt="image-20200716103510941"></p>
+<p>把必须重新平衡的结点叫做 $\alpha$. 由于任意结点最多有 2 个儿子, 因此出现高度不平衡就需要 $\alpha$ 点的两棵子树的高度差 2, 容易得出, 这种不平衡的情况有以下 4 种:</p>
+<ol>
+<li>对 $\alpha$  的左儿子的左子树进行一次插入</li>
+<li>对 $\alpha$  的左儿子的右子树进行一次插入</li>
+<li>对 $\alpha$  的右儿子的左子树进行一次插入</li>
+<li>对 $\alpha$  的右儿子的右子树进行一次插入</li>
+</ol>
+<ul>
+<li><p>单旋转修复情况1 和情况4</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105012.png" alt="image-20200716105010604" style="zoom:67%;" />
+
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105038.png" alt="image-20200716105036878" style="zoom:67%;" />
+</li>
+<li><p>单旋转不能修复情况2和情况3, 要进行双旋转</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716105237.png" alt="image-20200716105236215" style="zoom:67%;" />
+
+</li>
+</ul>
+<h2 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>Red-Black Tree is a self-balancing Binary Search Tree (BST) where every node follows following rules.</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716110604.png" alt="red-black-tree" style="zoom:67%;" />
+
+<p><strong>1)</strong> Every node has a color either red or black.<br><strong>2)</strong> Root of tree is always black.<br><strong>3)</strong> There are no two adjacent red nodes (A red node cannot have a red parent or red child).<br><strong>4)</strong> Every path from a node (including root) to any of its descendant NULL node has the same number of black nodes.</p>
+<p><strong>1)</strong> 每个结点不是红色就是黑色<br><strong>2)</strong> 根结点必须是黑色<br><strong>3)</strong> 从每个叶子到根的所有路径上不能有两个连续的红色结点(红色结点的父结点和子结点都不能是红色的)<br><strong>4)</strong> 从任一节点到其每个叶子的所有不包含重复点的路径都包含相同数目的黑色结点.</p>
+<h3 id="红黑树是如何保证平衡的"><a href="#红黑树是如何保证平衡的" class="headerlink" title="红黑树是如何保证平衡的?"></a>红黑树是如何保证平衡的?</h3><ul>
+<li><p>一个简单的理解平衡的例子是，在红黑树中不可能有 3 个结点的链。我们可以尝试颜色的任意组合，并查看它们全部违反了Red-Black树的属性</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716111919.png" alt="image-20200716111918095" style="zoom:67%;" />
+
+<ul>
+<li>From the above examples, we get some idea how Red-Black trees ensure balance. Following is an important fact about balancing in Red-Black Trees.</li>
+</ul>
+</li>
+<li><p><strong>Black Height of a Red-Black Tree :</strong><br><em>Black height is number of black nodes on a path from root to a leaf. Leaf nodes are also counted black nodes. From above properties 3 and 4, we can derive(推出), <strong>a Red-Black Tree of height h has black-height &gt;= h/2</strong>.</em></p>
+<p>Number of nodes from a node to its farthest descendant leaf(最远的后代叶子结点) is no more than twice as the number of nodes to the nearest descendant leaf(最近的叶子结点).</p>
+</li>
+<li><p><strong><em>Every Red Black Tree with n nodes has height &lt;=</em></strong>  $2Log_2(n+1)$</p>
+<p>prove:</p>
+<ul>
+<li>For a general Binary Tree, let <strong>k</strong> be the minimum number of nodes on all root to NULL paths, then $n &gt;= 2^k – 1$ (Ex. If k is 3, then n is atleast 7).<br>This expression can also be written as $$k &lt;= Log_2(n+1)$$</li>
+<li>From property 4 of Red-Black trees and above claim, we can say in a Red-Black Tree with n nodes, there is a root to leaf path with at-most $Log_2(n+1)$ black nodes.</li>
+<li>From property 3 of Red-Black trees, we can claim that the number black nodes in a Red-Black tree is at least ⌊ n/2 ⌋ where n is the total number of nodes</li>
+</ul>
+<p>From above 2 points, we can conclude the fact that Red Black Tree with <strong>n</strong> nodes has $$height &lt;= 2Log_2(n+1)$$</p>
+<p>分析过程: </p>
+<ul>
+<li>对于一般的二叉树, 设 k 为所有从根结点到NULL路径上的最小节点数, n 为总结点数<br>k 相当于是最小的高度( 空树时, k = 0, 只有一个根节点, k = 1)<br>当 k = 3 时, 也就是说最少有 3 层, 又由于红黑树是保持一定平衡的(这里还不是很明白, 可以参考上面说的如何保持平衡), 则至少有 $2^k - 1$ 个结点</li>
+<li>结合第 4 点定义, n 个结点的红黑树最多有 $Log_2(n+1)$ 个黑色结点</li>
+<li>再结合第 3 点定义, 黑色节点至少是总结点 n 的一半, 即  n/2 个<br>综上: n 个结点的红黑树的高度 $&lt;= 2Log_2(n + 1)$  </li>
+</ul>
+</li>
+</ul>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><ul>
+<li><p>Is it possible to have all black nodes in a Red-Black tree?</p>
+<p><strong>Yes</strong>, a tree with all nodes black can be a red-black tree. The tree has to be a perfect binary tree (<em>all leaves are at the same depth or same level, and in which every parent has two children</em>) and so, it is the only tree whose <em>Black height</em> equals to its <em>tree height</em>.<br>来自: <a href="https://stackoverflow.com/questions/6406658/is-a-tree-with-all-black-nodes-a-red-black-tree" target="_blank" rel="noopener">https://stackoverflow.com/questions/6406658/is-a-tree-with-all-black-nodes-a-red-black-tree</a></p>
+</li>
+<li><p>How to draw a Red-Black Tree that is not an <a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion/" target="_blank" rel="noopener">AVL tree</a> structure wise?<br>Consider the following tree whose</p>
+<ul>
+<li>right sub-tree is a complete binary tree with depth <strong>d</strong>, in which every node is black</li>
+<li>left sub-tree is a complete binary tree with depth <strong>2d</strong>, in which every node odd depth is red and even depth is black<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716144000.png" alt="main-qimg-97101c464be4615dbe651aed59c1c547" style="zoom:30%;" /></li>
+<li>The above is a valid red-black tree but not an AVL tree (since the difference between heights of left and right sub-trees is more than one)<br>来自: <a href="https://www.quora.com/How-can-I-draw-a-red-black-tree-that-is-not-an-AVL-tree-structure-wise" target="_blank" rel="noopener">https://www.quora.com/How-can-I-draw-a-red-black-tree-that-is-not-an-AVL-tree-structure-wise</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>在这篇文章中，介绍了红黑树的基础,  复习了一下AVL树的旋转, 并介绍红黑树的性质, 以及如何确保平衡。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+        <tag>红黑树</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构学习之红黑树(2)</title>
+    <url>/posts/eab0ab25.html</url>
+    <content><![CDATA[<blockquote>
+<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-2-insert/" target="_blank" rel="noopener">Red-Black Tree | Set 2 (Insert)</a></p>
+</blockquote>
+<h2 id="红黑树的插入"><a href="#红黑树的插入" class="headerlink" title="红黑树的插入"></a>红黑树的插入</h2><p>在 AVL 树中, 通过”旋转”的方式来保证插入结点后的平衡, 但是在 红黑树中通过 2 种方式来实现平衡</p>
+<ol>
+<li>Recoloring</li>
+<li>Rotation</li>
+</ol>
+<p>首先尝试改变颜色, 如果改变颜色无效, 则进行旋转. </p>
+<p>Following is detailed algorithm. The algorithms has mainly two cases depending upon the color of uncle. If uncle is red, we do recoloring. If uncle is black, we do rotations and/or recoloring.<br>Color of a NULL node is considered as BLACK.</p>
+<a id="more"></a>
+
+<h3 id="算法原理"><a href="#算法原理" class="headerlink" title="算法原理:"></a>算法原理:</h3><ul>
+<li>算法主要有 2 种情况, 具体取决于 叔叔结点(父结点的兄弟结点) 的颜色,</li>
+<li>如果叔叔结点是红色的, 改变颜色</li>
+<li>如果叔叔结点是黑色的, 则尝试 旋转 或/且 改变颜色</li>
+</ul>
+<p>Let x be the newly inserted node.</p>
+<ol>
+<li>Perform <a href="http://geeksquiz.com/binary-search-tree-set-1-search-and-insertion/" target="_blank" rel="noopener">standard BST insertion</a> and make the color of newly inserted nodes as RED.</li>
+<li>If x is root, change color of x as BLACK (Black height of complete tree increases by 1).</li>
+<li>Do following if color of x’s parent is not BLACK <strong>and</strong> x is not root.<ol>
+<li><strong>If x’s uncle is RED</strong> (Grand parent must have been black from <a href="https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/" target="_blank" rel="noopener">property 4</a>)<ol>
+<li>Change color of parent and uncle as BLACK.</li>
+<li>color of grand parent as RED.</li>
+<li>Change x = x’s grandparent, repeat steps 2 and 3 for new x.</li>
+</ol>
+</li>
+<li><strong>If x’s uncle is BLACK</strong>, then there can be four configurations for x, x’s parent (<strong>p</strong>) and x’s grandparent (<strong>g</strong>) (This is similar to<a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion/" target="_blank" rel="noopener"> AVL Tree</a>)<ol>
+<li>Left Left Case (p is left child of g and x is left child of p)</li>
+<li>Left Right Case (p is left child of g and x is right child of p)</li>
+<li>Right Right Case (Mirror of case 1)</li>
+<li>Right Left Case (Mirror of case 2)</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="算法过程"><a href="#算法过程" class="headerlink" title="算法过程"></a>算法过程</h3><p>假设 x 是新插入的结点</p>
+<ol>
+<li><p>按照标准 BST 的方式插入, 并且设 x 的颜色为红色, (因为如果为黑色, 则一旦插入就要进行各种平衡, 所以先假设为红色)</p>
+</li>
+<li><p>如果 x 是根结点, 则直接将 x 变为黑色, 完成. 因为红黑树的根节点必须是黑色</p>
+</li>
+<li><p>如果 x 的父结点不是黑色, 且不是根结点, 则进行如下判断(如果 x 的父结点为黑色, x 为红色, 满足红黑树的性质, 不用进行任何操作)</p>
+<ol>
+<li><p>如果 x 的叔叔结点为红色, 则 x 的祖父结点一定为黑色</p>
+<ol>
+<li>将 x 的父结点和叔叔结点变为黑色</li>
+<li>将 x 的祖父结点变为红色</li>
+<li>此时 x 插入的操作已经平衡, 但是 x 的祖父结点状态变化了, 将 x 的祖父结点看为新插入的结点, 递归的进行重新调整, 直到根节点<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716151833.png" alt="uncle-red" style="zoom:80%;" />
+</li>
+</ol>
+</li>
+<li><p>如果 x 的叔叔结点是黑色, 那么 x 就有四种情况, 类似 AVL 树的4种情况, 用上图来说明,</p>
+<ol>
+<li><p>左-左  </p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152856.png" alt="LL" style="zoom:80%;" />
+</li>
+<li><p>左-右</p>
+</li>
+</ol>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716152912.png" alt="LR" style="zoom:80%;" />
+
+<ol start="3">
+<li><p>右-右</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153143.png" alt="RR" style="zoom:80%;" />
+</li>
+<li><p>右-左</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code>&lt;img src=&quot;https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153007.png&quot; alt=&quot;RL&quot; style=&quot;zoom:80%;&quot; /&gt;</code></pre><h3 id="插入过程示例"><a href="#插入过程示例" class="headerlink" title="插入过程示例"></a>插入过程示例</h3><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153646.png" alt="ex-insert" style="zoom:80%;" />
+
+<ul>
+<li><p>练习</p>
+<p>insert 2, 6, and 13 in below tree</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716153740.png" alt="ex1" style="zoom:80%;" />
+
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161429.jpg" alt="ex1" style="zoom:80%;" />
+
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716161532.jpg" alt="微信图片_20200716161316" style="zoom:80%;" />
+
+</li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文主要介绍了红黑树的插入过程原理.</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+        <tag>红黑树</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Windows编译OpenJDK</title>
+    <url>/posts/98613aa6.html</url>
+    <content><![CDATA[<blockquote>
+<p>笔者之前为了阅读 jdk 的源码, 搭建了阅读源码的环境, 然后一通注释, 再次调试的时候, 发现错行了, 提示 <code>Source code does not match the bytecode</code><br>这是因为我们虽然修改了阅读的源码, 但是并没有重新编译而导致的, 相信也有很多同学遇到过, 话不多说, 开冲<br>参考的博客和用到的软件都在本章末尾</p>
+</blockquote>
+<h2 id="环境基础"><a href="#环境基础" class="headerlink" title="环境基础"></a>环境基础</h2><p>我的系统环境:</p>
+<ul>
+<li>win10 1903</li>
+<li>本机安装的 jdk: 1.8.0_221</li>
+</ul>
+<p>需要的软件:</p>
+<ol>
+<li><p><a href="https://cygwin.com/install.html" target="_blank" rel="noopener">cygwin x64</a></p>
+</li>
+<li><p><a href="https://download.savannah.gnu.org/releases/freetype/" target="_blank" rel="noopener">FreeType 2.7</a></p>
+<blockquote>
+<p>Sun公司在<a href="https://zh.wikipedia.org/wiki/OpenJDK" target="_blank" rel="noopener">OpenJDK</a>这个Java开发工具包中将专有的字体栅格化引擎变更为FreeType</p>
+</blockquote>
+</li>
+<li><p>Visual Studio 2010</p>
+<p>需要C++ x64位编译器模块还有 .NET FRAMEWORK 4</p>
+<blockquote>
+<p>建议一定 2010 版的, 否则会有各种麻烦, 主要是 .NET FRAMEWORK 4 的相关依赖很复杂</p>
+<p>因为我第一次就是用的 Visual Studio 2019, 后面各种报错, 心态爆炸</p>
+<p>换成 2010 后出现的问题就解决了</p>
+</blockquote>
+</li>
+<li><p><a href="https://jdk.java.net/java-se-ri/8-MR3" target="_blank" rel="noopener">openjdk8</a></p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718152748.png" alt="image-20200718152746400" style="zoom:50%;" />
+
+
+
+</li>
+</ol>
+<h3 id="安装-Cygwin"><a href="#安装-Cygwin" class="headerlink" title="安装 Cygwin"></a>安装 Cygwin</h3><p>用来在windows 上模拟 Linux 系统</p>
+<p>需要加选以下模块</p>
+<table>
+<thead>
+<tr>
+<th>Binary Name</th>
+<th>Category</th>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ar.exe</td>
+<td>Devel</td>
+<td>binutils</td>
+<td>The GNU assembler, linker and binary utilities</td>
+</tr>
+<tr>
+<td>make.exe</td>
+<td>Devel</td>
+<td>make</td>
+<td>The GNU version of the ‘make’ utility built for CYGWIN</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>zip.exe</td>
+<td>Archive</td>
+<td>zip</td>
+<td>Package and compress (archive) files</td>
+</tr>
+<tr>
+<td>unzip.exe</td>
+<td>Archive</td>
+<td>unzip</td>
+<td>Extract compressed files in a ZIP archive</td>
+</tr>
+<tr>
+<td>free.exe</td>
+<td>System</td>
+<td>procps</td>
+<td>Display amount of free and used memory in the system</td>
+</tr>
+</tbody></table>
+<ul>
+<li>上表是 OpenJDK 出自 README-builds.html#windows, 如果英文好的可以直接参考README文档</li>
+<li>如果有漏装的或者还想装的, 可以重新运行Cygwin的安装文件, 添加想要安装的模块即可</li>
+</ul>
+<h3 id="编译-FreeType"><a href="#编译-FreeType" class="headerlink" title="编译 FreeType"></a>编译 FreeType</h3><p>使用 VS 2010 打开<code>你的路径\freetype-2.7\builds\windows\vc2010</code> 目录下的 <code>freetype.sln</code> 文件</p>
+<p>等待 VS 2010 加载成功后, Build 生成 dll 和 lib 文件</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718154549.png" alt="image-20200718154547522" style="zoom:67%;" />
+
+<ul>
+<li>生成的文件在 <code>你的路径\freetype-2.7\objs\vc2010\x64</code> 下</li>
+<li>复制 dll 和 lib 文件到 <code>E:\myjdk\freetype-2.7\lib</code> 目录下, lib 目录需要手动创建</li>
+<li>然后 将 <code>~\freetype-2.7\include</code> <code>~\freetype-2.7\lib</code> 添加到 PATH 环境变量中</li>
+</ul>
+<h2 id="编译-OpenJDK"><a href="#编译-OpenJDK" class="headerlink" title="编译 OpenJDK"></a>编译 OpenJDK</h2><h4 id="OpenJDK-目录结构简单介绍"><a href="#OpenJDK-目录结构简单介绍" class="headerlink" title="OpenJDK 目录结构简单介绍"></a>OpenJDK 目录结构简单介绍</h4><figure class="highlight md"><table><tr><td class="code"><pre><span class="line">openjdk</span><br><span class="line">├── corba</span><br><span class="line">├── hotspot</span><br><span class="line">├── jaxp</span><br><span class="line">├── jaxws</span><br><span class="line">├── jdk</span><br><span class="line">├── langtools</span><br><span class="line">└── nashorn</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>Corba</p>
+<p>全称 Common Object Request Broker Architecture, 通用对象请求代理架构，是基于 对象-服务 机制设计得。与 JavaBean、COM 等是同种范畴</p>
+</li>
+<li><p>hotspot</p>
+<ul>
+<li>全称 Java HotSpot Performance Engine，是 Java 虚拟机的一个实现，包含了服务器版和桌面应用程序版。利用 JIT 及自适应优化技术 (自动查找性能热点并进行动态优化) 来提高性能。</li>
+</ul>
+</li>
+<li><p>jaxp</p>
+<p>全称 <code>Java API for XML Processing</code>，处理 XML 的 Java API，是 Java XML 程序设计的应用程序接口之一，它提供解析和验证XML文档的能力</p>
+</li>
+<li><p>jaxws</p>
+<p>全称 <code>Java API for Web Services</code>，<code>JAX-WS</code> 允许开发者选择 <code>RPC-oriented</code> (面向 RPC)  或者 <code>message-oriented</code> (消息通信，<code>erlang</code> 使用的就是消息通信，不过 Java 内存模型是内存共享) 来实现自己的 <code>web services</code></p>
+</li>
+<li><p>langtools</p>
+<p>Java 语言支持工具</p>
+</li>
+<li><p>JDK</p>
+<p>全称 <code>Java Development Kit</code>，即java开发工具包</p>
+<p>jdk 目录下的 <code>src/share</code>中的 <code>classes</code>目录里的是 Java 的实现，<code>native</code>目录里的是 C++ 的实现，两部分基本对应</p>
+</li>
+<li><p>Nashorn</p>
+<p><code>Nashorn</code> 项目的目的是基于 Java 在 JVM 上实现一个轻量级高性能的 <code>JavaScript</code>运行环境。基于 <code>JSR-223</code> 协议，Java 程序员可在 Java 程序中嵌入 JavaScript 代码</p>
+</li>
+</ul>
+<h4 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h4><ul>
+<li><p>打开 Cygwin 进入下载的  openjdk 目录, 可以  <code>cd &#39;E:/openjdk&#39;</code></p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./configure --with-freetype=<span class="string">'E:\myjdk\freetype-2.7'</span>  -with-target-bits=64 --<span class="built_in">enable</span>-debug</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于这是第二天写的.. 图片丢了, 直接参考我参考的博客把…</p>
+<p><a href="https://www.cnblogs.com/jpfss/p/11641045.html#problems" target="_blank" rel="noopener">win10 编译 openjdk</a></p>
+<p>遇到问题是肯定的, 一定要耐心, 多查查, 会有解决办法的, (ง •_•)ง</p>
+<p>心态要稳</p>
+</li>
+<li><p>如果上面的命令执行成功后, 便可以正式开始编译了</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在 openjdk 的根目录执行</span></span><br><span class="line">make all	<span class="comment"># 全量编译, 也就是所有的openjdk的工具都进行编译, 耗时看电脑性能, 我编译了 23 分钟...</span></span><br><span class="line">make clean  <span class="comment"># 删除编译出来的文件, 不会删除 configure 的文件</span></span><br><span class="line">make images <span class="comment"># 只编译 jdk (但是如果之前没有make all 的话, 还是会编译所有有依赖的</span></span><br><span class="line">			<span class="comment"># 如果后面修改源码后, 可以执行 make images 命令, 会快一点</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译成功后的 jdk 在 <code>你的路径\openjdk\build\windows-x86_64-normal-server-fastdebug\images</code> 下</p>
+<p>有 j2re-image和 j2sdke-image, 分别就是 jre 和 jdk</p>
+</li>
+</ul>
+<h2 id="使用自己编译的jdk"><a href="#使用自己编译的jdk" class="headerlink" title="使用自己编译的jdk"></a>使用自己编译的jdk</h2><p>如果来到这一步基本上就算大功告成了,  因为此时已经根据你修改的源码编译出了自定义的 jdk</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>下面只是一个小小的验证</p>
+<ol>
+<li><p>在 IDEA 中创建一个最基本的 Java 工程</p>
+</li>
+<li><p>写一个 HelloWorld</p>
+</li>
+<li><p>选择我们自己编译的jdk</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163655.png" alt="image-20200718163654290" style="zoom:67%;" />
+</li>
+<li><p>如果还想一边调试一边修改源码的话, </p>
+<ol>
+<li>排除之前存在的源码</li>
+<li>添加 openjdk 的源码 <code>~\openjdk\jdk\src\share</code>, 此时就可以对源码进行修改了</li>
+</ol>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163911.png" alt="image-20200718163909448" style="zoom:67%;" />
+
+</li>
+</ol>
+<p>修改源码后, 则需要重新编译才能生效, 重新编译还是在之前编译的根目录, 只要执行 <code>make images</code> 即可, 会快不少</p>
+<h3 id="添加中文注释后的注意事项-要修改生成的编码"><a href="#添加中文注释后的注意事项-要修改生成的编码" class="headerlink" title="添加中文注释后的注意事项: 要修改生成的编码"></a>添加中文注释后的注意事项: 要修改生成的编码</h3><p>如果添加了中文注释, 一定要修改一个地方的编码, 否则会编译出错  /(ㄒoㄒ)/~~</p>
+<p>在 <code>~\openjdk\jdk\make\Setup.gmk</code> 中 修改<code>-encoding ascii -XDignore.symbol.file=true</code> 为 <code>-encoding utf-8 -XDignore.symbol.file=true</code></p>
+<p>一定要修改编码!!!</p>
+<p>如果不在这个文件中的话, 把 openjdk 目录导入到 vscode 中, 然后全局搜索一下 <code>-encoding ascii</code> 修改编码即可</p>
+<p>如果修改了源码, 但是没有重新编译的话, 是不会对运行产生影响的, 调试的时候会错行, 以及提示 <code>Source code does not match the bytecode</code></p>
+<h3 id="测试效果"><a href="#测试效果" class="headerlink" title="测试效果"></a>测试效果</h3><p>给源码加点料, O(∩_∩)O</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164653.png" alt="image-20200718164652172" style="zoom:67%;" />
+
+<p>效果如下: </p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164805.png" alt="image-20200718164803660" style="zoom:67%;" />
+
+
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>肝了半天, 总算出来了, 比较费时费力的主要就是解决编译时的报错, ┭┮﹏┭┮</p>
+<p>而且编译一次 23 分钟, 等的人心烦…</p>
+<p>不过最后成功了是真滴开心 o(<em>￣▽￣</em>)ブ</p>
+<p>如果你都看到这了, 太感谢了, 给你个赞, b(￣▽￣)d</p>
+<p>(ง •_•)ง</p>
+<blockquote>
+<p>参考文章:</p>
+<p><a href="https://blog.csdn.net/baichoufei90/article/details/85055655" target="_blank" rel="noopener">OpenJDK 源码的目录结构</a></p>
+<p><a href="https://blog.csdn.net/wqlinloveruby/article/details/80409031" target="_blank" rel="noopener">JVM学习——1. win10 下构建64位 openJDK8 完整篇</a></p>
+<p><a href="https://my.oschina.net/langxSpirit/blog/1624428" target="_blank" rel="noopener">OpenJDK8 Windows编译</a></p>
+<p>openjdk 的 Readme-Build 文件</p>
+</blockquote>
+<blockquote>
+<p>资源分享:</p>
+<p>链接: <a href="https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g" target="_blank" rel="noopener">https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g</a> 提取码: 8ru9 </p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>实践</category>
       </categories>
       <tags>
         <tag>java</tag>

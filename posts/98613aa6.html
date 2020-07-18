@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon16x16.png">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="笔者之前为了阅读 jdk 的源码, 搭建了阅读源码的环境, 然后一通注释, 再次调试的时候, 发现错行了, 提示 Source code does not match the bytecode这是因为我们虽然修改了阅读的源码, 但是并没有重新编译而导致的, 相信也有很多同学遇到过, 话不多说, 开冲参考的博客和用到的软件都在本章末尾  环境基础我的系统环境:  win10 1903 本机安装的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows编译OpenJDK">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/98613aa6.html">
+<meta property="og:site_name" content="JoeMendez&#39;s Blog">
+<meta property="og:description" content="笔者之前为了阅读 jdk 的源码, 搭建了阅读源码的环境, 然后一通注释, 再次调试的时候, 发现错行了, 提示 Source code does not match the bytecode这是因为我们虽然修改了阅读的源码, 但是并没有重新编译而导致的, 相信也有很多同学遇到过, 话不多说, 开冲参考的博客和用到的软件都在本章末尾  环境基础我的系统环境:  win10 1903 本机安装的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718152748.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718154549.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163655.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163911.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164653.png">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164805.png">
+<meta property="article:published_time" content="2020-07-18T07:11:55.000Z">
+<meta property="article:modified_time" content="2020-07-18T09:01:14.495Z">
+<meta property="article:author" content="Joe Mendez">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718152748.png">
+
+<link rel="canonical" href="https://joemendezckh.github.io/posts/98613aa6.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Windows编译OpenJDK | JoeMendez's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">JoeMendez's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">用学习驱动自己的生活.</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/98613aa6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JoeMendez's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Windows编译OpenJDK
+        </h2>
+
+        <div class="post-meta">
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-18 17:01:14" itemprop="dateModified" datetime="2020-07-18T17:01:14+08:00">2020-07-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">实践</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/98613aa6.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/98613aa6.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>笔者之前为了阅读 jdk 的源码, 搭建了阅读源码的环境, 然后一通注释, 再次调试的时候, 发现错行了, 提示 <code>Source code does not match the bytecode</code><br>这是因为我们虽然修改了阅读的源码, 但是并没有重新编译而导致的, 相信也有很多同学遇到过, 话不多说, 开冲<br>参考的博客和用到的软件都在本章末尾</p>
+</blockquote>
+<h2 id="环境基础"><a href="#环境基础" class="headerlink" title="环境基础"></a>环境基础</h2><p>我的系统环境:</p>
+<ul>
+<li>win10 1903</li>
+<li>本机安装的 jdk: 1.8.0_221</li>
+</ul>
+<p>需要的软件:</p>
+<ol>
+<li><p><a href="https://cygwin.com/install.html" target="_blank" rel="noopener">cygwin x64</a></p>
+</li>
+<li><p><a href="https://download.savannah.gnu.org/releases/freetype/" target="_blank" rel="noopener">FreeType 2.7</a></p>
+<blockquote>
+<p>Sun公司在<a href="https://zh.wikipedia.org/wiki/OpenJDK" target="_blank" rel="noopener">OpenJDK</a>这个Java开发工具包中将专有的字体栅格化引擎变更为FreeType</p>
+</blockquote>
+</li>
+<li><p>Visual Studio 2010</p>
+<p>需要C++ x64位编译器模块还有 .NET FRAMEWORK 4</p>
+<blockquote>
+<p>建议一定 2010 版的, 否则会有各种麻烦, 主要是 .NET FRAMEWORK 4 的相关依赖很复杂</p>
+<p>因为我第一次就是用的 Visual Studio 2019, 后面各种报错, 心态爆炸</p>
+<p>换成 2010 后出现的问题就解决了</p>
+</blockquote>
+</li>
+<li><p><a href="https://jdk.java.net/java-se-ri/8-MR3" target="_blank" rel="noopener">openjdk8</a></p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718152748.png" alt="image-20200718152746400" style="zoom:50%;" />
+
+
+
+</li>
+</ol>
+<h3 id="安装-Cygwin"><a href="#安装-Cygwin" class="headerlink" title="安装 Cygwin"></a>安装 Cygwin</h3><p>用来在windows 上模拟 Linux 系统</p>
+<p>需要加选以下模块</p>
+<table>
+<thead>
+<tr>
+<th>Binary Name</th>
+<th>Category</th>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ar.exe</td>
+<td>Devel</td>
+<td>binutils</td>
+<td>The GNU assembler, linker and binary utilities</td>
+</tr>
+<tr>
+<td>make.exe</td>
+<td>Devel</td>
+<td>make</td>
+<td>The GNU version of the ‘make’ utility built for CYGWIN</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>m4.exe</td>
+<td>Interpreters</td>
+<td>m4</td>
+<td>GNU implementation of the traditional Unix macro processor</td>
+</tr>
+<tr>
+<td>zip.exe</td>
+<td>Archive</td>
+<td>zip</td>
+<td>Package and compress (archive) files</td>
+</tr>
+<tr>
+<td>unzip.exe</td>
+<td>Archive</td>
+<td>unzip</td>
+<td>Extract compressed files in a ZIP archive</td>
+</tr>
+<tr>
+<td>free.exe</td>
+<td>System</td>
+<td>procps</td>
+<td>Display amount of free and used memory in the system</td>
+</tr>
+</tbody></table>
+<ul>
+<li>上表是 OpenJDK 出自 README-builds.html#windows, 如果英文好的可以直接参考README文档</li>
+<li>如果有漏装的或者还想装的, 可以重新运行Cygwin的安装文件, 添加想要安装的模块即可</li>
+</ul>
+<h3 id="编译-FreeType"><a href="#编译-FreeType" class="headerlink" title="编译 FreeType"></a>编译 FreeType</h3><p>使用 VS 2010 打开<code>你的路径\freetype-2.7\builds\windows\vc2010</code> 目录下的 <code>freetype.sln</code> 文件</p>
+<p>等待 VS 2010 加载成功后, Build 生成 dll 和 lib 文件</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718154549.png" alt="image-20200718154547522" style="zoom:67%;" />
+
+<ul>
+<li>生成的文件在 <code>你的路径\freetype-2.7\objs\vc2010\x64</code> 下</li>
+<li>复制 dll 和 lib 文件到 <code>E:\myjdk\freetype-2.7\lib</code> 目录下, lib 目录需要手动创建</li>
+<li>然后 将 <code>~\freetype-2.7\include</code> <code>~\freetype-2.7\lib</code> 添加到 PATH 环境变量中</li>
+</ul>
+<h2 id="编译-OpenJDK"><a href="#编译-OpenJDK" class="headerlink" title="编译 OpenJDK"></a>编译 OpenJDK</h2><h4 id="OpenJDK-目录结构简单介绍"><a href="#OpenJDK-目录结构简单介绍" class="headerlink" title="OpenJDK 目录结构简单介绍"></a>OpenJDK 目录结构简单介绍</h4><figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">openjdk</span><br><span class="line">├── corba</span><br><span class="line">├── hotspot</span><br><span class="line">├── jaxp</span><br><span class="line">├── jaxws</span><br><span class="line">├── jdk</span><br><span class="line">├── langtools</span><br><span class="line">└── nashorn</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>Corba</p>
+<p>全称 Common Object Request Broker Architecture, 通用对象请求代理架构，是基于 对象-服务 机制设计得。与 JavaBean、COM 等是同种范畴</p>
+</li>
+<li><p>hotspot</p>
+<ul>
+<li>全称 Java HotSpot Performance Engine，是 Java 虚拟机的一个实现，包含了服务器版和桌面应用程序版。利用 JIT 及自适应优化技术 (自动查找性能热点并进行动态优化) 来提高性能。</li>
+</ul>
+</li>
+<li><p>jaxp</p>
+<p>全称 <code>Java API for XML Processing</code>，处理 XML 的 Java API，是 Java XML 程序设计的应用程序接口之一，它提供解析和验证XML文档的能力</p>
+</li>
+<li><p>jaxws</p>
+<p>全称 <code>Java API for Web Services</code>，<code>JAX-WS</code> 允许开发者选择 <code>RPC-oriented</code> (面向 RPC)  或者 <code>message-oriented</code> (消息通信，<code>erlang</code> 使用的就是消息通信，不过 Java 内存模型是内存共享) 来实现自己的 <code>web services</code></p>
+</li>
+<li><p>langtools</p>
+<p>Java 语言支持工具</p>
+</li>
+<li><p>JDK</p>
+<p>全称 <code>Java Development Kit</code>，即java开发工具包</p>
+<p>jdk 目录下的 <code>src/share</code>中的 <code>classes</code>目录里的是 Java 的实现，<code>native</code>目录里的是 C++ 的实现，两部分基本对应</p>
+</li>
+<li><p>Nashorn</p>
+<p><code>Nashorn</code> 项目的目的是基于 Java 在 JVM 上实现一个轻量级高性能的 <code>JavaScript</code>运行环境。基于 <code>JSR-223</code> 协议，Java 程序员可在 Java 程序中嵌入 JavaScript 代码</p>
+</li>
+</ul>
+<h4 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h4><ul>
+<li><p>打开 Cygwin 进入下载的  openjdk 目录, 可以  <code>cd &#39;E:/openjdk&#39;</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --with-freetype=<span class="string">'E:\myjdk\freetype-2.7'</span>  -with-target-bits=64 --<span class="built_in">enable</span>-debug</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于这是第二天写的.. 图片丢了, 直接参考我参考的博客把…</p>
+<p><a href="https://www.cnblogs.com/jpfss/p/11641045.html#problems" target="_blank" rel="noopener">win10 编译 openjdk</a></p>
+<p>遇到问题是肯定的, 一定要耐心, 多查查, 会有解决办法的, (ง •_•)ง</p>
+<p>心态要稳</p>
+</li>
+<li><p>如果上面的命令执行成功后, 便可以正式开始编译了</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在 openjdk 的根目录执行</span></span><br><span class="line">make all	<span class="comment"># 全量编译, 也就是所有的openjdk的工具都进行编译, 耗时看电脑性能, 我编译了 23 分钟...</span></span><br><span class="line">make clean  <span class="comment"># 删除编译出来的文件, 不会删除 configure 的文件</span></span><br><span class="line">make images <span class="comment"># 只编译 jdk (但是如果之前没有make all 的话, 还是会编译所有有依赖的</span></span><br><span class="line">			<span class="comment"># 如果后面修改源码后, 可以执行 make images 命令, 会快一点</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译成功后的 jdk 在 <code>你的路径\openjdk\build\windows-x86_64-normal-server-fastdebug\images</code> 下</p>
+<p>有 j2re-image和 j2sdke-image, 分别就是 jre 和 jdk</p>
+</li>
+</ul>
+<h2 id="使用自己编译的jdk"><a href="#使用自己编译的jdk" class="headerlink" title="使用自己编译的jdk"></a>使用自己编译的jdk</h2><p>如果来到这一步基本上就算大功告成了,  因为此时已经根据你修改的源码编译出了自定义的 jdk</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>下面只是一个小小的验证</p>
+<ol>
+<li><p>在 IDEA 中创建一个最基本的 Java 工程</p>
+</li>
+<li><p>写一个 HelloWorld</p>
+</li>
+<li><p>选择我们自己编译的jdk</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163655.png" alt="image-20200718163654290" style="zoom:67%;" />
+</li>
+<li><p>如果还想一边调试一边修改源码的话, </p>
+<ol>
+<li>排除之前存在的源码</li>
+<li>添加 openjdk 的源码 <code>~\openjdk\jdk\src\share</code>, 此时就可以对源码进行修改了</li>
+</ol>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718163911.png" alt="image-20200718163909448" style="zoom:67%;" />
+
+</li>
+</ol>
+<p>修改源码后, 则需要重新编译才能生效, 重新编译还是在之前编译的根目录, 只要执行 <code>make images</code> 即可, 会快不少</p>
+<h3 id="添加中文注释后的注意事项-要修改生成的编码"><a href="#添加中文注释后的注意事项-要修改生成的编码" class="headerlink" title="添加中文注释后的注意事项: 要修改生成的编码"></a>添加中文注释后的注意事项: 要修改生成的编码</h3><p>如果添加了中文注释, 一定要修改一个地方的编码, 否则会编译出错  /(ㄒoㄒ)/~~</p>
+<p>在 <code>~\openjdk\jdk\make\Setup.gmk</code> 中 修改<code>-encoding ascii -XDignore.symbol.file=true</code> 为 <code>-encoding utf-8 -XDignore.symbol.file=true</code></p>
+<p>一定要修改编码!!!</p>
+<p>如果不在这个文件中的话, 把 openjdk 目录导入到 vscode 中, 然后全局搜索一下 <code>-encoding ascii</code> 修改编码即可</p>
+<p>如果修改了源码, 但是没有重新编译的话, 是不会对运行产生影响的, 调试的时候会错行, 以及提示 <code>Source code does not match the bytecode</code></p>
+<h3 id="测试效果"><a href="#测试效果" class="headerlink" title="测试效果"></a>测试效果</h3><p>给源码加点料, O(∩_∩)O</p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164653.png" alt="image-20200718164652172" style="zoom:67%;" />
+
+<p>效果如下: </p>
+<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164805.png" alt="image-20200718164803660" style="zoom:67%;" />
+
+
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>肝了半天, 总算出来了, 比较费时费力的主要就是解决编译时的报错, ┭┮﹏┭┮</p>
+<p>而且编译一次 23 分钟, 等的人心烦…</p>
+<p>不过最后成功了是真滴开心 o(<em>￣▽￣</em>)ブ</p>
+<p>如果你都看到这了, 太感谢了, 给你个赞, b(￣▽￣)d</p>
+<p>(ง •_•)ง</p>
+<blockquote>
+<p>参考文章:</p>
+<p><a href="https://blog.csdn.net/baichoufei90/article/details/85055655" target="_blank" rel="noopener">OpenJDK 源码的目录结构</a></p>
+<p><a href="https://blog.csdn.net/wqlinloveruby/article/details/80409031" target="_blank" rel="noopener">JVM学习——1. win10 下构建64位 openJDK8 完整篇</a></p>
+<p><a href="https://my.oschina.net/langxSpirit/blog/1624428" target="_blank" rel="noopener">OpenJDK8 Windows编译</a></p>
+<p>openjdk 的 Readme-Build 文件</p>
+</blockquote>
+<blockquote>
+<p>资源分享:</p>
+<p>链接: <a href="https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g" target="_blank" rel="noopener">https://pan.baidu.com/s/1bpYHGni-ZDCZD1Uv_GcZ_g</a> 提取码: 8ru9 </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+    
+    <div>
+        
+          
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/98613aa6.html">Windows编译OpenJDK</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
+  <p><span>发布时间:</span>2020年07月18日 - 15:07</p>
+  <p><span>最后更新:</span>2020年07月18日 - 17:07</p>
+  <p><span>原始链接:</span><a href="/posts/98613aa6.html" title="Windows编译OpenJDK">https://joemendezckh.github.io/posts/98613aa6.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/98613aa6.html"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+        
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/55690cd4.html" rel="prev" title="数据结构学习之红黑树-3">
+      <i class="fa fa-chevron-left"></i> 数据结构学习之红黑树-3
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境基础"><span class="nav-number">1.</span> <span class="nav-text">环境基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Cygwin"><span class="nav-number">1.1.</span> <span class="nav-text">安装 Cygwin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译-FreeType"><span class="nav-number">1.2.</span> <span class="nav-text">编译 FreeType</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译-OpenJDK"><span class="nav-number">2.</span> <span class="nav-text">编译 OpenJDK</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OpenJDK-目录结构简单介绍"><span class="nav-number">2.0.1.</span> <span class="nav-text">OpenJDK 目录结构简单介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开始编译"><span class="nav-number">2.0.2.</span> <span class="nav-text">开始编译</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用自己编译的jdk"><span class="nav-number">3.</span> <span class="nav-text">使用自己编译的jdk</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">3.1.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加中文注释后的注意事项-要修改生成的编码"><span class="nav-number">3.2.</span> <span class="nav-text">添加中文注释后的注意事项: 要修改生成的编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试效果"><span class="nav-number">3.3.</span> <span class="nav-text">测试效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Joe Mendez"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">Joe Mendez</p>
+  <div class="site-description" itemprop="description">和大家分享自己的学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JoeMendezCKH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JoeMendezCKH" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:joemendez@163.com" title="E-Mail → mailto:joemendez@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe Mendez</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">176k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:40</span>
+</div>
+  <!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+  -->
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='105,105,105' opacity='0.5' zIndex='-1' count='120' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QU0nXYxiBIrF3PXjxqyqkKEh-gzGzoHsz',
+      appKey     : '3CJah6GE4jkGjgb7k5HIbSz4',
+      placeholder: "今天你摸鱼<。)#)))≦了嘛!",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
