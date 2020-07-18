@@ -4988,6 +4988,10 @@
 <p>Sun公司在<a href="https://zh.wikipedia.org/wiki/OpenJDK" target="_blank" rel="noopener">OpenJDK</a>这个Java开发工具包中将专有的字体栅格化引擎变更为FreeType</p>
 </blockquote>
 </li>
+</ol>
+<a id="more"></a>
+
+<ol start="3">
 <li><p>Visual Studio 2010</p>
 <p>需要C++ x64位编译器模块还有 .NET FRAMEWORK 4</p>
 <blockquote>
@@ -5070,7 +5074,7 @@
 <li>复制 dll 和 lib 文件到 <code>E:\myjdk\freetype-2.7\lib</code> 目录下, lib 目录需要手动创建</li>
 <li>然后 将 <code>~\freetype-2.7\include</code> <code>~\freetype-2.7\lib</code> 添加到 PATH 环境变量中</li>
 </ul>
-<h2 id="编译-OpenJDK"><a href="#编译-OpenJDK" class="headerlink" title="编译 OpenJDK"></a>编译 OpenJDK</h2><h4 id="OpenJDK-目录结构简单介绍"><a href="#OpenJDK-目录结构简单介绍" class="headerlink" title="OpenJDK 目录结构简单介绍"></a>OpenJDK 目录结构简单介绍</h4><figure class="highlight md"><table><tr><td class="code"><pre><span class="line">openjdk</span><br><span class="line">├── corba</span><br><span class="line">├── hotspot</span><br><span class="line">├── jaxp</span><br><span class="line">├── jaxws</span><br><span class="line">├── jdk</span><br><span class="line">├── langtools</span><br><span class="line">└── nashorn</span><br></pre></td></tr></table></figure>
+<h2 id="编译-OpenJDK"><a href="#编译-OpenJDK" class="headerlink" title="编译 OpenJDK"></a>编译 OpenJDK</h2><h3 id="OpenJDK-目录结构简单介绍"><a href="#OpenJDK-目录结构简单介绍" class="headerlink" title="OpenJDK 目录结构简单介绍"></a>OpenJDK 目录结构简单介绍</h3><figure class="highlight md"><table><tr><td class="code"><pre><span class="line">openjdk</span><br><span class="line">├── corba</span><br><span class="line">├── hotspot</span><br><span class="line">├── jaxp</span><br><span class="line">├── jaxws</span><br><span class="line">├── jdk</span><br><span class="line">├── langtools</span><br><span class="line">└── nashorn</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li><p>Corba</p>
@@ -5098,7 +5102,7 @@
 <p><code>Nashorn</code> 项目的目的是基于 Java 在 JVM 上实现一个轻量级高性能的 <code>JavaScript</code>运行环境。基于 <code>JSR-223</code> 协议，Java 程序员可在 Java 程序中嵌入 JavaScript 代码</p>
 </li>
 </ul>
-<h4 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h4><ul>
+<h3 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h3><ul>
 <li><p>打开 Cygwin 进入下载的  openjdk 目录, 可以  <code>cd &#39;E:/openjdk&#39;</code></p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./configure --with-freetype=<span class="string">'E:\myjdk\freetype-2.7'</span>  -with-target-bits=64 --<span class="built_in">enable</span>-debug</span><br></pre></td></tr></table></figure>
 </li>
@@ -5110,8 +5114,7 @@
 <li><p>如果上面的命令执行成功后, 便可以正式开始编译了</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在 openjdk 的根目录执行</span></span><br><span class="line">make all	<span class="comment"># 全量编译, 也就是所有的openjdk的工具都进行编译, 耗时看电脑性能, 我编译了 23 分钟...</span></span><br><span class="line">make clean  <span class="comment"># 删除编译出来的文件, 不会删除 configure 的文件</span></span><br><span class="line">make images <span class="comment"># 只编译 jdk (但是如果之前没有make all 的话, 还是会编译所有有依赖的</span></span><br><span class="line">			<span class="comment"># 如果后面修改源码后, 可以执行 make images 命令, 会快一点</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>编译成功后的 jdk 在 <code>你的路径\openjdk\build\windows-x86_64-normal-server-fastdebug\images</code> 下</p>
-<p>有 j2re-image和 j2sdke-image, 分别就是 jre 和 jdk</p>
+<li><p>编译成功后的 jdk 在 <code>你的路径\openjdk\build\windows-x86_64-normal-server-fastdebug\images</code> 下; j2re-image和 j2sdke-image, 分别就是 jre 和 jdk</p>
 </li>
 </ul>
 <h2 id="使用自己编译的jdk"><a href="#使用自己编译的jdk" class="headerlink" title="使用自己编译的jdk"></a>使用自己编译的jdk</h2><p>如果来到这一步基本上就算大功告成了,  因为此时已经根据你修改的源码编译出了自定义的 jdk</p>
@@ -5146,12 +5149,7 @@
 <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200718164805.png" alt="image-20200718164803660" style="zoom:67%;" />
 
 
-
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>肝了半天, 总算出来了, 比较费时费力的主要就是解决编译时的报错, ┭┮﹏┭┮</p>
-<p>而且编译一次 23 分钟, 等的人心烦…</p>
-<p>不过最后成功了是真滴开心 o(<em>￣▽￣</em>)ブ</p>
-<p>如果你都看到这了, 太感谢了, 给你个赞, b(￣▽￣)d</p>
-<p>(ง •_•)ง</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>肝了半天, 总算出来了, 比较费时费力的主要就是解决编译时的报错, ┭┮﹏┭┮<br>而且编译一次 23 分钟, 等的人心烦…<br>不过最后成功了是真滴开心 o(<em>￣▽￣</em>)ブ<br>如果你都看到这了, 太感谢了, 给你个赞, b(￣▽￣)d<br>(ง •_•)ง</p>
 <blockquote>
 <p>参考文章:</p>
 <p><a href="https://blog.csdn.net/baichoufei90/article/details/85055655" target="_blank" rel="noopener">OpenJDK 源码的目录结构</a></p>
