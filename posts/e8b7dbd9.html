@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon16x16.png">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="数据结构之队列-Queue 参考：平头哥的技术博文  前言队列（queue）是一种采用先进先出(FIFO)策略的抽象数据结构。即最先进队列的数据元素，要最先出队列  队列的概念   队列是一种特殊的线性表，特殊之处在于它只允许在表的前端（head）进行删除操作，而在表的后端（tail）进行插入操作，队列是一种操作受限制的线性表   进行插入操作的端称为队尾，进行删除操作的端称为队头  与堆栈类似，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之队列(一)">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/e8b7dbd9.html">
+<meta property="og:site_name" content="JoeMendez&#39;s Blog">
+<meta property="og:description" content="数据结构之队列-Queue 参考：平头哥的技术博文  前言队列（queue）是一种采用先进先出(FIFO)策略的抽象数据结构。即最先进队列的数据元素，要最先出队列  队列的概念   队列是一种特殊的线性表，特殊之处在于它只允许在表的前端（head）进行删除操作，而在表的后端（tail）进行插入操作，队列是一种操作受限制的线性表   进行插入操作的端称为队尾，进行删除操作的端称为队头  与堆栈类似，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920110143">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920110554">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920160346">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920163522">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920164446">
+<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920172705">
+<meta property="article:published_time" content="2020-09-20T06:21:27.000Z">
+<meta property="article:modified_time" content="2020-09-20T14:06:13.830Z">
+<meta property="article:author" content="Joe Mendez">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="队列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920110143">
+
+<link rel="canonical" href="https://joemendezckh.github.io/posts/e8b7dbd9.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数据结构之队列(一) | JoeMendez's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">JoeMendez's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">用学习驱动自己的生活.</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/e8b7dbd9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="Joe Mendez">
+      <meta itemprop="description" content="和大家分享自己的学习笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JoeMendez's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          数据结构之队列(一)
+        </h2>
+
+        <div class="post-meta">
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-20 22:06:13" itemprop="dateModified" datetime="2020-09-20T22:06:13+08:00">2020-09-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/posts/e8b7dbd9.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/e8b7dbd9.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="数据结构之队列-Queue"><a href="#数据结构之队列-Queue" class="headerlink" title="数据结构之队列-Queue"></a>数据结构之队列-Queue</h1><blockquote>
+<p>参考：<a href="https://juejin.im/post/6844903928476368909" target="_blank" rel="noopener">平头哥的技术博文</a></p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>队列（queue）是一种采用<strong>先进先出(FIFO)</strong>策略的抽象数据结构。即最先进队列的数据元素，要最先出队列</p>
+<ul>
+<li><p><strong>队列的概念</strong></p>
+<p>  队列是一种特殊的<strong>线性表</strong>，特殊之处在于它只允许在表的<strong>前端（head）</strong>进行删除操作，而在表的<strong>后端（tail）</strong>进行插入操作，队列是一种操作受限制的线性表</p>
+<p>  进行插入操作的端称为<strong>队尾</strong>，进行删除操作的端称为<strong>队头</strong></p>
+</li>
+<li><p>与堆栈类似，队列既可以用<strong>数组</strong>来实现，也可以用<strong>链表</strong>来实现</p>
+</li>
+</ul>
+<p>常用的几种队列类型：</p>
+<ul>
+<li><strong>顺序队列</strong></li>
+<li><strong>链式队列</strong></li>
+<li><strong>循环队列</strong></li>
+<li><strong>优先队列</strong></li>
+</ul>
+<h2 id="顺序队列"><a href="#顺序队列" class="headerlink" title="顺序队列"></a>顺序队列</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>用数组实现的队列，叫做 <strong>顺序队列</strong></p>
+</blockquote>
+<p>不管使用那种方式来实现队列，都需要定义两个指针分别指向队头和队尾，本文中我们用 <code>head</code> 指向队头，<code>tail</code> 指向队尾.</p>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920110143" alt="arrayQueue"></p>
+<ul>
+<li><p>图中可以看出，入队时，队尾往后移动，队头保持不变，出队是队头往后移动，队尾保持不变。</p>
+</li>
+<li><p><strong>出队时为什么队头要往后移动而不是一直指向数组下标为<code>0</code>的位置？</strong> </p>
+<p>  如果保持队头一直指向数组下标为<code>0</code>的位置，那每次出队操作后，后面的数据都需要往前挪一位，换句话说每次出队操作都需要进行数据迁移，而数据迁移的代价比较大，每次数据迁移的时间复杂度为O(n)，这样会极大的影响队列的使用性能。</p>
+<p>  如果我们出队时，队头往后移动一位，这样我们就避免每次出队都进行数据迁移，我们只需要在只有在<code>tail</code>等于数组大小且<code>head</code>不等于<code>0</code>时，进行一次数据迁移，将已经出队留下的空间继续供入队时使用。下图是数据迁移的过程</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920110554" alt=""></p>
+<blockquote>
+<p>数据迁移的效率不高，通常使用环形队列(循环队列)对其优化</p>
+</blockquote>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><ul>
+<li>Java 实现顺序队列</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyArrayQueue</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * pointer the head of the queue, and no include</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">int</span> head;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * pointer the end of the queue, arr[tail] is the last value of the queue</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">int</span> tail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** store the data */</span></span><br><span class="line">    <span class="keyword">int</span>[] arr;</span><br><span class="line">    <span class="comment">/** arr's length */</span></span><br><span class="line">    <span class="keyword">int</span> maxSize;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> maxSize size of the queue</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyArrayQueue</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.maxSize = maxSize;</span><br><span class="line">        arr = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="keyword">this</span>.maxSize];</span><br><span class="line">        head = -<span class="number">1</span>;</span><br><span class="line">        tail = -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFull</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tail == maxSize - <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tail == head;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addQueue</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFull() &amp;&amp; front != -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// data migration</span></span><br><span class="line">            <span class="comment">// head 后面的数据都需要往前迁移 head 位</span></span><br><span class="line">            head = head + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span> (maxSize - head &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                System.arraycopy(arr, head, arr, <span class="number">0</span>, maxSize - head);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 将最后一个元素迁移 head 位</span></span><br><span class="line">            tail -= head;</span><br><span class="line">            <span class="comment">// 第一个元素指向 -1</span></span><br><span class="line">            head = -<span class="number">1</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// add data</span></span><br><span class="line">            tail++;</span><br><span class="line">            arr[tail] = n;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isFull() &amp;&amp; front == -<span class="number">1</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"queue is full"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            tail++;</span><br><span class="line">            arr[tail] = n;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getQueue</span><span class="params">()</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> arr[++head];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">                System.out.printf(<span class="string">"arr[%d] = %d \t"</span>, i, arr[i]);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">peek</span><span class="params">()</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> arr[head + <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="链式队列"><a href="#链式队列" class="headerlink" title="链式队列"></a>链式队列</h2><h3 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h3><p>用链表实现的队列，相对顺序队列来说要简单很多</p>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920160346" alt=""></p>
+<p>从图中可以看出链式队列入队操作是将 <code>tail</code> 的 <code>next</code> 指向新增的节点，然后将 <code>tail</code> 指向新增的节点，出队操作时，将 <code>head</code> 节点指向 <code>head.next</code> 节点。</p>
+<p>链式队列与顺序队列比起来不需要进行数据的迁移，但是链式队列增加了存储成本，链式队列是无界的</p>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><ul>
+<li><p>java</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLinkedQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 指向队首</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node head;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 指向队尾</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node tail;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tail==<span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">addQueue</span><span class="params">(String data)</span> </span>&#123;</span><br><span class="line">        Node node = <span class="keyword">new</span> Node(data, <span class="keyword">null</span>);</span><br><span class="line">        <span class="comment">// justice lin</span></span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            tail = node;</span><br><span class="line">            head = node;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            tail.next = node;</span><br><span class="line">            tail = node;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        String data = head.data;</span><br><span class="line">        head = head.next;</span><br><span class="line">        <span class="comment">// 取出元素后，头指针为空，说明队列中没有元素，tail也需要制为空</span></span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) &#123;</span><br><span class="line">            tail = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String data;</span><br><span class="line">        <span class="keyword">private</span> Node next;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(String data, Node node)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.data = data;</span><br><span class="line">            next = node;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="循环队列-环形队列"><a href="#循环队列-环形队列" class="headerlink" title="循环队列(环形队列)"></a>循环队列(环形队列)</h2><h3 id="概念-2"><a href="#概念-2" class="headerlink" title="概念"></a>概念</h3><p>循环队列是对顺序队列的改进，因为顺序队列需要额外的数据迁移操作，数据迁移操作会导致队列的性能下降，为了避免这个问题，将队列改造成循环的，当<code>tail</code>到达数组的最大下标时，重新指回数组下标为<code>0</code>的位置，这样就避免了数据迁移。</p>
+<p>先来看看循环队列的出队、入队操作：</p>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920163522" alt=""></p>
+<p>因为队列是循环队列，所以在进行入队、出队操作时，就不能像顺序队列那样对 <code>tail</code> 、 <code>head</code> 进行简单的加 <code>1</code> 操作，我们需要对 <code>tail</code> 、<code>head</code> 加 <code>1</code> 后与数组的大小进行求余操作，来得出 <code>tail</code> 、 <code>head</code> 的值，这样才能进行循环操作。</p>
+<p>循环队列需要牺牲一个存储空间，对于一个存储空间为  <code>n</code>  的循环队列来说只能存放 <code>n-1</code> 为数据; 因为如果不牺牲一个存储空间的话，当 <code>tail==head</code> 时，可能是队空也可能是队满的情况，无法判断。</p>
+<h3 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h3><ul>
+<li><p>java</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyArraySimCycleQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * pointer the head of the queue, and no include</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">int</span> front;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * pointer the end of the queue, arr[rear] is the last value of the queue</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">int</span> rear;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** store the data */</span></span><br><span class="line">    <span class="keyword">int</span>[] arr;</span><br><span class="line">    <span class="comment">/** arr's length */</span></span><br><span class="line">    <span class="keyword">int</span> maxSize;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> maxSize size of the queue</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyArraySimCycleQueue</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.maxSize = maxSize;</span><br><span class="line">        arr = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="keyword">this</span>.maxSize];</span><br><span class="line">        front = <span class="number">0</span>;</span><br><span class="line">        rear = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the condition of the full is</span></span><br><span class="line"><span class="comment">     * (rear + 1) % maxSize == front</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFull</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (rear + <span class="number">1</span>) % maxSize == front;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * the condition of the empty is</span></span><br><span class="line"><span class="comment">     * rear == front</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> rear == front;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addQueue</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isFull()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"queue is full"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            arr[rear] = n;</span><br><span class="line">            rear = (rear + <span class="number">1</span>) % maxSize;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getQueue</span><span class="params">()</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> temp = arr[front];</span><br><span class="line">            front = (front + <span class="number">1</span>) % maxSize;</span><br><span class="line">            <span class="keyword">return</span> temp;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = front; i &lt; (front + ((rear - front + maxSize) % maxSize)); i++) &#123;</span><br><span class="line">                System.out.printf(<span class="string">"arr[%d] = %d \t"</span>, (i % maxSize), arr[(i % maxSize)]);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">peek</span><span class="params">()</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"queue is empty"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> arr[front];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="双端队列"><a href="#双端队列" class="headerlink" title="双端队列"></a>双端队列</h2><h3 id="概念-3"><a href="#概念-3" class="headerlink" title="概念"></a>概念</h3><p>双端队列是一种队头、队尾都可以进行入队、出队操作的队列，双端队列采用双向链表来实现。</p>
+<p>入队出队如图所示：</p>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920164446" alt="双端队列"></p>
+<p>从动态图中看出，双端队列的每一端都是一个栈，都符合栈先进后出的特性，如果我们对双端队列进行禁止队头入队和队尾出队操作的限制，双端队列又变成了一个链式队列。</p>
+<p>双端队列是一种多功能的数据结构，我们可以使用它来提供队列和栈两种功能</p>
+<h3 id="代码实现-3"><a href="#代码实现-3" class="headerlink" title="代码实现"></a>代码实现</h3><ul>
+<li><p>java</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDoubleLinkedQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">        String data;</span><br><span class="line">        Node next;</span><br><span class="line">        Node prev;</span><br><span class="line"></span><br><span class="line">        Node(Node prev, String element, Node next) &#123;</span><br><span class="line">            <span class="keyword">this</span>.data = element;</span><br><span class="line">            <span class="keyword">this</span>.next = next;</span><br><span class="line">            <span class="keyword">this</span>.prev = prev;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Node head;</span><br><span class="line">    <span class="keyword">private</span> Node tail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * before first node insert</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enqueueFirst</span><span class="params">(String e)</span> </span>&#123;</span><br><span class="line">        Node f = head;</span><br><span class="line">        Node newNode = <span class="keyword">new</span> Node(<span class="keyword">null</span>, e, f);</span><br><span class="line">        head = newNode;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// queue is empty, last node is pointer to current node</span></span><br><span class="line">        <span class="keyword">if</span> (f == <span class="keyword">null</span>) &#123;</span><br><span class="line">            tail = newNode;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// queue is not empty</span></span><br><span class="line">            f.prev = newNode;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * after tail insert</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e element's data</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enqueueLast</span><span class="params">(String e)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Node l = tail;</span><br><span class="line">        <span class="keyword">final</span> Node newNode = <span class="keyword">new</span> Node(l, e, <span class="keyword">null</span>);</span><br><span class="line">        <span class="comment">// last node points to new node</span></span><br><span class="line">        tail = newNode;</span><br><span class="line">        <span class="keyword">if</span> (l == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// queue is empty, init the head</span></span><br><span class="line">            head = newNode;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            l.next = newNode;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * dequeue from first node</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">dequeueFirst</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">final</span> Node f = head;</span><br><span class="line">        String element = f.data;</span><br><span class="line">        Node next = f.next;</span><br><span class="line">        f.data = <span class="keyword">null</span>;</span><br><span class="line">        f.next = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// the first node point to the next node of the current node</span></span><br><span class="line">        head = next;</span><br><span class="line">        <span class="keyword">if</span> (next == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// queue is empty</span></span><br><span class="line">            tail = <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            next.prev = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> element;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * dequeue from last node</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">dequeueLast</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Node l = tail;</span><br><span class="line">        <span class="keyword">if</span> (tail == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        String element = l.data;</span><br><span class="line">        Node prev = l.prev;</span><br><span class="line">        l.data = <span class="keyword">null</span>;</span><br><span class="line">        l.prev = <span class="keyword">null</span>;</span><br><span class="line">        tail = prev;</span><br><span class="line">        <span class="keyword">if</span> (prev == <span class="keyword">null</span>) &#123;</span><br><span class="line">            head = <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            prev.next = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> element;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">displayAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (head != <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.print(head.data + <span class="string">" "</span>);</span><br><span class="line">            head = head.next;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"==============="</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="优先队列"><a href="#优先队列" class="headerlink" title="优先队列"></a>优先队列</h2><h3 id="概念-4"><a href="#概念-4" class="headerlink" title="概念"></a>概念</h3><ul>
+<li><p>优先队列是一种不必遵循队列先进先出(FIFO)特性的特殊队列。</p>
+</li>
+<li><p>优先队列跟普通队列一样都只有一个队头和一个队尾并且也是从队头出队，队尾入队，不过在优先队列中，每次入队时，都会按照入队数据项的关键值进行排序(从大到小、从小到大)，这样保证了关键字最小的或者最大的项始终在队头，出队的时候优先级最高的就最先出队。  </p>
+<p>就像在医院就医一样，急救的病人要比普通的病人先就诊。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200920172705" alt=""></p>
+<p>如图所示，我们规定数值越小优先级越高。我们每执行一次入队操作时，小的元素都会靠近头队，在出队的时候，元素小的也就先出队</p>
+<h3 id="代码实现-4"><a href="#代码实现-4" class="headerlink" title="代码实现"></a>代码实现</h3><p>这里是用数组实现优先队列，用数组实现主要原因是更好理解优先队列的思想。</p>
+<blockquote>
+<p>一般都是使用堆来实现优先队列，因为数组实现在插入的时候对数据的排序代价比较大</p>
+</blockquote>
+<ul>
+<li><p>java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyPriorityQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 存放数据的数组</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Integer[] items;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 容器的大小</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxSize = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 第一个节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> head = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyPriorityQueue</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.maxSize = maxSize;</span><br><span class="line">        items = <span class="keyword">new</span> Integer[maxSize];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 入队操作</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">enqueue</span><span class="params">(Integer data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> j;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="number">0</span>) &#123;</span><br><span class="line">            items[head++] = data;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (j = head - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">                <span class="comment">// 将小的数往后排</span></span><br><span class="line">                <span class="keyword">if</span> (data &gt; items[j]) &#123;</span><br><span class="line">                    items[j + <span class="number">1</span>] = items[j];</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            items[j + <span class="number">1</span>] = data;</span><br><span class="line">            head++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">dequeue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> items[--head];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">list</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = head - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            System.out.println(items[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+    
+    <div>
+        
+          
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/e8b7dbd9.html">数据结构之队列(一)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
+  <p><span>发布时间:</span>2020年09月20日 - 14:09</p>
+  <p><span>最后更新:</span>2020年09月20日 - 22:09</p>
+  <p><span>原始链接:</span><a href="/posts/e8b7dbd9.html" title="数据结构之队列(一)">https://joemendezckh.github.io/posts/e8b7dbd9.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/e8b7dbd9.html"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+        
+    </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+              <a href="/tags/%E9%98%9F%E5%88%97/" rel="tag"># 队列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/98613aa6.html" rel="prev" title="Windows编译OpenJDK">
+      <i class="fa fa-chevron-left"></i> Windows编译OpenJDK
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据结构之队列-Queue"><span class="nav-number">1.</span> <span class="nav-text">数据结构之队列-Queue</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#顺序队列"><span class="nav-number">1.2.</span> <span class="nav-text">顺序队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.2.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">1.2.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#链式队列"><span class="nav-number">1.3.</span> <span class="nav-text">链式队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环队列-环形队列"><span class="nav-number">1.4.</span> <span class="nav-text">循环队列(环形队列)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念-2"><span class="nav-number">1.4.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-2"><span class="nav-number">1.4.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双端队列"><span class="nav-number">1.5.</span> <span class="nav-text">双端队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念-3"><span class="nav-number">1.5.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-3"><span class="nav-number">1.5.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优先队列"><span class="nav-number">1.6.</span> <span class="nav-text">优先队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念-4"><span class="nav-number">1.6.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-4"><span class="nav-number">1.6.2.</span> <span class="nav-text">代码实现</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Joe Mendez"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">Joe Mendez</p>
+  <div class="site-description" itemprop="description">和大家分享自己的学习笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JoeMendezCKH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JoeMendezCKH" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:joemendez@163.com" title="E-Mail → mailto:joemendez@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Joe Mendez</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">184k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:47</span>
+</div>
+  <!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.7.2
+  </div>
+  -->
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='105,105,105' opacity='0.5' zIndex='-1' count='120' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'QU0nXYxiBIrF3PXjxqyqkKEh-gzGzoHsz',
+      appKey     : '3CJah6GE4jkGjgb7k5HIbSz4',
+      placeholder: "今天你摸鱼<。)#)))≦了嘛!",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
