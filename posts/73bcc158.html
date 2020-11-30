@@ -19,28 +19,20 @@
     var CONFIG = {"hostname":"joemendezckh.github.io","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="参考内容:Red-Black Tree | Set 3 (Delete)数据结构: 红黑树的删除  红黑树的删除Insertion Vs Deletion:Like Insertion, recoloring and rotations are used to maintain the Red-Black properties. In insert operation, we check col">
+  <meta name="description" content="235. 二叉搜索树的最近公共祖先给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据结构学习之红黑树-3">
-<meta property="og:url" content="https://joemendezckh.github.io/posts/55690cd4.html">
+<meta property="og:title" content="每日一题(01)">
+<meta property="og:url" content="https://joemendezckh.github.io/posts/73bcc158.html">
 <meta property="og:site_name" content="JoeMendez&#39;s Blog">
-<meta property="og:description" content="参考内容:Red-Black Tree | Set 3 (Delete)数据结构: 红黑树的删除  红黑树的删除Insertion Vs Deletion:Like Insertion, recoloring and rotations are used to maintain the Red-Black properties. In insert operation, we check col">
+<meta property="og:description" content="235. 二叉搜索树的最近公共祖先给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213508.png">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716215846.png">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716221652.png">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716222322.png">
-<meta property="og:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716223147.png">
-<meta property="article:published_time" content="2020-07-16T14:13:09.000Z">
-<meta property="article:modified_time" content="2020-07-16T14:54:52.123Z">
+<meta property="article:published_time" content="2020-11-30T12:47:47.000Z">
+<meta property="article:modified_time" content="2020-11-30T13:03:00.067Z">
 <meta property="article:author" content="Joe Mendez">
-<meta property="article:tag" content="java">
 <meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png">
 
-<link rel="canonical" href="https://joemendezckh.github.io/posts/55690cd4.html">
+<link rel="canonical" href="https://joemendezckh.github.io/posts/73bcc158.html">
 
 
 <script id="page-configurations">
@@ -53,7 +45,7 @@
   };
 </script>
 
-  <title>数据结构学习之红黑树-3 | JoeMendez's Blog</title>
+  <title>每日一题(01) | JoeMendez's Blog</title>
   
 
 
@@ -202,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/55690cd4.html">
+    <link itemprop="mainEntityOfPage" href="https://joemendezckh.github.io/posts/73bcc158.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.jpg">
@@ -215,7 +207,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          数据结构学习之红黑树-3
+          每日一题(01)
         </h2>
 
         <div class="post-meta">
@@ -224,7 +216,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-16 22:54:52" itemprop="dateModified" datetime="2020-07-16T22:54:52+08:00">2020-07-16</time>
+                <time title="修改时间：2020-11-30 21:03:00" itemprop="dateModified" datetime="2020-11-30T21:03:00+08:00">2020-11-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -232,7 +224,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                  <a href="/categories/%E6%AF%8F%E6%97%A5%E4%B8%80%E9%A2%98/" itemprop="url" rel="index"><span itemprop="name">每日一题</span></a>
                 </span>
             </span>
 
@@ -252,8 +244,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/posts/55690cd4.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/posts/55690cd4.html" itemprop="commentCount"></span>
+    <a title="valine" href="/posts/73bcc158.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/posts/73bcc158.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -263,14 +255,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.8k</span>
+              <span>1.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -282,91 +274,30 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <blockquote>
-<p>参考内容:<br><a href="https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/" target="_blank" rel="noopener">Red-Black Tree | Set 3 (Delete)</a><br><a href="https://zhuanlan.zhihu.com/p/22800206" target="_blank" rel="noopener">数据结构: 红黑树的删除</a></p>
-</blockquote>
-<h2 id="红黑树的删除"><a href="#红黑树的删除" class="headerlink" title="红黑树的删除"></a>红黑树的删除</h2><p><strong>Insertion Vs Deletion:</strong><br>Like Insertion, recoloring and rotations are used to maintain the Red-Black properties.</p>
-<p>In insert operation, we check color of uncle to decide the appropriate case. In delete operation, <strong><em>we check color of sibling</em></strong> to decide the appropriate case.</p>
-<p>The main property that violates after insertion is two consecutive reds. In delete, the main violated property is, change of black height in subtrees as deletion of a black node may cause reduced black height in one root to leaf path</p>
-<h3 id="插入-VS-删除"><a href="#插入-VS-删除" class="headerlink" title="插入 VS 删除"></a>插入 VS 删除</h3><ul>
-<li>删除时进行的操作和插入一样, 也是改变颜色或旋转</li>
-<li>在插入过程中, 主要比较观察的叔叔结点的状态;<br>在删除的过程中, 主要<strong>检查的是兄弟结点的状态</strong>, 以此来决定进行的操作</li>
-<li>插入后违反的主要属性是 2 个连续的红色结点;<br>删除操作中主要违反的属性是: 子树中的黑色高度的变化, 因为删除黑色结点可能会导致从根结点到叶子结点的黑色高度降低</li>
-</ul>
+        <h3 id="235-二叉搜索树的最近公共祖先"><a href="#235-二叉搜索树的最近公共祖先" class="headerlink" title="235. 二叉搜索树的最近公共祖先"></a><a href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" target="_blank" rel="noopener">235. 二叉搜索树的最近公共祖先</a></h3><p>给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先</p>
 <a id="more"></a>
 
-<h3 id="删除的过程分析"><a href="#删除的过程分析" class="headerlink" title="删除的过程分析"></a>删除的过程分析</h3><p>Deletion is fairly complex process.  To understand deletion, notion of double black is used.  When a black node is deleted and replaced by a black child, the child is marked as double black. The main task now becomes to convert this double black to single black.</p>
-<p>删除是一个很复杂的过程. 为了理解删除, 使用了<strong>双重黑色</strong>的概念.<br>当删除黑色结点并用黑色子结点替换时该子结点被标记为双黑色。现在的主要任务是将这种双黑色转换为单黑色</p>
-<h4 id="删除时可能遇到的情况"><a href="#删除时可能遇到的情况" class="headerlink" title="删除时可能遇到的情况"></a>删除时可能遇到的情况</h4><ol>
-<li>Perform <a href="https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/" target="_blank" rel="noopener">standard BST delete</a>. When we perform standard delete operation in BST, we always end up deleting a node which is either leaf or has only one child (For an internal node, we copy the successor and then recursively call delete for successor, successor is always a leaf node or a node with one child). So we only need to handle cases where a node is leaf or has one child. Let v be the node to be deleted and u be the child that replaces v (Note that u is NULL when v is a leaf and color of NULL is considered as Black)<br> 按照 BST 删除节点的方法, 删除的节点实际上就是一个叶子结点或者只有一个子结点的结点(对于内部节点, 复制其右子树的最小值, 然后递归调用删除复制的那个结点, 实际上还是删除只有一个结点的情况)<br> 同理, 我们还是只用处理删除的结点为叶子结点或只有一个孩子的结点<br>设 v 为要删除的结点, 让 u 为替换 v 的子结点, (当 v 为叶子结点时, u 是 null, 且颜色为黑色)</li>
-</ol>
-<h4 id="简单情况"><a href="#简单情况" class="headerlink" title="简单情况"></a>简单情况</h4><ol>
-<li><p>Simple Case: <strong>If either u or v is red</strong>, we mark the replaced child as black (No change in black height). Note that both u and v cannot be red as v is parent of u and two consecutive reds are not allowed in red-black tree<br> 如果 u 或 v 为红色, 将替换后的子结点标记为黑色即可, 不会改变黑色高度<br> 注: u 和 v 不可能同时为红色  </p>
- <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213032.png" alt="simpleCase" style="zoom:67%;" />
 
-</li>
-</ol>
-<h4 id="复杂情况-Double-black"><a href="#复杂情况-Double-black" class="headerlink" title="复杂情况 Double black"></a>复杂情况 Double black</h4><p><strong>If Both u and v are Black</strong></p>
-<p>Color u as double black. Now our task reduces to convert this double black to single black. Note that If v is leaf, then u is NULL and color of NULL is considered as black. So the deletion of a black leaf also causes a double black.</p>
-<img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716213508.png" alt="delete20" style="zoom:67%;" />
 
-<p>删除的 20 是黑色的叶子结点, 但是 null 也视为 黑色, 所以当删除 20 后, 该结点成为了 Double black, 这种情况就比较复杂了, 要进行如下的处理过程</p>
-<p><strong>Do following while the current node u is double black and it is not root</strong>. Let sibling of node be <strong>s</strong>.</p>
-<p>u 为 double black 的情况, 且不为 root , 则循环执行如下步骤, 设 u 的兄弟结点为 <strong>s</strong></p>
-<ol>
-<li><p>a) <strong>If sibling s is black and at least one of sibling’s children is red</strong>, perform rotation(s). Let the red child of s be <strong>r</strong>.<br> This case can be divided in four subcases depending upon positions of s and r.</p>
-<p> 如果 s 是黑色的, 并且至少有一个子结点为红色, 则旋转 s, 记 s 的红色子结点为 r, 此时 s 和 r 的关系有 4 种情况; (没错, 你猜对了, 还是一直在旋转中出现的那 4 种)<br> 易得, 情况1, 4 是对称的, 情况 2, 3 是对称的, 所以这里只分析 2 种情况</p>
-<ol>
-<li><p>Left Left Case (s is left child of its parent and r is left child of s or both children of s are red). This is mirror of right right case shown in below diagram</p>
-</li>
-<li><p>Left Right Case (s is left child of its parent and r is right child). This is mirror of right left case shown in below diagram. </p>
-</li>
-<li><p>Right Right Case (s is right child of its parent and r is right child of s or both children of s are red)</p>
- <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716215846.png" alt="RR" style="zoom:67%;" />
+<h4 id="解法一"><a href="#解法一" class="headerlink" title="解法一"></a>解法一</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    TreeNode res = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        dfs(root, p, q);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">dfs</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">            leftSon : 左子树包含 p/q</span></span><br><span class="line"><span class="comment">            rightSon : 右子树包含 p/q</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">boolean</span> leftSon = dfs(root.left, p, q);</span><br><span class="line">        <span class="keyword">boolean</span> rightSon = dfs(root.right, p, q);</span><br><span class="line">        <span class="comment">// 左右子树都为true, 说明 p/q 一边一个, 该 root 为一个公共祖先, 而且是dfs,一直到叶子节点开始判断</span></span><br><span class="line">        <span class="comment">// 不是一边一个的话, 想要为祖先,则是当前节点为 p/q, 剩下一个在子树中</span></span><br><span class="line">        <span class="keyword">if</span> ((leftSon &amp;&amp; rightSon) || ((root.val == p.val || root.val == q.val) &amp;&amp; (leftSon || rightSon))) &#123;</span><br><span class="line">            res = root;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 左包含 || 右包含 || 值相等</span></span><br><span class="line">        <span class="keyword">return</span> leftSon || rightSon || (root.val == p.val || root.val == q.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且有 2 个红色子结点, 为 RR case </p>
+<p>上面是通用的解法, 没有利用 二叉搜索树 的性质: <strong>左边值比根小,右边值比根大</strong></p>
+<p>核心思路: </p>
 <ul>
-<li><p>将父结点 p 的颜色赋予兄弟节点 s; </p>
-</li>
-<li><p>将父结点和<strong>兄弟节点的右子结点</strong>设为黑色;</p>
-</li>
-<li><p>对父结点进行<strong>左旋转</strong></p>
-<blockquote>
-<p>对称的情况, 把左变右, 右变左即可</p>
-</blockquote>
-</li>
+<li>dfs</li>
+<li>如何判定一个节点是否可能为公共祖先</li>
 </ul>
-</li>
-<li><p>Right Left Case (s is right child of its parent and r is left child of s)</p>
- <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716221652.png" alt="RL" style="zoom:67%;" />
+<h4 id="解法二"><a href="#解法二" class="headerlink" title="解法二"></a>解法二</h4><p>利用二叉搜索树有序的性质</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">    TreeNode ans = root;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (p.val &lt; ans.val &amp;&amp; q.val &lt; ans.val) &#123;</span><br><span class="line">            ans = ans.left;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (p.val &gt; ans.val &amp;&amp; q.val &gt; ans.val) &#123;</span><br><span class="line">            ans = ans.right;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p> 删除黑色叶子结点 20 , 此时为 double black 情况, 观察其兄弟节点 40 , 记为 s, s 是黑色且只有 1 个红色左子结点(必然为红色, 不然违规了), 该红色结点为 r, 为 RL case</p>
-<ul>
-<li>将该左子结点 r 变为黑色</li>
-<li>将兄弟节点 s 变为红色</li>
-<li>对兄弟节点执行右旋转</li>
-<li>回到了第3种情况, hhh</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><p>b) <strong>If sibling is black and its both children are black</strong>, perform recoloring, and recur for the parent if parent is black.</p>
- <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716222322.png" alt="bb" style="zoom:67%;" />
-
-<p> In this case, if parent was red, then we didn’t need to recur for parent, we can simply make it black<br> (red + double black = single black)</p>
-<p> 删除 v , 因为兄弟节点为黑色叶子节点, 将其设为红色即可; 然后将父结点设为当前节点递归, 直到根结点或遇到红色节点</p>
-</li>
-<li><p>c) <strong>If sibling is red</strong>, perform a rotation to move old sibling up, recolor the old sibling and parent. The new sibling is always black (See the below diagram). This mainly converts the tree to black sibling case (by rotation) and leads to case (a) or (b). </p>
-<p> This case can be divided in two subcases</p>
+<p>从根节点开始遍历; </p>
 <ol>
-<li><p>Left Case (s is left child of its parent). This is mirror of right right case shown in below diagram. We right rotate the parent p.</p>
+<li><p>如果当前节点的值大于 p 和 q 的值, 说明 p 和 q 应该在当前节点的左子树, 因此将当前节点移动到它的左子节点; </p>
 </li>
-<li><p>Right Case (s is right child of its parent). We left rotate the parent p</p>
- <img src="https://gitee.com/JoeMendez/picGoImages/raw/master/img/20200716223147.png" alt="RightCase" style="zoom:67%;" />
-
-<p> 删除 10, 其兄弟节点为红色, 且子结点都为黑色, 则对父结点 p 执行右旋转, 并且改变他们的颜色, 然后就变成了上面的 b 情况</p>
+<li><p>如果当前节点的值小于 p 和 q 的值, 说明 p 和 q 应该在当前节点的右子树, 因此将当前节点移动到它的右子节点; </p>
 </li>
-</ol>
+<li><p>如果当前节点的值不满足上述两条要求, 那么说明当前节点就是<strong>分岔点</strong>; </p>
+<p>此时, p 和 q 要么在当前节点的不同的子树中, 要么其中一个就是当前节点</p>
 </li>
 </ol>
 
@@ -385,12 +316,12 @@
   <!-- JS库 sweetalert 可修改路径 -->
   <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <p><span>本文标题:</span><a href="/posts/55690cd4.html">数据结构学习之红黑树-3</a></p>
+  <p><span>本文标题:</span><a href="/posts/73bcc158.html">每日一题(01)</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 Joe Mendez 的个人博客">Joe Mendez</a></p>
-  <p><span>发布时间:</span>2020年07月16日 - 22:07</p>
-  <p><span>最后更新:</span>2020年07月16日 - 22:07</p>
-  <p><span>原始链接:</span><a href="/posts/55690cd4.html" title="数据结构学习之红黑树-3">https://joemendezckh.github.io/posts/55690cd4.html</a>
-    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/55690cd4.html"  aria-label="复制成功！"></i></span>
+  <p><span>发布时间:</span>2020年11月30日 - 20:11</p>
+  <p><span>最后更新:</span>2020年11月30日 - 21:11</p>
+  <p><span>原始链接:</span><a href="/posts/73bcc158.html" title="每日一题(01)">https://joemendezckh.github.io/posts/73bcc158.html</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://joemendezckh.github.io/posts/73bcc158.html"  aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span>本博客所有文章除特别声明外，均采用 <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"> CC BY-NC-SA 4.0 </a>许可协议。转载请注明出处！</p>  
 </div>
@@ -413,7 +344,6 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
               <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
           </div>
 
@@ -423,13 +353,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/eab0ab25.html" rel="prev" title="数据结构学习之红黑树(2)">
-      <i class="fa fa-chevron-left"></i> 数据结构学习之红黑树(2)
+    <a href="/posts/e8b7dbd9.html" rel="prev" title="数据结构之队列(一)">
+      <i class="fa fa-chevron-left"></i> 数据结构之队列(一)
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/98613aa6.html" rel="next" title="Windows编译OpenJDK">
-      Windows编译OpenJDK <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -490,7 +417,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#红黑树的删除"><span class="nav-number">1.</span> <span class="nav-text">红黑树的删除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入-VS-删除"><span class="nav-number">1.1.</span> <span class="nav-text">插入 VS 删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除的过程分析"><span class="nav-number">1.2.</span> <span class="nav-text">删除的过程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#删除时可能遇到的情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">删除时可能遇到的情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单情况"><span class="nav-number">1.2.2.</span> <span class="nav-text">简单情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复杂情况-Double-black"><span class="nav-number">1.2.3.</span> <span class="nav-text">复杂情况 Double black</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#235-二叉搜索树的最近公共祖先"><span class="nav-number">1.</span> <span class="nav-text">235. 二叉搜索树的最近公共祖先</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解法一"><span class="nav-number">1.1.</span> <span class="nav-text">解法一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解法二"><span class="nav-number">1.2.</span> <span class="nav-text">解法二</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

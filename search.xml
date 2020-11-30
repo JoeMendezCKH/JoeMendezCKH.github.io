@@ -5274,4 +5274,41 @@
         <tag>队列</tag>
       </tags>
   </entry>
+  <entry>
+    <title>每日一题(01)</title>
+    <url>/posts/73bcc158.html</url>
+    <content><![CDATA[<h3 id="235-二叉搜索树的最近公共祖先"><a href="#235-二叉搜索树的最近公共祖先" class="headerlink" title="235. 二叉搜索树的最近公共祖先"></a><a href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" target="_blank" rel="noopener">235. 二叉搜索树的最近公共祖先</a></h3><p>给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先</p>
+<a id="more"></a>
+
+
+
+<h4 id="解法一"><a href="#解法一" class="headerlink" title="解法一"></a>解法一</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    TreeNode res = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        dfs(root, p, q);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">dfs</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">            leftSon : 左子树包含 p/q</span></span><br><span class="line"><span class="comment">            rightSon : 右子树包含 p/q</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">boolean</span> leftSon = dfs(root.left, p, q);</span><br><span class="line">        <span class="keyword">boolean</span> rightSon = dfs(root.right, p, q);</span><br><span class="line">        <span class="comment">// 左右子树都为true, 说明 p/q 一边一个, 该 root 为一个公共祖先, 而且是dfs,一直到叶子节点开始判断</span></span><br><span class="line">        <span class="comment">// 不是一边一个的话, 想要为祖先,则是当前节点为 p/q, 剩下一个在子树中</span></span><br><span class="line">        <span class="keyword">if</span> ((leftSon &amp;&amp; rightSon) || ((root.val == p.val || root.val == q.val) &amp;&amp; (leftSon || rightSon))) &#123;</span><br><span class="line">            res = root;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 左包含 || 右包含 || 值相等</span></span><br><span class="line">        <span class="keyword">return</span> leftSon || rightSon || (root.val == p.val || root.val == q.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面是通用的解法, 没有利用 二叉搜索树 的性质: <strong>左边值比根小,右边值比根大</strong></p>
+<p>核心思路: </p>
+<ul>
+<li>dfs</li>
+<li>如何判定一个节点是否可能为公共祖先</li>
+</ul>
+<h4 id="解法二"><a href="#解法二" class="headerlink" title="解法二"></a>解法二</h4><p>利用二叉搜索树有序的性质</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">    TreeNode ans = root;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (p.val &lt; ans.val &amp;&amp; q.val &lt; ans.val) &#123;</span><br><span class="line">            ans = ans.left;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (p.val &gt; ans.val &amp;&amp; q.val &gt; ans.val) &#123;</span><br><span class="line">            ans = ans.right;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从根节点开始遍历; </p>
+<ol>
+<li><p>如果当前节点的值大于 p 和 q 的值, 说明 p 和 q 应该在当前节点的左子树, 因此将当前节点移动到它的左子节点; </p>
+</li>
+<li><p>如果当前节点的值小于 p 和 q 的值, 说明 p 和 q 应该在当前节点的右子树, 因此将当前节点移动到它的右子节点; </p>
+</li>
+<li><p>如果当前节点的值不满足上述两条要求, 那么说明当前节点就是<strong>分岔点</strong>; </p>
+<p>此时, p 和 q 要么在当前节点的不同的子树中, 要么其中一个就是当前节点</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>每日一题</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+      </tags>
+  </entry>
 </search>
