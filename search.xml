@@ -5311,4 +5311,23 @@
         <tag>数据结构</tag>
       </tags>
   </entry>
+  <entry>
+    <title>每日一题(02)</title>
+    <url>/posts/5891929b.html</url>
+    <content><![CDATA[<h3 id="95-Unique-Binary-Search-Trees2"><a href="#95-Unique-Binary-Search-Trees2" class="headerlink" title="95. Unique Binary Search Trees2"></a><a href="https://leetcode-cn.com/problems/unique-binary-search-trees-ii/" target="_blank" rel="noopener">95. Unique Binary Search Trees2</a></h3><p>给定一个整数 <em>n</em>，生成所有由 1 … <em>n</em> 为节点所组成的 <strong>二叉搜索树</strong></p>
+<a id="more"></a>
+
+<h3 id="解"><a href="#解" class="headerlink" title="解"></a>解</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">generateTrees</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> generateTree(<span class="number">1</span>, n);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">generateTree</span><span class="params">(<span class="keyword">int</span> start, <span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">    List&lt;TreeNode&gt; allTrees = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span> (start &gt; end) &#123;</span><br><span class="line">        <span class="comment">// 这句很关键, 保证叶子节点的初始化</span></span><br><span class="line">        <span class="comment">// 要正确构建所有树，依赖于对左右子树列表的遍历，也就是下面代码两层 for-each 的地方</span></span><br><span class="line">        <span class="comment">// 如果其中一个列表为空，那么循环都将无法进行, 所以添加 null</span></span><br><span class="line">        allTrees.add(<span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">return</span> allTrees;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt;= end; i++) &#123;</span><br><span class="line">        List&lt;TreeNode&gt; leftTrees = generateTree(start, i - <span class="number">1</span>);</span><br><span class="line">        List&lt;TreeNode&gt; rightTrees = generateTree(i + <span class="number">1</span>, end);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (TreeNode leftTree : leftTrees) &#123;</span><br><span class="line">            <span class="keyword">for</span> (TreeNode rightTree : rightTrees) &#123;</span><br><span class="line">                TreeNode currRoot = <span class="keyword">new</span> TreeNode(i);</span><br><span class="line">                currRoot.left = leftTree;</span><br><span class="line">                currRoot.right = rightTree;</span><br><span class="line">                allTrees.add(currRoot);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> allTrees;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思路:</p>
+<p>根据二叉搜索树的性质, 如果全部数据为 1, …, i, …, n , 选择根节点为 i, 则左子树为 1, … i-1, 右子树为 i+1, … n</p>
+<p>所以自然用递归来做</p>
+]]></content>
+      <categories>
+        <category>每日一题</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+      </tags>
+  </entry>
 </search>
